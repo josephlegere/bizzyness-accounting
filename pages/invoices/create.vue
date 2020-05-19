@@ -19,6 +19,10 @@
                 <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
         </v-toolbar>
+
+        <v-row>
+            <draggable-nested v-model="elements" />
+        </v-row>
     
         <v-bottom-navigation
             v-model="bottomNav"
@@ -44,10 +48,26 @@
 </template>
 
 <script>
+import DraggableNested from '../../components/DraggableNested';
+
 export default {
     data () {
         return {
             bottomNav: 'recent',
+            name: 'invoice-create'
+        }
+    },
+    components: {
+        DraggableNested
+    },
+    computed: {
+        elements: {
+            get() {
+                return this.$store.state.invoiceCreate.elements;
+            },
+            set(value) {
+                this.$store.dispatch('invoiceCreate/updateElements', value);
+            }
         }
     }
 }
