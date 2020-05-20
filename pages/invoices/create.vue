@@ -22,7 +22,8 @@
             </v-toolbar>
 
             <v-row>
-                <draggable-nested v-model="elements" />
+                <!--draggable-nested v-model="elements" /-->
+                <drag-nested class="drag-list" :tasks="list" />
             </v-row>
         
             <v-bottom-navigation
@@ -50,31 +51,49 @@
 </template>
 
 <script>
-import DraggableNested from '../../components/DraggableNested';
+//import DraggableNested from '../../components/DraggableNested';
+import DragNested from '../../components/DragNested';
+
 
 export default {
     data () {
         return {
             bottomNav: 'recent',
-            name: 'invoice-create'
+            name: 'invoice-create',
+            list: [
+                {
+                    name: "task 1",
+                    tasks: [
+                        {
+                            name: "task 2",
+                            tasks: []
+                        }
+                    ]
+                },
+                {
+                    name: "task 3",
+                    tasks: [
+                        {
+                            name: "task 4",
+                            tasks: []
+                        }
+                    ]
+                },
+                {
+                    name: "task 5",
+                    tasks: []
+                }
+            ]
         }
     },
     components: {
-        DraggableNested
-    },
-    computed: {
-        elements: {
-            get() {
-                return this.$store.state.invoiceCreate.elements;
-            },
-            set(value) {
-                this.$store.dispatch('invoiceCreate/updateElements', value);
-            }
-        }
+        DragNested
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+    .drag-list {
+        width:                      400px;
+    }
 </style>

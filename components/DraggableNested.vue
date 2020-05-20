@@ -9,7 +9,7 @@
     >
         <div class="item-group" :key="el.id" v-for="el in realValue">
             <div class="item">{{ el.name }}</div>
-            <draggable-element class="item-sub" :list="el.elements" />
+            <draggable-nested class="item-sub" :list="el.elements" />
         </div>
   </draggable>
 </template>
@@ -18,7 +18,7 @@
 import draggable from 'vuedraggable';
 
 export default {
-    name: 'draggable-element',
+    name: 'draggable-nested',
     methods: {
         emitter(value) {
             this.$emit('input', value);
