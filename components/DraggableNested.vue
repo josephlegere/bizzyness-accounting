@@ -7,12 +7,16 @@
             >
                 <v-row no-gutters>
                     <v-col
-
+                        cols="1"
                     >
                         <v-icon class="handle">mdi-drag-horizontal</v-icon>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="10"
+                        md="2"
+                    >
                         <v-textarea
+                            class="design-textarea"
                             placeholder="Key"
                             v-model="el.key"
                             autoGrow
@@ -21,8 +25,14 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="10"
+                        offset="1"
+                        md="2"
+                        offset-md="0"
+                    >
                         <v-textarea
+                            class="design-textarea"
                             placeholder="Description"
                             v-model="el.description"
                             autoGrow
@@ -31,8 +41,14 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="10"
+                        offset="1"
+                        md="2"
+                        offset-md="0"
+                    >
                         <v-textarea
+                            class="design-textarea"
                             placeholder="Quantity"
                             v-model="el.quantity"
                             autoGrow
@@ -41,8 +57,14 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="10"
+                        offset="1"
+                        md="2"
+                        offset-md="0"
+                    >
                         <v-textarea
+                            class="design-textarea"
                             placeholder="Price"
                             v-model="el.price"
                             autoGrow
@@ -51,8 +73,14 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="10"
+                        offset="1"
+                        md="2"
+                        offset-md="0"
+                    >
                         <v-textarea
+                            class="design-textarea"
                             placeholder="Total"
                             autoGrow
                             dense
@@ -60,7 +88,9 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
-                    <v-col>
+                    <v-col
+                        cols="1"
+                    >
                         <v-btn
                             icon
                         >
@@ -92,12 +122,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+    .drag-list {
+        padding:                    0 !important;
+    } 
     .dragArea {
         /* outline:                    1px dashed; */
     }
     .dragArea li {
         /* outline:                    1px solid; */
         list-style:                 none;
+    }
+    .design-textarea.v-text-field > .v-input__control > .v-input__slot:before {
+        border-style:               none;
+    }
+    .design-textarea.v-text-field > .v-input__control > .v-input__slot:after {
+        border-style:               none;
     }
 </style>

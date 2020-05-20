@@ -24,6 +24,8 @@
             <v-container fluid>
                 <draggable-nested class="drag-list mt-md-3" :items="list" />
             </v-container>
+
+            <br>
         
             <v-bottom-navigation
                 v-model="bottomNav"
