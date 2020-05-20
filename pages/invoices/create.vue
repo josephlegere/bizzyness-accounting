@@ -21,9 +21,9 @@
                 </v-btn>
             </v-toolbar>
 
-            <v-row>
-                <draggable-nested class="drag-list" :tasks="list" />
-            </v-row>
+            <v-container fluid>
+                <draggable-nested class="drag-list mt-md-3" :items="list" />
+            </v-container>
         
             <v-bottom-navigation
                 v-model="bottomNav"
@@ -60,26 +60,40 @@ export default {
             name: 'invoice-create',
             list: [
                 {
-                    name: "task 1",
-                    tasks: [
-                        {
-                            name: "task 2",
-                            tasks: []
-                        }
-                    ]
+                    key: '1',
+                    description: 'abc',
+                    quantity: '',
+                    price: '',
+                    items: []
                 },
                 {
-                    name: "task 3",
-                    tasks: [
-                        {
-                            name: "task 4",
-                            tasks: []
-                        }
-                    ]
+                    key: '2',
+                    description: '',
+                    quantity: '',
+                    price: '',
+                    items: []
                 },
                 {
-                    name: "task 5",
-                    tasks: []
+                    key: '3',
+                    description: '',
+                    quantity: '',
+                    price: '',
+                    items: []
+                },
+                {
+                    key: '5',
+                    description: '',
+                    quantity: '',
+                    price: '',
+                    items: [
+                        {
+                            key: '4',
+                            description: '',
+                            quantity: '',
+                            price: '',
+                            items: []
+                        }
+                    ]
                 }
             ]
         }
@@ -92,6 +106,6 @@ export default {
 
 <style scoped>
     .drag-list {
-        width:                      400px;
+        /* width:                      400px; */
     }
 </style>

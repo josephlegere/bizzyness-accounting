@@ -42,7 +42,7 @@
 			app
 			dense
 		>
-			<v-app-bar-nav-icon @click.stop="drawer = !drawer" class="d-md-none" />
+			<v-app-bar-nav-icon @click.stop="drawer = !drawer" class="d-xl-none" />
 			<v-toolbar-title v-text="title" />
 			<v-spacer />
 			<v-btn
