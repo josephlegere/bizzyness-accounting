@@ -1,73 +1,32 @@
 <template>
-    <draggable
-        v-bind="dragOptions"
-        tag="div"
-        class="item-container"
-        :list="list"
-        :value="value"
-        @input="emitter"
-    >
-        <div class="item-group" :key="el.id" v-for="el in realValue">
-            <div class="item">{{ el.name }}</div>
-            <draggable-nested class="item-sub" :list="el.elements" />
-        </div>
-  </draggable>
+    <draggable class="dragArea" tag="ul" :list="tasks" :group="{ name: 'g1' }">
+        <li v-for="el in tasks" :key="el.name">
+            <p>{{ el.name }}</p>
+            <draggable-nested :tasks="el.tasks" />
+        </li>
+    </draggable>
 </template>
 
 <script>
 import draggable from 'vuedraggable';
 
 export default {
-    name: 'draggable-nested',
-    methods: {
-        emitter(value) {
-            this.$emit('input', value);
+    props: {
+        tasks: {
+            required: true,
+            type: Array
         }
     },
     components: {
         draggable
     },
-    computed: {
-        dragOptions() {
-            return {
-                animation: 0,
-                group: "description",
-                disabled: false,
-                ghostClass: "ghost"
-            };
-        },
-        // this.value when input = v-model
-        // this.list  when input != v-model
-        realValue() {
-            return this.value ? this.value : this.list;
-        }
-    },
-    props: {
-        value: {
-            required: false,
-            type: Array,
-            default: null
-        },
-        list: {
-            required: false,
-            type: Array,
-            default: null
-        }
+    name: 'draggable-nested'
     }
-}
 </script>
 
 <style scoped>
-    .item-container {
-        max-width: 20rem;
-        margin: 0;
-    }
-    .item {
-        padding: 1rem;
-        border: solid black 1px;
-        background-color: #fefefe;
-    }
-    .item-sub {
-        margin: 0 0 0 1rem;
+    .dragArea {
+        min-height:                 50px;
+        outline:                    1px dashed;
     }
 </style>

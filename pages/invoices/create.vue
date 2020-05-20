@@ -22,8 +22,7 @@
             </v-toolbar>
 
             <v-row>
-                <!--draggable-nested v-model="elements" /-->
-                <drag-nested class="drag-list" :tasks="list" />
+                <draggable-nested class="drag-list" :tasks="list" />
             </v-row>
         
             <v-bottom-navigation
@@ -51,8 +50,7 @@
 </template>
 
 <script>
-//import DraggableNested from '../../components/DraggableNested';
-import DragNested from '../../components/DragNested';
+import DraggableNested from '../../components/DraggableNested';
 
 
 export default {
@@ -87,7 +85,7 @@ export default {
         }
     },
     components: {
-        DragNested
+        DraggableNested
     }
 }
 </script>
