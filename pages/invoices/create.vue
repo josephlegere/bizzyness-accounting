@@ -2,7 +2,9 @@
     <v-layout>
         <v-flex class="text-center">
             <v-toolbar dense>
-                <v-app-bar-nav-icon></v-app-bar-nav-icon>
+                <v-btn icon @click="add">
+                    <v-icon>mdi-plus</v-icon>
+                </v-btn>
 
                 <v-toolbar-title>Create An Invoice</v-toolbar-title>
 
@@ -98,6 +100,17 @@ export default {
                     ]
                 }
             ]
+        }
+    },
+    methods: {
+        add: function() {
+            this.list.push({
+                key: '',
+                description: '',
+                quantity: '',
+                price: '',
+                items: []
+            });
         }
     },
     components: {

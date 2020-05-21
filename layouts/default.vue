@@ -119,3 +119,12 @@ export default {
   }
 }
 </script>
+
+<style>
+    .handle {
+        cursor:                     grab;
+    }
+    .handle:active {
+        cursor:                     grabbing;
+    }
+</style>

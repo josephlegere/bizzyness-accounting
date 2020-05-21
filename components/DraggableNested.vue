@@ -1,6 +1,6 @@
 <template>
     <draggable class="dragArea" tag="ul" :list="items" :group="{ name: 'g1' }" handle=".handle">
-        <li v-for="el in items" :key="el.name">
+        <li v-for="(el, i) in items" :key="i">
             <v-card
                 dense
                 class="mb-1"
@@ -8,8 +8,9 @@
                 <v-row no-gutters>
                     <v-col
                         cols="1"
+                        class="d-flex justify-center"
                     >
-                        <v-icon class="handle">mdi-drag-horizontal</v-icon>
+                        <v-icon class="handle align-self-center">mdi-drag-horizontal</v-icon>
                     </v-col>
                     <v-col
                         cols="10"
@@ -94,7 +95,9 @@
                         <v-btn
                             icon
                         >
-                            <v-icon class="handle">mdi-close</v-icon>
+                            <no-ssr>
+                                <v-icon class="handle" @click="removeAt(i)">mdi-close</v-icon>
+                            </no-ssr>
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -114,6 +117,12 @@ export default {
         items: {
             required: true,
             type: Array
+        }
+    },
+    methods: {
+        removeAt(i) {
+            console.log(`delete ${i}`)
+            this.items.splice(i, 1);
         }
     },
     components: {
