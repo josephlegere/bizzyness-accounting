@@ -1,29 +1,39 @@
 <template>
     <v-layout>
         <v-flex class="text-center">
-            <v-toolbar dense>
-                <v-btn icon @click="add">
-                    <v-icon>mdi-plus</v-icon>
-                </v-btn>
 
-                <v-toolbar-title>Create An Invoice</v-toolbar-title>
+            <p class="text-right">{{ new Date().getMonth() }} {{ new Date().getDate() }}, {{ new Date().getFullYear() }}</p>
+            <h3>Invoice</h3>
+            <h2>12345</h2>
 
-                <v-spacer></v-spacer>
+            <v-container>
+                <v-textarea
+                    placeholder="Clients"
+                    autoGrow
+                    dense
+                    hide-details
+                    rows="1"
+                ></v-textarea>
+            </v-container>
 
-                <v-btn icon>
-                    <v-icon>mdi-magnify</v-icon>
-                </v-btn>
+            <v-container>
+                <v-toolbar
+                    class="mb-1"
+                    height="30"
+                    elevation="2"
+                    collapse
+                >
+                    <v-btn icon @click="add">
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
 
-                <v-btn icon>
-                    <v-icon>mdi-heart</v-icon>
-                </v-btn>
+                    <v-spacer></v-spacer>
 
-                <v-btn icon>
-                    <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
-            </v-toolbar>
+                    <v-btn icon>
+                        <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                </v-toolbar>
 
-            <v-container fluid>
                 <draggable-nested class="drag-list mt-md-3" :items="list" />
             </v-container>
 
