@@ -130,7 +130,4 @@ export default {
 </script>
 
 <style scoped>
-    .drag-list {
-        /* width:                      400px; */
-    }
 </style>

@@ -2,7 +2,7 @@
     <v-layout>
         <v-flex class="text-center">
             <v-toolbar
-                class="mb-1"
+                class="mb-2"
                 dense>
                 <v-app-bar-nav-icon></v-app-bar-nav-icon>
 

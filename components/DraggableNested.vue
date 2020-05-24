@@ -13,76 +13,17 @@
                         <v-icon class="handle align-self-center">mdi-drag-horizontal</v-icon>
                     </v-col>
                     <v-col
+                        v-for="(data, i) in recordData"
+                        :key="i"
                         cols="10"
                         md="2"
+                        :offset="data.offset ? data.offset : null"
+                        :offset-md="data.hasOwnProperty('offset_md') ? data.offset_md : null"
                     >
                         <v-textarea
                             class="design-textarea"
-                            placeholder="Key"
-                            v-model="el.key"
-                            autoGrow
-                            dense
-                            hide-details
-                            rows="1"
-                        ></v-textarea>
-                    </v-col>
-                    <v-col
-                        cols="10"
-                        offset="1"
-                        md="2"
-                        offset-md="0"
-                    >
-                        <v-textarea
-                            class="design-textarea"
-                            placeholder="Description"
-                            v-model="el.description"
-                            autoGrow
-                            dense
-                            hide-details
-                            rows="1"
-                        ></v-textarea>
-                    </v-col>
-                    <v-col
-                        cols="10"
-                        offset="1"
-                        md="2"
-                        offset-md="0"
-                    >
-                        <v-textarea
-                            class="design-textarea"
-                            placeholder="Quantity"
-                            v-model="el.quantity"
-                            autoGrow
-                            dense
-                            hide-details
-                            rows="1"
-                        ></v-textarea>
-                    </v-col>
-                    <v-col
-                        cols="10"
-                        offset="1"
-                        md="2"
-                        offset-md="0"
-                    >
-                        <v-textarea
-                            class="design-textarea"
-                            placeholder="Price"
-                            v-model="el.price"
-                            autoGrow
-                            dense
-                            hide-details
-                            rows="1"
-                        ></v-textarea>
-                    </v-col>
-                    <v-col
-                        cols="10"
-                        offset="1"
-                        md="2"
-                        offset-md="0"
-                    >
-                        <v-textarea
-                            class="design-textarea"
-                            placeholder="Total"
+                            :placeholder="data.placeholder"
+                            v-model="el[data.cellData]"
                             autoGrow
                             dense
                             hide-details
@@ -113,6 +54,17 @@ import draggable from 'vuedraggable';
 
 export default {
     name: 'draggable-nested',
+    data () {
+        return {
+            recordData: [
+                {cellData: 'key', placeholder: 'Key'},
+                {cellData: 'description', placeholder: 'Description', offset: 1, offset_md: 0},
+                {cellData: 'quantity', placeholder: 'Quantity', offset: 1, offset_md: 0},
+                {cellData: 'price', placeholder: 'Price', offset: 1, offset_md: 0},
+                {cellData: 'total', placeholder: 'Total', offset: 1, offset_md: 0}
+            ]
+        }
+    },
     props: {
         items: {
             required: true,
