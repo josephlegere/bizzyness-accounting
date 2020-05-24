@@ -1,152 +1,203 @@
 <template>
-    <v-layout>
-        <v-flex class="text-center">
-            <v-toolbar
-                class="mb-2"
-                dense>
-                <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-                <v-toolbar-title>Title</v-toolbar-title>
-
-                <v-spacer></v-spacer>
-
-                <v-btn icon>
-                    <v-icon>mdi-magnify</v-icon>
-                </v-btn>
-
-                <v-btn icon>
-                    <v-icon>mdi-heart</v-icon>
-                </v-btn>
-
-                <v-btn icon>
-                    <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
-            </v-toolbar>
-
+    <v-row no-gutters="">
+        <v-col>
             <v-card>
                 <v-card-title>
-                    Nutrition
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                        v-model="search"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                    ></v-text-field>
+                    <v-row no-gutters>
+                        <v-col cols="12"  md="6" class="pa-2">
+                            <v-text-field
+                                v-model="search"
+                                append-icon="mdi-magnify"
+                                label="Search"
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6" class="pa-2">
+                            <v-row no-gutters>
+                                <v-col cols="12">
+                                    <v-dialog
+                                        ref="dialog"
+                                        v-model="datepicker"
+                                        :return-value.sync="datefilter"
+                                        persistent
+                                        width="290px"
+                                    >
+                                        <template v-slot:activator="{ on }">
+                                            <v-combobox
+                                                v-model="datefilter"
+                                                multiple
+                                                chips
+                                                small-chips
+                                                hide-details
+                                                prepend-icon="mdi-calendar"
+                                                placeholder="Date"
+                                                readonly
+                                                v-on="on"
+                                            ></v-combobox>
+                                        </template>
+                                        <v-date-picker v-model="datefilter" range scrollable>
+                                            <v-spacer></v-spacer>
+                                            <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
+                                            <v-btn text color="primary" @click="$refs.dialog.save(datefilter)">OK</v-btn>
+                                        </v-date-picker>
+                                    </v-dialog>
+                                </v-col>
+                                <v-col cols="12" class="mt-1 d-flex justify-end">
+                                    <v-chip
+                                        class="mr-2"
+                                        @click="weekly"
+                                        small
+                                    >
+                                        Weekly
+                                    </v-chip>
+                                    <v-chip
+                                        @click="monthly"
+                                        small
+                                    >
+                                        Monthly
+                                    </v-chip>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
                 </v-card-title>
                 <v-data-table
                     :headers="headers"
-                    :items="desserts"
+                    :items="invoices"
                     :search="search"
-                ></v-data-table>
+                >
+                    <template slot="body.append">
+                        <tr>
+                            <th class="d-flex justify-space-between">TOTAL <span class="d-sm-none">{{total}}</span></th>
+                            <th colspan="2" class="pa-0"></th>
+                            <th class="d-none d-sm-block">{{total}}</th> 
+                            <th colspan="2" class="pa-0"></th>
+                        </tr>
+                    </template>
+                </v-data-table>
             </v-card>
-        </v-flex>
-    </v-layout>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
     export default {
+        computed: {
+            total: function() {
+                return this.invoices.reduce(function(a, c){return a + Number((c.total) || 0)}, 0);
+            }
+        },
         data () {
             return {
+                datepicker: '',
+                datefilter: [],
                 search: '',
                 headers: [
                     {
-                        text: 'Dessert (100g serving)',
+                        text: 'Invoice No.',
                         align: 'start',
                         sortable: false,
-                        value: 'name',
+                        value: 'invoice',
                     },
-                    { text: 'Calories', value: 'calories' },
-                    { text: 'Fat (g)', value: 'fat' },
-                    { text: 'Carbs (g)', value: 'carbs' },
-                    { text: 'Protein (g)', value: 'protein' },
-                    { text: 'Iron (%)', value: 'iron' },
+                    { text: 'Date', value: 'date' },
+                    { text: 'Client', value: 'client' },
+                    { text: 'Total', value: 'total' },
+                    { text: 'Author', value: 'author' },
+                    { text: 'Remarks', value: 'remarks' },
                 ],
-                desserts: [
+                invoices: [
                     {
-                        name: 'Frozen Yogurt',
-                        calories: 159,
-                        fat: 6.0,
-                        carbs: 24,
-                        protein: 4.0,
-                        iron: '1%',
+                        invoice: 'Frozen Yogurt',
+                        date: 159,
+                        client: 6.0,
+                        total: 24,
+                        author: 4.0,
+                        remarks: '1%',
                     },
                     {
-                        name: 'Ice cream sandwich',
-                        calories: 237,
-                        fat: 9.0,
-                        carbs: 37,
-                        protein: 4.3,
-                        iron: '1%',
+                        invoice: 'Ice cream sandwich',
+                        date: 237,
+                        client: 9.0,
+                        total: 37,
+                        author: 4.3,
+                        remarks: '1%',
                     },
                     {
-                        name: 'Eclair',
-                        calories: 262,
-                        fat: 16.0,
-                        carbs: 23,
-                        protein: 6.0,
-                        iron: '7%',
+                        invoice: 'Eclair',
+                        date: 262,
+                        client: 16.0,
+                        total: 23,
+                        author: 6.0,
+                        remarks: '7%',
                     },
                     {
-                        name: 'Cupcake',
-                        calories: 305,
-                        fat: 3.7,
-                        carbs: 67,
-                        protein: 4.3,
-                        iron: '8%',
+                        invoice: 'Cupcake',
+                        date: 305,
+                        client: 3.7,
+                        total: 67,
+                        author: 4.3,
+                        remarks: '8%',
                     },
                     {
-                        name: 'Gingerbread',
-                        calories: 356,
-                        fat: 16.0,
-                        carbs: 49,
-                        protein: 3.9,
-                        iron: '16%',
+                        invoice: 'Gingerbread',
+                        date: 356,
+                        client: 16.0,
+                        total: 49,
+                        author: 3.9,
+                        remarks: '16%',
                     },
                     {
-                        name: 'Jelly bean',
-                        calories: 375,
-                        fat: 0.0,
-                        carbs: 94,
-                        protein: 0.0,
-                        iron: '0%',
+                        invoice: 'Jelly bean',
+                        date: 375,
+                        client: 0.0,
+                        total: 94,
+                        author: 0.0,
+                        remarks: '0%',
                     },
                     {
-                        name: 'Lollipop',
-                        calories: 392,
-                        fat: 0.2,
-                        carbs: 98,
-                        protein: 0,
-                        iron: '2%',
+                        invoice: 'Lollipop',
+                        date: 392,
+                        client: 0.2,
+                        total: 98,
+                        author: 0,
+                        remarks: '2%',
                     },
                     {
-                        name: 'Honeycomb',
-                        calories: 408,
-                        fat: 3.2,
-                        carbs: 87,
-                        protein: 6.5,
-                        iron: '45%',
+                        invoice: 'Honeycomb',
+                        date: 408,
+                        client: 3.2,
+                        total: 87,
+                        author: 6.5,
+                        remarks: '45%',
                     },
                     {
-                        name: 'Donut',
-                        calories: 452,
-                        fat: 25.0,
-                        carbs: 51,
-                        protein: 4.9,
-                        iron: '22%',
+                        invoice: 'Donut',
+                        date: 452,
+                        client: 25.0,
+                        total: 51,
+                        author: 4.9,
+                        remarks: '22%',
                     },
                     {
-                        name: 'KitKat',
-                        calories: 518,
-                        fat: 26.0,
-                        carbs: 65,
-                        protein: 7,
-                        iron: '6%',
+                        invoice: 'KitKat',
+                        date: 518,
+                        client: 26.0,
+                        total: 65,
+                        author: 7,
+                        remarks: '6%',
                     },
-                ],
+                ]
             }
         },
+        methods: {
+            weekly() {
+                console.log('Weekly')
+            },
+            monthly() {
+                console.log('Monthly')
+            }
+        }
     }
 </script>
 

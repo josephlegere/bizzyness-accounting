@@ -14,6 +14,13 @@
                     hide-details
                     rows="1"
                 ></v-textarea>
+                <v-textarea
+                    placeholder="Date"
+                    autoGrow
+                    dense
+                    hide-details
+                    rows="1"
+                ></v-textarea>
             </v-container>
 
             <v-container>
