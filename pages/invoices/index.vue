@@ -14,7 +14,7 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" md="6" class="pa-2">
-                            <date-range :dates="datefilter" />
+                            <date-range :suggests="suggests" @update-range="updateDateFilter" />
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -49,6 +49,7 @@
         data () {
             return {
                 datefilter: [],
+                suggests: ['2020-05-24', '2020-05-29'],
                 search: '',
                 headers: [
                     {
@@ -145,6 +146,11 @@
                         remarks: '6%',
                     },
                 ]
+            }
+        },
+        methods: {
+            updateDateFilter(range) {
+                this.datefilter = range;
             }
         },
         components: {

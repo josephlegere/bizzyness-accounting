@@ -21,7 +21,7 @@
                         v-on="on"
                     ></v-combobox>
                 </template>
-                <v-date-picker v-model="dates" range scrollable>
+                <v-date-picker v-model="dates" @click:date="updateRange" range scrollable>
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
                     <v-btn text color="primary" @click="$refs.dialog.save(dates)">OK</v-btn>
@@ -51,22 +51,26 @@ export default {
     data () {
         return {
             datepicker: false,
+            dates: [],
             suggested: ''
         }
     },
     props: {
-        dates: {
-            type: Array,
-            required: true
+        suggests: {
+            type: Array
         }
     },
     methods: {
         weekly() {
             console.log('Weekly')
-            this.dates.push(new Date().toISOString().substr(0, 10));
+            this.dates = this.suggests;
         },
         monthly() {
             console.log('Monthly')
+        },
+        updateRange() {
+            let newRange = this.dates;
+            this.$emit('update-range', newRange);
         }
     }
 }

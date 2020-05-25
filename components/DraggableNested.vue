@@ -36,9 +36,9 @@
                         <v-btn
                             icon
                         >
-                            <no-ssr>
+                            <client-only>
                                 <v-icon class="handle" @click="removeAt(i)">mdi-close</v-icon>
-                            </no-ssr>
+                            </client-only>
                         </v-btn>
                     </v-col>
                 </v-row>
