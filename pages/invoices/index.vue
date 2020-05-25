@@ -14,51 +14,7 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" md="6" class="pa-2">
-                            <v-row no-gutters>
-                                <v-col cols="12">
-                                    <v-dialog
-                                        ref="dialog"
-                                        v-model="datepicker"
-                                        :return-value.sync="datefilter"
-                                        persistent
-                                        width="290px"
-                                    >
-                                        <template v-slot:activator="{ on }">
-                                            <v-combobox
-                                                v-model="datefilter"
-                                                multiple
-                                                chips
-                                                small-chips
-                                                hide-details
-                                                prepend-icon="mdi-calendar"
-                                                placeholder="Date"
-                                                readonly
-                                                v-on="on"
-                                            ></v-combobox>
-                                        </template>
-                                        <v-date-picker v-model="datefilter" range scrollable>
-                                            <v-spacer></v-spacer>
-                                            <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
-                                            <v-btn text color="primary" @click="$refs.dialog.save(datefilter)">OK</v-btn>
-                                        </v-date-picker>
-                                    </v-dialog>
-                                </v-col>
-                                <v-col cols="12" class="mt-1 d-flex justify-end">
-                                    <v-chip
-                                        class="mr-2"
-                                        @click="weekly"
-                                        small
-                                    >
-                                        Weekly
-                                    </v-chip>
-                                    <v-chip
-                                        @click="monthly"
-                                        small
-                                    >
-                                        Monthly
-                                    </v-chip>
-                                </v-col>
-                            </v-row>
+                            <date-range :dates="datefilter" />
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -69,9 +25,9 @@
                 >
                     <template slot="body.append">
                         <tr>
-                            <th class="d-flex justify-space-between">TOTAL <span class="d-sm-none">{{total}}</span></th>
+                            <th class="d-flex justify-space-between align-center">TOTAL <span class="d-sm-none">{{total}}</span></th>
                             <th colspan="2" class="pa-0"></th>
-                            <th class="d-none d-sm-block">{{total}}</th> 
+                            <th class="d-none d-sm-block align-center">{{total}}</th> 
                             <th colspan="2" class="pa-0"></th>
                         </tr>
                     </template>
@@ -82,6 +38,8 @@
 </template>
 
 <script>
+    import DateRange from '~/components/DateRange';
+
     export default {
         computed: {
             total: function() {
@@ -90,7 +48,6 @@
         },
         data () {
             return {
-                datepicker: '',
                 datefilter: [],
                 search: '',
                 headers: [
@@ -190,13 +147,8 @@
                 ]
             }
         },
-        methods: {
-            weekly() {
-                console.log('Weekly')
-            },
-            monthly() {
-                console.log('Monthly')
-            }
+        components: {
+            DateRange
         }
     }
 </script>
