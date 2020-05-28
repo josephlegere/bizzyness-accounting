@@ -12,6 +12,11 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/firebase": "^5.2.0",
+    "cookieparser": "^0.1.0",
+    "firebase": "^7.14.5",
+    "js-cookie": "^2.2.1",
+    "jwt-decode": "^2.2.0",
     "nuxt": "^2.0.0",
     "vuedraggable": "^2.23.2"
   },
