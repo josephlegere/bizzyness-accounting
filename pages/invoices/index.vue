@@ -32,7 +32,7 @@
                         </tr>
                     </template>
                     <template v-slot:item="props">
-                        <tr :active="props.selected"  @click="open(props.item.id)">
+                        <tr :active="props.selected" @click="open(props.item.id)">
                             <td>{{ props.item.invoice }}</td>
                             <td>{{ props.item.date }}</td>
                             <td>{{ props.item.client }}</td>
@@ -77,8 +77,7 @@
                 this.datefilter = range;
             },
             open(id) {
-                console.log(id)
-                console.log('hi')
+                this.$router.push({ path: `/invoices/${id}` })
             }
         },
         computed: {
@@ -89,7 +88,7 @@
                 invoices: state => state.invoices.list
             })
         },
-        async fetch({store}) {
+        async asyncData({store}) {
             await store.dispatch('invoices/get');
         },
         components: {
