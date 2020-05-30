@@ -77,7 +77,7 @@
                 this.datefilter = range;
             },
             open(id) {
-                this.$router.push({ path: `/invoices/${id}` })
+                this.$router.push({ path: `/invoices/${id}` });
             }
         },
         computed: {

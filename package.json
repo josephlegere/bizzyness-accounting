@@ -16,6 +16,7 @@
     "cookieparser": "^0.1.0",
     "firebase": "^7.14.5",
     "js-cookie": "^2.2.1",
+    "jspdf": "^1.5.3",
     "jwt-decode": "^2.2.0",
     "nuxt": "^2.0.0",
     "vuedraggable": "^2.23.2"
