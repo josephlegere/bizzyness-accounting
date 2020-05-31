@@ -32,7 +32,7 @@
                         </tr>
                     </template>
                     <template v-slot:item="props">
-                        <tr :active="props.selected" @click="open(props.item.id)">
+                        <tr :active="props.selected" @click="open(props.item)">
                             <td>{{ props.item.invoice }}</td>
                             <td>{{ props.item.date }}</td>
                             <td>{{ props.item.client }}</td>
@@ -76,8 +76,10 @@
             updateDateFilter(range) {
                 this.datefilter = range;
             },
-            open(id) {
-                this.$router.push({ path: `/invoices/${id}` });
+            open(invoice) {
+                //console.log(invoice)
+                this.$store.commit('invoices/setInvoice', invoice);
+                this.$router.push({ path: `/invoices/${invoice.invoice}` });
             }
         },
         computed: {

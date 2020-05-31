@@ -18,7 +18,7 @@ export const actions = {
             .get()
             .then(snapshot => {
                 snapshot.forEach(doc => {
-                    console.log(doc.id, "=>", doc.data());
+                    //console.log(doc.id, "=>", doc.data());
                     let _invoice = doc.data();
 
                     _list.push({
@@ -28,7 +28,9 @@ export const actions = {
                       total: _invoice.total,
                       author: _invoice.agent.name,
                       remarks: _invoice.remarks,
-                      id: doc.id
+                      id: doc.id,
+                      items: _invoice.items,
+                      layout: _invoice.layout
                     });
                 });
             })
