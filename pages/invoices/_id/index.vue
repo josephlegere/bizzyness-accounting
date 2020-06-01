@@ -18,6 +18,8 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import PDFRender from 'vue-pdf';
 import { mapState } from 'vuex';
+import num_convert from 'number-to-words';
+import { ToWords } from 'to-words';
 
 export default {
     data() {
@@ -27,7 +29,8 @@ export default {
             headers: [{key: 'Item\nNo.', description: 'Description', quantity: 'Qty', price: 'Unit\nPrice', amount: 'Amount QRS.'}],
             body: [],
             footer: [],
-            total: 0
+            total: 0,
+            toWords: new ToWords()
         }
     },
     methods: {
@@ -57,13 +60,16 @@ export default {
         fillFooter() {
             let _footer = [];
             _footer[0] = [
-                { content: 'Only', colSpan: 4, styles: { halign: 'left' } },
+                { content: `${this.toWords.convert(this.total)} Qatar Riyals Only`, colSpan: 4, styles: { halign: 'left' } },
                 { content: this.numberWithCommas(this.total.toFixed(2)), styles: { halign: 'right' }}
             ];
             this.footer = _footer;
         },
         numberWithCommas(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        firstLetterUpperCase(str) { //make all first letters capitals
+            return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
         }
     },
     asyncData() {
