@@ -2,7 +2,6 @@
     <v-row no-gutters="">
         <v-col>
             <v-card>
-                <b>{{ $route.params.id }}</b>
                 {{currentPage}} / {{pageCount}}
                 <PDFRender
                     :src="generatePDF"
@@ -25,32 +24,46 @@ export default {
         return {
             currentPage: 0,
             pageCount: 0,
-            headers: [['Item No.', 'Description', 'Qty', 'Unit Price', 'Amount QRS.']],
-            body: []
+            headers: [{key: 'Item\nNo.', description: 'Description', quantity: 'Qty', price: 'Unit\nPrice', amount: 'Amount QRS.'}],
+            body: [],
+            footer: [],
+            total: 0
         }
     },
     methods: {
         fillBody() {
             let _temp_records = [];
             this.invoice.layout.forEach(elem => {
-                let _temp_array = [];
-                _temp_array.push(elem.key); //key
+                let _temp_object = {};
+                _temp_object.key = elem.key; //key
 
                 if (elem.source.hasOwnProperty('content'))
-                    _temp_array.push(elem.source.content);
+                    _temp_object.description = elem.source.content;
                 else if (elem.source.hasOwnProperty('origin') && elem.source.hasOwnProperty('key')) {
                     let _item = this.invoice.items[elem.source.key];
 
-                    _temp_array.push(_item.name); //description
-                    _temp_array.push(_item.quantity); //quantity
-                    _temp_array.push(_item.price); //price
-                    _temp_array.push(_item.price * _item.quantity); //total price
+                    _temp_object.description = _item.name; //description
+                    _temp_object.quantity = _item.quantity; //quantity
+                    _temp_object.price = this.numberWithCommas((_item.price).toFixed(2)); //prices
+                    _temp_object.amount = this.numberWithCommas((_item.price * _item.quantity).toFixed(2)); //total price
+                    this.total += _item.price * _item.quantity;
                 }
 
-                console.log(_temp_array)
-                _temp_records.push(_temp_array);
+                console.log(_temp_object)
+                _temp_records.push(_temp_object);
             });
             this.body = _temp_records;
+        },
+        fillFooter() {
+            let _footer = [];
+            _footer[0] = [
+                { content: 'Only', colSpan: 4, styles: { halign: 'left' } },
+                { content: this.numberWithCommas(this.total.toFixed(2)), styles: { halign: 'right' }}
+            ];
+            this.footer = _footer;
+        },
+        numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
     },
     asyncData() {
@@ -58,7 +71,7 @@ export default {
     },
     created: function() {
         this.fillBody(); //set body
-        
+        this.fillFooter();
     },
     computed: {
         ...mapState({
@@ -77,28 +90,42 @@ export default {
             doc.text(`BANK PAYMENT VOUCHER`, 65, 34);
 
             doc.setFontSize(11);
-            doc.text(`Petty Cash Replenishment`, 14, 42);
+            doc.text(`Cash/Credit Invoice`, 85, 42);
 
             doc.autoTable({
                 head: this.headers,
                 body: this.body,
+                foot: this.footer,
                 startY: 54,
-                theme: 'grid',
+                theme: 'plain',
                 tableLineColor: [0, 0, 0],
                 tableLineWidth: 0.2,
                 styles: {
                     lineColor: [0, 0, 0],
-                    lineWidth: 0.2
+                    lineWidth: 0,
+                    halign: 'center'
                 },
                 headStyles: {
+                    lineColor: [0, 0, 0],
+                    lineWidth: 0.2,
                     fillColor: [255, 255, 255],
                     textColor: 0,
-                    fontSize: 11
+                    fontSize: 11,
+                    valign: 'middle'
+                },
+                footStyles: {
+                    lineColor: [0, 0, 0],
+                    lineWidth: 0.2,
+                },
+                columnStyles: {
+                    keys: { valign: 'top' },
+                    description: { halign: 'left' },
+                    price: { halign: 'right' },
+                    amount: { halign: 'right' }
                 }
             });
             
-            //doc.rect(14, 14, 182, doc.autoTable.previous.finalY - 14); //border
-            doc.rect(14, 14, 182, 80); //border
+            doc.rect(14, 14, 182, doc.autoTable.previous.finalY - 14); //border
             
             doc.autoPrint({ variant: 'non-conform' });
             let _pdf = doc.output('datauristring');
