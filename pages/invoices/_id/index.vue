@@ -28,6 +28,7 @@ export default {
             pageCount: 0,
             headers: [{key: 'Item\nNo.', description: 'Description', quantity: 'Qty', price: 'Unit\nPrice', amount: 'Amount QRS.'}],
             body: [],
+            defaultBodySize: 60,
             footer: [],
             total: 0,
             toWords: new ToWords()
@@ -42,8 +43,8 @@ export default {
 
                 if (elem.source.hasOwnProperty('content'))
                     _temp_object.description = elem.source.content;
-                else if (elem.source.hasOwnProperty('origin') && elem.source.hasOwnProperty('key')) {
-                    let _item = this.invoice.items[elem.source.key];
+                else if (elem.source.hasOwnProperty('origin')) {
+                    let _item = this.getSourceData(this.invoice, elem.source.origin.split('/'));
 
                     _temp_object.description = _item.name; //description
                     _temp_object.quantity = _item.quantity; //quantity
@@ -70,6 +71,15 @@ export default {
         },
         firstLetterUpperCase(str) { //make all first letters capitals
             return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+        },
+        getSourceData(obj, arr) {
+            let _item;
+            if (arr.length > 1)
+                _item = this.getSourceData(obj[arr[0]], arr.slice(1))
+            else
+                _item = obj[arr[0]];
+
+            return _item;
         }
     },
     asyncData() {
@@ -84,16 +94,19 @@ export default {
             invoice: state => state.invoices.invoice
         }),
         generatePDF() {
-            let doc = new jsPDF();
+            let doc = new jsPDF(); //default => unit: 'mm', format: 'a4',
 
-            doc.setFontSize(18);
-            doc.text(`Goodwill Electrical & Mechanical Services`, 50, 22);
+            // doc.setFontSize(18);
+            // doc.text(`Goodwill Electrical & Mechanical Services`, 50, 22);
 
-            doc.setFontSize(13);
-            doc.text(`Doha, Qatar`, 90, 28);
+            // doc.setFontSize(13);
+            // doc.text(`Doha, Qatar`, 90, 28);
 
-            doc.setFontSize(15);
-            doc.text(`BANK PAYMENT VOUCHER`, 65, 34);
+            // doc.setFontSize(15);
+            // doc.text(`BANK PAYMENT VOUCHER`, 65, 34);
+
+            doc.setFontSize(7);
+            doc.text(`(Edge)`, 1, 1);
 
             doc.setFontSize(11);
             doc.text(`Cash/Credit Invoice`, 85, 42);
@@ -131,7 +144,12 @@ export default {
                 }
             });
             
-            doc.rect(14, 14, 182, doc.autoTable.previous.finalY - 14); //border
+            doc.rect(14, 14, 182, doc.lastAutoTable.finalY - 14); //border
+            console.log(doc.lastAutoTable)
+            console.log(doc.lastAutoTable.finalY - doc.lastAutoTable.pageStartY)
+            console.log(doc.lastAutoTable.height)
+            console.log(doc.lastAutoTable.height - (doc.lastAutoTable.headHeight + doc.lastAutoTable.footHeight))
+            doc.lastAutoTable.height = 70;
             
             doc.autoPrint({ variant: 'non-conform' });
             let _pdf = doc.output('datauristring');
