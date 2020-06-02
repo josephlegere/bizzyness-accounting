@@ -2,9 +2,16 @@
     <v-row no-gutters="">
         <v-col>
             <v-card>
+                <v-btn x-small class="mx-1 move-prev" fab fixed right bottom @click="movePage('prev')" color="primary">
+                    <v-icon dark>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-btn x-small class="mx-1" fab fixed right bottom @click="movePage('next')" color="primary">
+                    <v-icon dark>mdi-chevron-right</v-icon>
+                </v-btn>
                 {{currentPage}} / {{pageCount}}
                 <PDFRender
                     :src="generatePDF"
+                    :page="currentPage"
                     @num-pages="pageCount = $event"
                     @page-loaded="currentPage = $event"
                 ></PDFRender>
@@ -24,7 +31,7 @@ import { ToWords } from 'to-words';
 export default {
     data() {
         return {
-            currentPage: 0,
+            currentPage: 1,
             pageCount: 0,
             headers: [{key: 'Item\nNo.', description: 'Description', quantity: 'Qty', price: 'Unit\nPrice', amount: 'Amount QRS.'}],
             body: [],
@@ -53,7 +60,7 @@ export default {
                     this.total += _item.price * _item.quantity;
                 }
 
-                console.log(_temp_object)
+                //console.log(_temp_object)
                 _temp_records.push(_temp_object);
             });
             this.body = _temp_records;
@@ -65,6 +72,46 @@ export default {
                 { content: this.numberWithCommas(this.total.toFixed(2)), styles: { halign: 'right' }}
             ];
             this.footer = _footer;
+        },
+        tempBodyData() {
+            let _data = [
+                {description: 'Hello'},
+                {description: 'Hi'},
+                {description: 'What is up'},
+                {description: 'COntrol Power'},
+                {description: 'Slary for who'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'},
+                {description: 'Hello'}
+            ];
+
+            _data.forEach((elem, key) => {
+                let _temp_object = {};
+                _temp_object.key = key + 1;
+                _temp_object.description = elem.description;
+                this.body.push(_temp_object)
+            });
         },
         numberWithCommas(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -80,6 +127,16 @@ export default {
                 _item = obj[arr[0]];
 
             return _item;
+        },
+        movePage(action) {
+            if (action === 'prev') {
+                if (this.currentPage > 1)
+                    this.currentPage--;
+            }
+            else if (action === 'next') {
+                if (this.currentPage < this.pageCount)
+                    this.currentPage++
+            }
         }
     },
     asyncData() {
@@ -87,6 +144,7 @@ export default {
     },
     created: function() {
         this.fillBody(); //set body
+        this.tempBodyData();
         this.fillFooter();
     },
     computed: {
@@ -149,7 +207,6 @@ export default {
             console.log(doc.lastAutoTable.finalY - doc.lastAutoTable.pageStartY)
             console.log(doc.lastAutoTable.height)
             console.log(doc.lastAutoTable.height - (doc.lastAutoTable.headHeight + doc.lastAutoTable.footHeight))
-            doc.lastAutoTable.height = 70;
             
             doc.autoPrint({ variant: 'non-conform' });
             let _pdf = doc.output('datauristring');
@@ -162,6 +219,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .move-prev {
+        right:                  60px;
+    }
 </style>
