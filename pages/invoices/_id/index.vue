@@ -2,13 +2,20 @@
     <v-row no-gutters="">
         <v-col>
             <v-card>
-                <v-btn x-small class="mx-1 move-prev" fab fixed right bottom @click="movePage('prev')" color="primary">
-                    <v-icon dark>mdi-chevron-left</v-icon>
-                </v-btn>
-                <v-btn x-small class="mx-1" fab fixed right bottom @click="movePage('next')" color="primary">
-                    <v-icon dark>mdi-chevron-right</v-icon>
-                </v-btn>
-                {{currentPage}} / {{pageCount}}
+
+                <div v-show="pageCount > 1">
+                    <v-btn x-small class="mx-1 move-prev" fab fixed right bottom @click="movePage('prev')" color="primary">
+                        <v-icon dark>mdi-chevron-left</v-icon>
+                    </v-btn>
+                    <v-btn x-small class="mx-1" fab fixed right bottom @click="movePage('next')" color="primary">
+                        <v-icon dark>mdi-chevron-right</v-icon>
+                    </v-btn>
+                </div>
+
+                <h3 class="text-right mr-1">
+                    {{currentPage}} / {{pageCount}}
+                </h3>
+
                 <PDFRender
                     :src="generatePDF"
                     :page="currentPage"
@@ -49,7 +56,7 @@ export default {
                 _temp_object.key = elem.key; //key
 
                 if (elem.source.hasOwnProperty('content'))
-                    _temp_object.description = elem.source.content;
+                    _temp_object.description = this.viewFormat(elem.source.content);
                 else if (elem.source.hasOwnProperty('origin')) {
                     let _item = this.getSourceData(this.invoice, elem.source.origin.split('/'));
 
@@ -80,18 +87,6 @@ export default {
                 {description: 'What is up'},
                 {description: 'COntrol Power'},
                 {description: 'Slary for who'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
-                {description: 'Hello'},
                 {description: 'Hello'},
                 {description: 'Hello'},
                 {description: 'Hello'},
@@ -137,6 +132,11 @@ export default {
                 if (this.currentPage < this.pageCount)
                     this.currentPage++
             }
+        },
+        viewFormat(txt) {
+            let formattedText = txt;
+            formattedText = formattedText.replace(/\\n/g, '\n');
+            return formattedText;
         }
     },
     asyncData() {
@@ -144,7 +144,6 @@ export default {
     },
     created: function() {
         this.fillBody(); //set body
-        this.tempBodyData();
         this.fillFooter();
     },
     computed: {
