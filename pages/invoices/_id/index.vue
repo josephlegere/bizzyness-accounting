@@ -166,13 +166,18 @@ export default {
             doc.text(`(Edge)`, 1, 1);
 
             doc.setFontSize(11);
+            doc.setFont('Helvetica', 'Bold');
+
             doc.text(`Cash/Credit Invoice`, 85, 42);
+            doc.text(`No. ${this.invoice.invoice}`, 14, 52);
+            doc.text(`To: ${this.invoice.client}`, 14, 58);
+            doc.text(`${this.invoice.date}`, 160, 52);
 
             doc.autoTable({
                 head: this.headers,
                 body: this.body,
                 foot: this.footer,
-                startY: 54,
+                startY: 70,
                 theme: 'plain',
                 tableLineColor: [0, 0, 0],
                 tableLineWidth: 0.2,
@@ -201,12 +206,20 @@ export default {
                 }
             });
             
+            doc.setFont('Helvetica', '');
+            doc.text(`Received By:`, 14, doc.lastAutoTable.finalY + 10);
+            doc.line(40, doc.lastAutoTable.finalY + 10, 74, doc.lastAutoTable.finalY + 10);
+            doc.text(`Signature:`, 14, doc.lastAutoTable.finalY + 20);
+            doc.line(40, doc.lastAutoTable.finalY + 20, 74, doc.lastAutoTable.finalY + 20);
+            doc.text(`Authorized Signature`, 160, doc.lastAutoTable.finalY + 20);
+            
             doc.rect(14, 14, 182, doc.lastAutoTable.finalY - 14); //border
             console.log(doc.lastAutoTable)
             console.log(doc.lastAutoTable.finalY - doc.lastAutoTable.pageStartY)
             console.log(doc.lastAutoTable.height)
             console.log(doc.lastAutoTable.height - (doc.lastAutoTable.headHeight + doc.lastAutoTable.footHeight))
             
+            console.log(doc.getFontList());
             doc.autoPrint({ variant: 'non-conform' });
             let _pdf = doc.output('datauristring');
             return _pdf;
