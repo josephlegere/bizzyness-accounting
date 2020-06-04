@@ -2,25 +2,68 @@
     <v-row no-gutters>
         <v-col class="text-center">
 
-            <p class="text-right">{{ new Date().getMonth() }} {{ new Date().getDate() }}, {{ new Date().getFullYear() }}</p>
             <h3>Invoice</h3>
             <h2>12345</h2>
 
             <v-container>
-                <v-textarea
-                    placeholder="Clients"
-                    autoGrow
+                <v-autocomplete
+                    v-model="recipient"
+                    :items="accounts"
+                    :loading="isLoadingAccounts"
+                    hide-no-data
+                    filled
+                    chips
+                    placeholder="Accounts"
+                    item-text="name"
+                    item-value="name"
                     dense
-                    hide-details
-                    rows="1"
-                ></v-textarea>
-                <v-textarea
-                    placeholder="Date"
-                    autoGrow
-                    dense
-                    hide-details
-                    rows="1"
-                ></v-textarea>
+                >
+                <template v-slot:selection="data">
+                    <v-chip
+                        v-bind="data.attrs"
+                        :input-value="data.selected"
+                        close
+                        @click="data.select"
+                        @click:close="remove(data.item)"
+                    >
+                        {{ data.item.name }}
+                    </v-chip>
+                </template>
+                <template v-slot:item="data">
+                    <template v-if="typeof data.item !== 'object'">
+                        <v-list-item-content v-text="data.item"></v-list-item-content>
+                    </template>
+                    <template v-else>
+                        <v-list-item-content>
+                            <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                            <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
+                        </v-list-item-content>
+                    </template>
+                </template>
+                </v-autocomplete>
+
+                <v-dialog
+                    ref="dialog"
+                    v-model="datepicker"
+                    :return-value.sync="date"
+                    persistent
+                    width="290px"
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-text-field
+                            v-model="date"
+                            placeholder="Date"
+                            readonly
+                            dense
+                            v-on="on"
+                        ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="date" scrollable>
+                        <v-spacer></v-spacer>
+                        <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
+                        <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
+                    </v-date-picker>
+                </v-dialog>
             </v-container>
 
             <v-container>
@@ -50,6 +93,7 @@
                 dark
                 class="form-toolbar">
                 <v-toolbar
+                    color="secondary"
                     flat
                     height="50">
                     <v-toolbar-title class="mr-4">Total: {{total.toFixed(2)}}</v-toolbar-title>
@@ -78,6 +122,11 @@ export default {
         return {
             bottomNav: 'recent',
             name: 'invoice-create',
+            date: new Date().toISOString().substr(0, 10),
+            datepicker: false,
+            recipient: null,
+            accounts: [],
+            isLoadingAccounts: false,
             headers: [
                 {value: 'key', text: 'Key'},
                 {value: 'description', text: 'Description'},
@@ -138,10 +187,25 @@ export default {
                     ]
                 }
             ]
-        }
+        },
+        temp_accounts() {
+            this.accounts = [
+                { header: 'Group 1' },
+                { name: 'Sandra Adams', group: 'Group 1' },
+                { name: 'Ali Connors', group: 'Group 1' },
+                { divider: true },
+                { header: 'Group 2' },
+                { name: 'Britta Holt', group: 'Group 2' },
+                { name: 'Jane Smith ', group: 'Group 2' }
+            ];
+        },
+        remove (item) {
+            this.recipient = null;
+      }
     },
     created() {
         this.presets();
+        this.temp_accounts();
     },
     components: {
         DraggableNested
