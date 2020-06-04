@@ -222,6 +222,12 @@ export default {
                     description: { halign: 'left' },
                     price: { halign: 'right' },
                     amount: { halign: 'right' }
+                },
+                willDrawCell: function (data) {
+                    if (data.row.section === 'body') {
+                        console.log(data)
+                        data.doc.line(data.cursor.x + data.column.width, data.cursor.y, data.cursor.x + data.column.width, data.cursor.y + data.row.height);
+                    }
                 }
             });
             
@@ -253,8 +259,8 @@ export default {
         bottom:                 16px;
         z-index:                4;
     }
-    .move-prev {
+    /* .move-prev {
     }
     .print-form {
-    }
+    } */
 </style>
