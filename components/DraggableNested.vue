@@ -13,17 +13,17 @@
                         <v-icon class="handle align-self-center">mdi-drag-horizontal</v-icon>
                     </v-col>
                     <v-col
-                        v-for="(data, i) in recordData"
+                        v-for="(data, i) in headers"
                         :key="i"
                         cols="10"
                         md="2"
-                        :offset="data.offset ? data.offset : null"
-                        :offset-md="data.hasOwnProperty('offset_md') ? data.offset_md : null"
-                    >
+                        :offset="i > 0 ? 1 : null"
+                        :offset-md="i > 0 ? 0 : null"
+                    ><!-- offsets will be null if its the first element -->
                         <v-textarea
                             class="design-textarea"
-                            :placeholder="data.placeholder"
-                            v-model="el[data.cellData]"
+                            :placeholder="data.text"
+                            v-model="el[data.value]"
                             autoGrow
                             dense
                             hide-details
@@ -44,7 +44,7 @@
                 </v-row>
             </v-card>
                 
-            <draggable-nested :items="el.items" />
+            <draggable-nested :headers="headers" :items="el.items" />
         </li>
     </draggable>
 </template>
@@ -54,21 +54,14 @@ import draggable from 'vuedraggable';
 
 export default {
     name: 'draggable-nested',
-    data () {
-        return {
-            recordData: [
-                {cellData: 'key', placeholder: 'Key'},
-                {cellData: 'description', placeholder: 'Description', offset: 1, offset_md: 0},
-                {cellData: 'quantity', placeholder: 'Quantity', offset: 1, offset_md: 0},
-                {cellData: 'price', placeholder: 'Price', offset: 1, offset_md: 0},
-                {cellData: 'total', placeholder: 'Total', offset: 1, offset_md: 0}
-            ]
-        }
-    },
     props: {
         items: {
-            required: true,
-            type: Array
+            type: Array,
+            required: true
+        },
+        headers: {
+            type: Array,
+            required: true
         }
     },
     methods: {

@@ -1,6 +1,6 @@
 <template>
-    <v-layout>
-        <v-flex class="text-center">
+    <v-row no-gutters>
+        <v-col class="text-center">
 
             <p class="text-right">{{ new Date().getMonth() }} {{ new Date().getDate() }}, {{ new Date().getFullYear() }}</p>
             <h3>Invoice</h3>
@@ -41,33 +41,32 @@
                     </v-btn>
                 </v-toolbar>
 
-                <draggable-nested class="drag-list mt-md-3" :items="list" />
+                <draggable-nested class="drag-list mt-md-3" :headers="headers" :items="list" />
             </v-container>
 
             <br>
-        
-            <v-bottom-navigation
-                v-model="bottomNav"
-                absolute
-                height="40"
-            >
-                <v-btn value="recent">
-                    <span>Recent</span>
-                    <v-icon>mdi-history</v-icon>
-                </v-btn>
 
-                <v-btn value="favorites">
-                    <span>Favorites</span>
-                    <v-icon>mdi-heart</v-icon>
-                </v-btn>
+            <v-sheet
+                dark
+                class="form-toolbar">
+                <v-toolbar
+                    flat
+                    height="50">
+                    <v-toolbar-title class="mr-4">Total: {{total.toFixed(2)}}</v-toolbar-title>
 
-                <v-btn value="nearby">
-                    <span>Nearby</span>
-                    <v-icon>mdi-map-marker</v-icon>
-                </v-btn>
-            </v-bottom-navigation>
-        </v-flex>
-    </v-layout>
+                    <v-spacer></v-spacer>
+
+                    <v-btn icon>
+                        <v-icon>mdi-printer-search</v-icon>
+                    </v-btn>
+
+                    <v-btn icon>
+                        <v-icon>mdi-send-circle-outline</v-icon>
+                    </v-btn>
+                </v-toolbar>
+            </v-sheet>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
@@ -79,7 +78,29 @@ export default {
         return {
             bottomNav: 'recent',
             name: 'invoice-create',
-            list: [
+            headers: [
+                {value: 'key', text: 'Key'},
+                {value: 'description', text: 'Description'},
+                {value: 'quantity', text: 'Quantity'},
+                {value: 'price', text: 'Price'},
+                {value: 'total', text: 'Total'}
+            ],
+            list: [],
+            total: 0.00
+        }
+    },
+    methods: {
+        add: function() {
+            this.list.push({
+                key: '',
+                description: '',
+                quantity: '',
+                price: '',
+                items: []
+            });
+        },
+        presets() {
+            this.list = [
                 {
                     key: '1',
                     description: 'abc',
@@ -119,16 +140,8 @@ export default {
             ]
         }
     },
-    methods: {
-        add: function() {
-            this.list.push({
-                key: '',
-                description: '',
-                quantity: '',
-                price: '',
-                items: []
-            });
-        }
+    created() {
+        this.presets();
     },
     components: {
         DraggableNested
@@ -137,4 +150,10 @@ export default {
 </script>
 
 <style scoped>
+    .form-toolbar {
+        position:               fixed;
+        z-index:                4;
+        bottom:                 35px;
+        right:                  0;
+    }
 </style>
