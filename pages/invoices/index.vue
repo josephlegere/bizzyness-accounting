@@ -68,7 +68,7 @@
                     { text: 'Client', value: 'client' },
                     { text: 'Total', value: 'total' },
                     { text: 'Author', value: 'author' },
-                    { text: 'Remarks', value: 'remarks' },
+                    { text: 'Remarks', value: 'remarks' }
                 ]
             }
         },
@@ -84,7 +84,7 @@
         },
         computed: {
             total: function() {
-                return this.invoices.reduce(function(a, c){return a + Number((c.total) || 0)}, 0);
+                return this.invoices.reduce(function(a, c) { return a + Number((c.total) || 0) }, 0);
             },
             ...mapState({
                 invoices: state => state.invoices.list

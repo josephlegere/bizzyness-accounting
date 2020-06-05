@@ -79,7 +79,7 @@ export default {
 <style>
     .drag-list {
         padding:                    0 !important;
-    } 
+    }
     .dragArea {
         /* outline:                    1px dashed; */
     }

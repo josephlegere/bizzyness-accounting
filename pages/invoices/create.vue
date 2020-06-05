@@ -128,11 +128,20 @@ export default {
             accounts: [],
             isLoadingAccounts: false,
             headers: [
-                {value: 'key', text: 'Key'},
-                {value: 'description', text: 'Description'},
-                {value: 'quantity', text: 'Quantity'},
-                {value: 'price', text: 'Price'},
-                {value: 'total', text: 'Total'}
+                { value: 'key', text: 'Key' },
+                { value: 'description', text: 'Description' },
+                { value: 'quantity', text: 'Quantity' },
+                { value: 'price', text: 'Price' },
+                {
+                    value: 'total',
+                    text: 'Total',
+                    readonly: true,
+                    input: {
+                        items: ['quantity', 'price'],
+                        compute: function (a, c) { return a * c }
+                    },
+                    sum: true
+                }
             ],
             list: [],
             total: 0.00
@@ -140,53 +149,31 @@ export default {
     },
     methods: {
         add: function() {
-            this.list.push({
-                key: '',
-                description: '',
-                quantity: '',
-                price: '',
-                items: []
+            let _temp = {};
+            
+            this.headers.forEach(elem => {
+                _temp[elem.value] = '';
             });
+            _temp.items = [];
+
+            this.list.push(_temp);
         },
         presets() {
-            this.list = [
-                {
-                    key: '1',
-                    description: 'abc',
-                    quantity: '',
-                    price: '',
-                    items: []
-                },
-                {
-                    key: '2',
-                    description: '',
-                    quantity: '',
-                    price: '',
-                    items: []
-                },
-                {
-                    key: '3',
-                    description: '',
-                    quantity: '',
-                    price: '',
-                    items: []
-                },
-                {
-                    key: '5',
-                    description: '',
-                    quantity: '',
-                    price: '',
-                    items: [
-                        {
-                            key: '4',
-                            description: '',
-                            quantity: '',
-                            price: '',
-                            items: []
-                        }
-                    ]
-                }
-            ]
+            let _items = [];
+
+            for (let i = 0; i < 5; i++) {
+                let _record = {};
+
+                this.headers.forEach(elem => {
+                    _record[elem.value] = '';
+                    if (elem.value === 'key') _record[elem.value] = i + 1;
+                });
+                _record.items = [];
+
+                _items.push(_record);
+            }
+
+            this.list = _items;
         },
         temp_accounts() {
             this.accounts = [
@@ -219,5 +206,8 @@ export default {
         z-index:                4;
         bottom:                 35px;
         right:                  0;
+    }
+    .drag-list {
+        padding:                0 !important;
     }
 </style>
