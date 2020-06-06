@@ -1,6 +1,6 @@
 <template>
     <draggable class="dragArea" tag="ul" :list="items" :group="{ name: 'g1' }" handle=".handle">
-        <li v-for="(el, i) in items" :key="i">
+        <li v-for="(el, i) in itemConfig" :key="i">
             <v-card
                 dense
                 class="mb-1"
@@ -24,6 +24,7 @@
                             class="design-textarea"
                             :placeholder="data.text"
                             v-model="el[data.value]"
+                            :readonly="data.readonly"
                             autoGrow
                             dense
                             hide-details
@@ -66,8 +67,33 @@ export default {
     },
     methods: {
         removeAt(i) {
-            console.log(`delete ${i}`)
+            //console.log(`delete ${i}`)
             this.items.splice(i, 1);
+        }
+    },
+    computed: {
+        itemConfig: function () {
+            return this.items.map(elem => {
+                this.headers.forEach(heads => {
+                    if (heads.hasOwnProperty('input')) {
+                        if (heads.input.hasOwnProperty('compute')) { //for computations
+                            let _items = heads.input.items.map(x => parseFloat(elem[x]));
+                            let _value = _items.reduce(heads.input.compute);
+                            elem[heads.value] = isNaN(_value) || parseInt(_value) === 0 ? '' : _value.toFixed(2);
+                        }
+                        else if (heads.input.hasOwnProperty('join')) { //for concatinating string
+                            let _items = heads.input.items.map(x => elem[x]);
+                            let _value = _items.reduce(heads.input.join);
+                            elem[heads.value] = _value;
+                        }
+                        else {
+                            console.error(`Add "Compute" or "Join" property in your input object for "${heads.value}"!`);
+                        }
+                        //console.log(elem)
+                    }
+                });
+                return elem;
+            });
         }
     },
     components: {

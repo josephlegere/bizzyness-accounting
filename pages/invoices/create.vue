@@ -51,7 +51,7 @@
                 >
                     <template v-slot:activator="{ on }">
                         <v-text-field
-                            v-model="date"
+                            v-model="dateStringFormat"
                             placeholder="Date"
                             readonly
                             dense
@@ -161,17 +161,23 @@ export default {
         presets() {
             let _items = [];
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 4; i++) {
                 let _record = {};
-
                 this.headers.forEach(elem => {
                     _record[elem.value] = '';
                     if (elem.value === 'key') _record[elem.value] = i + 1;
                 });
                 _record.items = [];
-
                 _items.push(_record);
             }
+
+            let _record = {};
+            this.headers.forEach(elem => { //add a child
+                _record[elem.value] = '';
+                if (elem.value === 'key') _record[elem.value] = _items.length + 1;
+            });
+            _record.items = [];
+            _items[_items.length-1].items.push(_record);
 
             this.list = _items;
         },
@@ -189,6 +195,11 @@ export default {
         remove (item) {
             this.recipient = null;
       }
+    },
+    computed: {
+        dateStringFormat: function () {
+            return new Date(this.date).toDateString().substr(3, 12);
+        }
     },
     created() {
         this.presets();
