@@ -96,7 +96,7 @@
                     color="secondary"
                     flat
                     height="50">
-                    <v-toolbar-title class="mr-4">Total: {{total.toFixed(2)}}</v-toolbar-title>
+                    <v-toolbar-title class="mr-4">Total: {{accumulate.toFixed(2)}}</v-toolbar-title>
 
                     <v-spacer></v-spacer>
 
@@ -133,18 +133,17 @@ export default {
                 { value: 'quantity', text: 'Quantity' },
                 { value: 'price', text: 'Price' },
                 {
-                    value: 'total',
-                    text: 'Total',
+                    value: 'amount',
+                    text: 'Amount',
                     readonly: true,
                     input: {
                         items: ['quantity', 'price'],
                         compute: function (a, c) { return a * c }
                     },
-                    sum: true
+                    accumulate: 'sum'
                 }
             ],
-            list: [],
-            total: 0.00
+            list: []
         }
     },
     methods: {
@@ -194,11 +193,28 @@ export default {
         },
         remove (item) {
             this.recipient = null;
-      }
+        },
+        accumulate_list (list, headers) { //list => layout, headers => format
+            return list.reduce((acc, curr) => {
+                let _total;
+                headers.forEach(heads => {
+                    if (heads.hasOwnProperty('accumulate')) {
+                        _total = Number((curr[heads.value]) || 0);
+                    }
+                });
+                if (curr.items.length > 0)
+                    _total += this.accumulate_list(curr.items, headers);
+
+                return acc + _total;
+            }, 0);
+        }
     },
     computed: {
         dateStringFormat: function () {
             return new Date(this.date).toDateString().substr(3, 12);
+        },
+        accumulate () {
+            return this.accumulate_list(this.list, this.headers);
         }
     },
     created() {

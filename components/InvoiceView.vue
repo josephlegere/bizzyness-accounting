@@ -61,7 +61,7 @@ export default {
                 //console.log(_temp_object)
                 _records.push(_temp_object);
                 
-                if (elem.children.length > 0)
+                if (elem.children.length > 0) //extract layout of children
                     _records = _records.concat(this.extractLayout(elem.children, len+=1));
             });
 

@@ -106,9 +106,6 @@ export default {
     .drag-list {
         padding:                    0 !important;
     }
-    .dragArea {
-        /* outline:                    1px dashed; */
-    }
     .dragArea li {
         /* outline:                    1px solid; */
         list-style:                 none;
