@@ -53,8 +53,8 @@ export default {
 
                     _temp_object.description = _item.name; //description
                     _temp_object.quantity = _item.quantity; //quantity
-                    _temp_object.price = this.numberWithCommas((_item.price).toFixed(2)); //prices
-                    _temp_object.amount = this.numberWithCommas((_item.price * _item.quantity).toFixed(2)); //total price
+                    _temp_object.price = _item.price !== '' ? this.numberWithCommas(parseFloat(_item.price).toFixed(2)) : ''; //prices
+                    _temp_object.amount = _item.price !== '' ? this.numberWithCommas(parseFloat(_item.price * _item.quantity).toFixed(2)) : ''; //total price
                     this.total += _item.price * _item.quantity;
                 }
 

@@ -13,12 +13,29 @@
                         <v-icon class="handle align-self-center">mdi-drag-horizontal</v-icon>
                     </v-col>
                     <v-col
+                        cols="10"
+                        md="2"
+                    >
+                        <v-select
+                            :items="rowtypes"
+                            v-model="el.rowtype"
+                            placeholder="Types"
+                            dense
+                            hide-details
+                            hide-selected
+                            solo
+                            flat
+                            clearable
+                            clear-icon="mdi-close-circle"
+                        ></v-select>
+                    </v-col>
+                    <v-col
                         v-for="(data, i) in headers"
                         :key="i"
                         cols="10"
-                        md="2"
-                        :offset="i > 0 ? 1 : null"
-                        :offset-md="i > 0 ? 0 : null"
+                        :md="data.colsize ? data.colsize : 1"
+                        offset="1"
+                        offset-md="0"
                     ><!-- offsets will be null if its the first element -->
                         <v-textarea
                             class="design-textarea"
@@ -65,6 +82,23 @@ export default {
             required: true
         }
     },
+    data: () => ({
+        rowtypes: [
+            {
+                text: 'MTR',
+                value: 'materials'
+            },
+            {
+                text: 'JOB',
+                value: 'jobs'
+            },
+            {
+                text: '\\n',
+                value: 'new line'
+            }
+        ],
+        definedRowTypes: [] //material and job will go here
+    }),
     methods: {
         removeAt(i) {
             //console.log(`delete ${i}`)

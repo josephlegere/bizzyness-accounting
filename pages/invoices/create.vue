@@ -3,7 +3,7 @@
         <v-col class="text-center">
 
             <h3>Invoice</h3>
-            <h2>12345</h2>
+            <h2>{{invoice_number}}</h2>
 
             <v-container>
                 <v-autocomplete
@@ -99,10 +99,27 @@
                     <v-toolbar-title class="mr-4">Total: {{accumulate.toFixed(2)}}</v-toolbar-title>
 
                     <v-spacer></v-spacer>
-
-                    <v-btn icon>
-                        <v-icon>mdi-printer-search</v-icon>
-                    </v-btn>
+                    
+                    <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                icon
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                                <v-icon>mdi-printer-search</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-card>
+                            <v-toolbar dark color="primary">
+                                <v-btn icon dark @click="preview = false">
+                                    <v-icon>mdi-close</v-icon>
+                                </v-btn>
+                                <v-toolbar-title>Invoice</v-toolbar-title>
+                            </v-toolbar>
+                            <InvoiceView :invoice="invoice" :key="previewKey" />
+                        </v-card>
+                    </v-dialog>
 
                     <v-btn icon>
                         <v-icon>mdi-send-circle-outline</v-icon>
@@ -115,26 +132,28 @@
 
 <script>
 import DraggableNested from '../../components/DraggableNested';
-
+import InvoiceView from '~/components/InvoiceView';
 
 export default {
     data () {
         return {
-            bottomNav: 'recent',
             name: 'invoice-create',
+            invoice_number: '12345',
             date: new Date().toISOString().substr(0, 10),
             datepicker: false,
             recipient: null,
             accounts: [],
             isLoadingAccounts: false,
+            rowtypes: ['materials', 'jobs'],
             headers: [
                 { value: 'key', text: 'Key' },
-                { value: 'description', text: 'Description' },
+                { value: 'description', text: 'Description', colsize: 2 },
                 { value: 'quantity', text: 'Quantity' },
-                { value: 'price', text: 'Price' },
+                { value: 'price', text: 'Price', colsize: 2 },
                 {
                     value: 'amount',
                     text: 'Amount',
+                    colsize: 2,
                     readonly: true,
                     input: {
                         items: ['quantity', 'price'],
@@ -143,7 +162,9 @@ export default {
                     accumulate: 'sum'
                 }
             ],
-            list: []
+            list: [],
+            currency: 'QR',
+            preview: false
         }
     },
     methods: {
@@ -154,6 +175,7 @@ export default {
                 _temp[elem.value] = '';
             });
             _temp.items = [];
+            _temp.rowtype = '';
 
             this.list.push(_temp);
         },
@@ -167,6 +189,7 @@ export default {
                     if (elem.value === 'key') _record[elem.value] = i + 1;
                 });
                 _record.items = [];
+                _record.rowtype = 'materials';
                 _items.push(_record);
             }
 
@@ -176,6 +199,7 @@ export default {
                 if (elem.value === 'key') _record[elem.value] = _items.length + 1;
             });
             _record.items = [];
+            _record.rowtype = '';
             _items[_items.length-1].items.push(_record);
 
             this.list = _items;
@@ -207,22 +231,84 @@ export default {
 
                 return acc + _total;
             }, 0);
+        },
+        extractData(list) {
+            let _items = {};
+            let _layout = [];
+
+            list.forEach((elem, key) => {
+                let _source = {};
+                let _children = [];
+
+                if (elem.items.length > 0) {
+                    let _child = this.extractData(elem.items);
+                    _children = _child.layout;
+                    Object.assign(_items, _child.items);
+                }
+
+                if (this.rowtypes.includes(elem.rowtype)) {
+                    if (!(_items.hasOwnProperty(elem.rowtype)))
+                        _items[elem.rowtype] = {};
+
+                    _items.materials[key] = {
+                        currency: this.currency,
+                        name: elem.description,
+                        price: elem.price,
+                        quantity: elem.quantity
+                    }
+                    _source.origin = `items/${elem.rowtype}/${key}`;
+                }
+                else
+                    _source.content = elem.description;
+
+                _layout.push({
+                    children: _children,
+                    key: elem.key,
+                    source: _source
+                });
+            });
+
+            return {
+                items: _items,
+                layout: _layout
+            };
         }
     },
     computed: {
-        dateStringFormat: function () {
+        dateStringFormat () {
             return new Date(this.date).toDateString().substr(3, 12);
         },
         accumulate () {
             return this.accumulate_list(this.list, this.headers);
+        },
+        invoice () {            
+            let _records = this.extractData(this.list);
+            console.log(_records)
+
+            return {
+                author: 'Joseph Legere',
+                client: this.recipient,
+                date: this.date,
+                invoice: this.invoice_number,
+                items: _records.items, //local
+                layout: _records.layout,
+                remarks: '',
+                total: this.accumulate
+            }
+        },
+        previewKey () { //to enable rerender of component
+            if (this.preview)
+                return Date.now();
         }
     },
     created() {
         this.presets();
         this.temp_accounts();
+        //console.log(this.extractData(this.list));
     },
     components: {
-        DraggableNested
+        DraggableNested,
+        InvoiceView
     }
 }
 </script>
