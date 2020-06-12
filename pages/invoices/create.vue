@@ -133,6 +133,7 @@
 <script>
 import DraggableNested from '../../components/DraggableNested';
 import InvoiceView from '~/components/InvoiceView';
+import _ from 'lodash';
 
 export default {
     data () {
@@ -232,7 +233,7 @@ export default {
                 return acc + _total;
             }, 0);
         },
-        extractData(list) {
+        extractData(list, len = 0) {
             let _items = {};
             let _layout = [];
 
@@ -241,22 +242,24 @@ export default {
                 let _children = [];
 
                 if (elem.items.length > 0) {
-                    let _child = this.extractData(elem.items);
+                    let _child = this.extractData(elem.items, len+1);
                     _children = _child.layout;
-                    Object.assign(_items, _child.items);
+                    console.log(_items)
+                    console.log(_child.items)
+                    _items = _.merge(_items, _child.items);
                 }
 
                 if (this.rowtypes.includes(elem.rowtype)) {
                     if (!(_items.hasOwnProperty(elem.rowtype)))
                         _items[elem.rowtype] = {};
 
-                    _items.materials[key] = {
+                    _items.materials[`${key}${len}`] = {
                         currency: this.currency,
                         name: elem.description,
                         price: elem.price,
                         quantity: elem.quantity
                     }
-                    _source.origin = `items/${elem.rowtype}/${key}`;
+                    _source.origin = `items/${elem.rowtype}/${key}${len}`;
                 }
                 else
                     _source.content = elem.description;
@@ -283,7 +286,6 @@ export default {
         },
         invoice () {            
             let _records = this.extractData(this.list);
-            console.log(_records)
 
             return {
                 author: 'Joseph Legere',
@@ -298,7 +300,9 @@ export default {
         },
         previewKey () { //to enable rerender of component
             if (this.preview)
-                return Date.now();
+                return Date.now(); //opened
+            else
+                return 0; //closed
         }
     },
     created() {

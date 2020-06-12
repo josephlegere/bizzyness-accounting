@@ -51,7 +51,7 @@ export default {
                 else if (elem.source.hasOwnProperty('origin')) {
                     let _item = this.extractSourceData(this.invoice, elem.source.origin.split('/'));
 
-                    _temp_object.description = _item.name; //description
+                    _temp_object.description = this.viewFormat(_item.name, { newline: true, tab: len }); //description
                     _temp_object.quantity = _item.quantity; //quantity
                     _temp_object.price = _item.price !== '' ? this.numberWithCommas(parseFloat(_item.price).toFixed(2)) : ''; //prices
                     _temp_object.amount = _item.price !== '' ? this.numberWithCommas(parseFloat(_item.price * _item.quantity).toFixed(2)) : ''; //total price
@@ -62,7 +62,7 @@ export default {
                 _records.push(_temp_object);
                 
                 if (elem.children.length > 0) //extract layout of children
-                    _records = _records.concat(this.extractLayout(elem.children, len+=1));
+                    _records = _records.concat(this.extractLayout(elem.children, len+1));
             });
 
             return _records;
