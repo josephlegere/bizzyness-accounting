@@ -1,6 +1,6 @@
 <template>
     <div>
-        <PDFViewer :src="generatePDF" />
+        <PDFViewer :src="generatePDF" :toPrint="toPrint" />
     </div>
 </template>
 
@@ -16,6 +16,9 @@ export default {
         invoice: {
             type: Object,
             required: true
+        },
+        toPrint: {
+            type: Boolean
         }
     },
     data() {

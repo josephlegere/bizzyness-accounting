@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-btn x-small class="mx-1 print-form" fab fixed right bottom @click="$refs.pdfComponent.print()" color="primary">
+        <v-btn v-show="toPrint" x-small class="mx-1 print-form" fab fixed right bottom @click="$refs.pdfComponent.print()" color="primary">
             <v-icon dark>mdi-printer</v-icon>
         </v-btn>
         
@@ -35,6 +35,9 @@ export default {
         src: {
             type: String,
             required: true
+        },
+        toPrint: {
+            type: Boolean //default true
         }
     },
     data() {
@@ -54,6 +57,9 @@ export default {
                     this.currentPage++
             }
         }
+    },
+    updated() {
+        //console.log(this.toPrint)
     },
     components: {
         PDFRender

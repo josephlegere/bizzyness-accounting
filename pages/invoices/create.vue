@@ -110,20 +110,43 @@
                                 <v-icon>mdi-printer-search</v-icon>
                             </v-btn>
                         </template>
-                        <v-card>
+                        <v-card dark>
                             <v-toolbar dark color="primary">
                                 <v-btn icon dark @click="preview = false">
                                     <v-icon>mdi-close</v-icon>
                                 </v-btn>
                                 <v-toolbar-title>Invoice</v-toolbar-title>
                             </v-toolbar>
-                            <InvoiceView :invoice="invoice" :key="previewKey" />
+                            <div v-if="preview">
+                                <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=false />
+                            </div>
+
+                        </v-card>
+                    </v-dialog>
+                    
+                    <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                icon
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                                <v-icon>mdi-send-circle-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-card dark>
+                            <v-toolbar dark color="primary">
+                                <v-btn icon dark @click="print = false">
+                                    <v-icon>mdi-close</v-icon>
+                                </v-btn>
+                                <v-toolbar-title>Invoice</v-toolbar-title>
+                            </v-toolbar>
+                            <div v-if="print">
+                                <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=true />
+                            </div>
                         </v-card>
                     </v-dialog>
 
-                    <v-btn icon>
-                        <v-icon>mdi-send-circle-outline</v-icon>
-                    </v-btn>
                 </v-toolbar>
             </v-sheet>
         </v-col>
@@ -131,7 +154,7 @@
 </template>
 
 <script>
-import DraggableNested from '../../components/DraggableNested';
+import DraggableNested from '~/components/DraggableNested';
 import InvoiceView from '~/components/InvoiceView';
 import _ from 'lodash';
 
@@ -165,7 +188,8 @@ export default {
             ],
             list: [],
             currency: 'QR',
-            preview: false
+            preview: false,
+            print: false
         }
     },
     methods: {
@@ -190,7 +214,6 @@ export default {
                     if (elem.value === 'key') _record[elem.value] = i + 1;
                 });
                 _record.items = [];
-                _record.rowtype = 'materials';
                 _items.push(_record);
             }
 
@@ -244,8 +267,6 @@ export default {
                 if (elem.items.length > 0) {
                     let _child = this.extractData(elem.items, len+1);
                     _children = _child.layout;
-                    console.log(_items)
-                    console.log(_child.items)
                     _items = _.merge(_items, _child.items);
                 }
 
@@ -298,7 +319,7 @@ export default {
                 total: this.accumulate
             }
         },
-        previewKey () { //to enable rerender of component
+        viewerwKey () { //initially to enable rerender of component, now mainly triggers a function (but still need to return a date)
             if (this.preview)
                 return Date.now(); //opened
             else
