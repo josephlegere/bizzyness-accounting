@@ -142,7 +142,7 @@
                                 <v-toolbar-title>Invoice</v-toolbar-title>
                             </v-toolbar>
                             <div v-if="print">
-                                <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=true />
+                                <InvoiceView :invoice="invoice" :key="viewerwKey" />
                             </div>
                         </v-card>
                     </v-dialog>

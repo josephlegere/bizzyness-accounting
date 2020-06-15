@@ -37,7 +37,8 @@ export default {
             required: true
         },
         toPrint: {
-            type: Boolean //default true
+            type: Boolean,
+            default: true
         }
     },
     data() {
