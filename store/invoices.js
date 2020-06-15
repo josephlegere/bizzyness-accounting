@@ -40,11 +40,16 @@ export const actions = {
 
         commit("setList", _list);
     },
-    async show({ commit }, id) {
-        const response = await this.$axios.get(
-            `${process.env.cmsURL}/posts/${id}`
-        );
-        commit("setPost", response.data);
+    // async show({ commit }, id) {
+    //     const response = await this.$axios.get(
+    //         `${process.env.cmsURL}/posts/${id}`
+    //     );
+    //     commit("setPost", response.data);
+    // },
+    async add({ commit }, invoice) {
+        //const response = await axios.post('https://jsonplaceholder.typicode.com/todos', { title, completed: false });
+        console.log(invoice);
+        return await this.$fireStore.collection('invoices').add(invoice);
     }
 };
 

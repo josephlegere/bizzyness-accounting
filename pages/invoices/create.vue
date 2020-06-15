@@ -100,7 +100,7 @@
 
                     <v-spacer></v-spacer>
                     
-                    <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition">
+                    <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Preview -->
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 icon
@@ -124,7 +124,7 @@
                         </v-card>
                     </v-dialog>
                     
-                    <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition">
+                    <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Print -->
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 icon
@@ -157,6 +157,7 @@
 import DraggableNested from '~/components/DraggableNested';
 import InvoiceView from '~/components/InvoiceView';
 import _ from 'lodash';
+import { mapActions } from 'vuex';
 
 export default {
     data () {
@@ -296,6 +297,39 @@ export default {
                 items: _items,
                 layout: _layout
             };
+        },
+        submitInvoice() {
+            let { date, invoice, items, layout, remarks, total } = this.invoice;
+            let _invoice = { //invoice format for database
+                active: true,
+                agent: {
+                    account: 'GEMS',
+                    id: 'users/EhAr8hIH9YvMzvShocXV',
+                    name: 'Joseph Legere'
+                },
+                client: {
+                    account: 'Family Food Centre',
+                    id: 'users/yUEGqYUP8uBbk4p0qknE',
+                    name: 'Tamer'
+                },
+                created_date: date,
+                invoice_code: invoice,
+                items,
+                layout,
+                remarks,
+                set_date: Date.now(),
+                tenant: 'tenants/HiternQX1hmdvcxnrSIr',
+                total
+            };
+
+            this.$store.dispatch('invoices/add', _invoice)
+            .then((ref) => {
+                console.log(ref)
+                console.log('Redirect');
+            })
+            .catch(err => {
+                console.error('Error in Store!');
+            });
         }
     },
     computed: {
@@ -320,7 +354,10 @@ export default {
             }
         },
         viewerwKey () { //initially to enable rerender of component, now mainly triggers a function (but still need to return a date)
-            if (this.preview)
+            if (this.print) {
+                this.submitInvoice();
+            }
+            else if (this.preview)
                 return Date.now(); //opened
             else
                 return 0; //closed
