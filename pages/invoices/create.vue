@@ -315,15 +315,15 @@ export default {
                 total
             };
 
-            console.log(_invoice);
-            // this.$store.dispatch('invoices/add', _invoice)
-            // .then((ref) => {
-            //     console.log(ref)
-            //     console.log('Redirect');
-            // })
-            // .catch(err => {
-            //     console.error('Error in Store!');
-            // });
+            //console.log(_invoice);
+            this.$store.dispatch('invoices/add', _invoice)
+            .then((ref) => {
+                console.log(ref)
+                console.log('Redirect');
+            })
+            .catch(err => {
+                console.error('Error in Store!');
+            });
         }
     },
     computed: {
