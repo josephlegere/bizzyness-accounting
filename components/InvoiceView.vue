@@ -149,7 +149,7 @@ export default {
             doc.setFont('Helvetica', 'Bold');
 
             doc.text(`Cash/Credit Invoice`, 85, 42);
-            doc.text(`No. ${this.invoice.invoice}`, 14, 52);
+            doc.text(`No. ${this.invoice.invoice_code}`, 14, 52);
             doc.text(`To: ${this.invoice.client}`, 14, 58);
             doc.text(`${this.invoice.date}`, 160, 52);
 

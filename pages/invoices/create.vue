@@ -17,29 +17,30 @@
                     item-text="name"
                     item-value="name"
                     dense
+                    return-object
                 >
-                <template v-slot:selection="data">
-                    <v-chip
-                        v-bind="data.attrs"
-                        :input-value="data.selected"
-                        close
-                        @click="data.select"
-                        @click:close="remove(data.item)"
-                    >
-                        {{ data.item.name }}
-                    </v-chip>
-                </template>
-                <template v-slot:item="data">
-                    <template v-if="typeof data.item !== 'object'">
-                        <v-list-item-content v-text="data.item"></v-list-item-content>
+                    <template v-slot:selection="data">
+                        <v-chip
+                            v-bind="data.attrs"
+                            :input-value="data.selected"
+                            close
+                            @click="data.select"
+                            @click:close="remove(data.item)"
+                        >
+                            {{ data.item.name }}
+                        </v-chip>
                     </template>
-                    <template v-else>
-                        <v-list-item-content>
-                            <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                            <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
-                        </v-list-item-content>
+                    <template v-slot:item="data">
+                        <template v-if="typeof data.item !== 'object'">
+                            <v-list-item-content v-text="data.item"></v-list-item-content>
+                        </template>
+                        <template v-else>
+                            <v-list-item-content>
+                                <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                                <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
+                            </v-list-item-content>
+                        </template>
                     </template>
-                </template>
                 </v-autocomplete>
 
                 <v-dialog
@@ -157,7 +158,7 @@
 import DraggableNested from '~/components/DraggableNested';
 import InvoiceView from '~/components/InvoiceView';
 import _ from 'lodash';
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 export default {
     data () {
@@ -167,7 +168,7 @@ export default {
             date: new Date().toISOString().substr(0, 10),
             datepicker: false,
             recipient: null,
-            accounts: [],
+            // accounts: [],
             isLoadingAccounts: false,
             rowtypes: ['materials', 'jobs'],
             headers: [
@@ -299,21 +300,13 @@ export default {
             };
         },
         submitInvoice() {
-            let { date, invoice, items, layout, remarks, total } = this.invoice;
+            let { date, invoice_code, items, layout, remarks, total } = this.invoice;
             let _invoice = { //invoice format for database
                 active: true,
-                agent: {
-                    account: 'GEMS',
-                    id: 'users/EhAr8hIH9YvMzvShocXV',
-                    name: 'Joseph Legere'
-                },
-                client: {
-                    account: 'Family Food Centre',
-                    id: 'users/yUEGqYUP8uBbk4p0qknE',
-                    name: 'Tamer'
-                },
+                agent: this.loggeduser,
+                client: this.recipient.client,
                 created_date: date,
-                invoice_code: invoice,
+                invoice_code,
                 items,
                 layout,
                 remarks,
@@ -322,14 +315,15 @@ export default {
                 total
             };
 
-            this.$store.dispatch('invoices/add', _invoice)
-            .then((ref) => {
-                console.log(ref)
-                console.log('Redirect');
-            })
-            .catch(err => {
-                console.error('Error in Store!');
-            });
+            console.log(_invoice);
+            // this.$store.dispatch('invoices/add', _invoice)
+            // .then((ref) => {
+            //     console.log(ref)
+            //     console.log('Redirect');
+            // })
+            // .catch(err => {
+            //     console.error('Error in Store!');
+            // });
         }
     },
     computed: {
@@ -346,7 +340,7 @@ export default {
                 author: 'Joseph Legere',
                 client: this.recipient,
                 date: this.date,
-                invoice: this.invoice_number,
+                invoice_code: this.invoice_number,
                 items: _records.items, //local
                 layout: _records.layout,
                 remarks: '',
@@ -361,11 +355,18 @@ export default {
                 return Date.now(); //opened
             else
                 return 0; //closed
-        }
+        },
+        ...mapState({
+            accounts: state => state.accounts.list,
+            loggeduser: state => state.auth.loggeduser
+        })
+    },
+    async asyncData({store}) {
+        await store.dispatch('accounts/get');
     },
     created() {
         this.presets();
-        this.temp_accounts();
+        // this.temp_accounts();
         //console.log(this.extractData(this.list));
     },
     components: {

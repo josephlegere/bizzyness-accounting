@@ -18,19 +18,19 @@ export const actions = {
             .get()
             .then(snapshot => {
                 snapshot.forEach(doc => {
-                    //console.log(doc.id, "=>", doc.data());
+                    console.log(doc.id, "=>", doc.data());
                     let _invoice = doc.data();
 
                     _list.push({
-                      invoice: _invoice.invoice_code,
+                      invoice_code: _invoice.invoice_code,
                       date: new Date(_invoice.created_date.seconds),
                       client: _invoice.client.account,
                       total: _invoice.total,
                       author: _invoice.agent.name,
                       remarks: _invoice.remarks,
-                      id: doc.id,
                       items: _invoice.items,
-                      layout: _invoice.layout
+                      layout: _invoice.layout,
+                      id: doc.id
                     });
                 });
             })

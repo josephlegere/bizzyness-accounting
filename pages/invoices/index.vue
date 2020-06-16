@@ -33,7 +33,7 @@
                     </template>
                     <template v-slot:item="props">
                         <tr :active="props.selected" @click="open(props.item)">
-                            <td>{{ props.item.invoice }}</td>
+                            <td>{{ props.item.invoice_code }}</td>
                             <td>{{ props.item.date }}</td>
                             <td>{{ props.item.client }}</td>
                             <td>{{ props.item.total }}</td>
@@ -79,7 +79,7 @@
             open(invoice) {
                 //console.log(invoice)
                 this.$store.commit('invoices/setInvoice', invoice);
-                this.$router.push({ path: `/invoices/${invoice.invoice}` });
+                this.$router.push({ path: `/invoices/${invoice.invoice_code}` });
             }
         },
         computed: {
