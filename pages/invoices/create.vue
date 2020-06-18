@@ -305,17 +305,17 @@ export default {
                 active: true,
                 agent: this.loggeduser,
                 client: this.recipient.client,
-                created_date: date,
+                created_date: this.$fireStoreObj.Timestamp.fromDate(new Date(date)),
                 invoice_code,
                 items,
                 layout,
                 remarks,
-                set_date: Date.now(),
-                tenant: 'tenants/HiternQX1hmdvcxnrSIr',
+                set_date: this.$fireStoreObj.FieldValue.serverTimestamp(), //this format is set date from server side
+                tenant: '/tenants/HiternQX1hmdvcxnrSIr',
                 total
             };
 
-            //console.log(_invoice);
+            // console.log(_invoice);
             this.$store.dispatch('invoices/add', _invoice)
             .then((ref) => {
                 console.log(ref)
@@ -338,7 +338,7 @@ export default {
 
             return {
                 author: 'Joseph Legere',
-                client: this.recipient,
+                client: this.recipient.client,
                 date: this.date,
                 invoice_code: this.invoice_number,
                 items: _records.items, //local

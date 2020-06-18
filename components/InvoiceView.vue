@@ -8,7 +8,7 @@
 import PDFViewer from './PDFViewer';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import num_convert from 'number-to-words';
+// import num_convert from 'number-to-words';
 import { ToWords } from 'to-words';
 
 export default {
@@ -150,7 +150,7 @@ export default {
 
             doc.text(`Cash/Credit Invoice`, 85, 42);
             doc.text(`No. ${this.invoice.invoice_code}`, 14, 52);
-            doc.text(`To: ${this.invoice.client}`, 14, 58);
+            doc.text(`To: ${this.invoice.client.account}`, 14, 58);
             doc.text(`${this.invoice.date}`, 160, 52);
 
             doc.autoTable({

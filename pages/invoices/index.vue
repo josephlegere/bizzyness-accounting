@@ -35,7 +35,7 @@
                         <tr :active="props.selected" @click="open(props.item)">
                             <td>{{ props.item.invoice_code }}</td>
                             <td>{{ props.item.date }}</td>
-                            <td>{{ props.item.client }}</td>
+                            <td>{{ props.item.client.account }}</td>
                             <td>{{ props.item.total }}</td>
                             <td>{{ props.item.author }}</td>
                             <td>{{ props.item.remarks }}</td>
