@@ -20,9 +20,11 @@
     "jspdf-autotable": "^3.5.3",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
+    "moment": "^2.27.0",
     "number-to-words": "^1.2.4",
     "nuxt": "^2.0.0",
     "to-words": "^2.1.1",
+    "vue-moment": "^4.1.0",
     "vue-pdf": "^4.0.8",
     "vuedraggable": "^2.23.2"
   },

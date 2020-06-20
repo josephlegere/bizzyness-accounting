@@ -1,3 +1,6 @@
+
+import moment from 'moment';
+
 export const state = () => ({
   list: [],
   invoice: {}
@@ -22,15 +25,15 @@ export const actions = {
                     let _invoice = doc.data();
 
                     _list.push({
-                      invoice_code: _invoice.invoice_code,
-                      date: new Date(_invoice.created_date.seconds),
-                      client: _invoice.client,
-                      total: _invoice.total,
-                      author: _invoice.agent.name,
-                      remarks: _invoice.remarks,
-                      items: _invoice.items,
-                      layout: _invoice.layout,
-                      id: doc.id
+                        invoice_code: _invoice.invoice_code,
+                        date: moment.unix(_invoice.created_date.seconds),
+                        client: _invoice.client,
+                        total: _invoice.total,
+                        author: _invoice.agent.name,
+                        remarks: _invoice.remarks,
+                        items: _invoice.items,
+                        layout: _invoice.layout,
+                        id: doc.id
                     });
                 });
             })
