@@ -137,7 +137,7 @@
                         </template>
                         <v-card dark>
                             <v-toolbar dark color="primary">
-                                <v-btn icon dark @click="print = false">
+                                <v-btn icon dark @click="onSubmit">
                                     <v-icon>mdi-close</v-icon>
                                 </v-btn>
                                 <v-toolbar-title>Invoice</v-toolbar-title>
@@ -164,8 +164,7 @@ export default {
     data () {
         return {
             name: 'invoice-create',
-            invoice_number: '12345',
-            date: new Date().toISOString().substr(0, 10),
+            date: new Date().toISOString().substr(0, 10), //no need to specify time as date is user defined
             datepicker: false,
             recipient: null,
             // accounts: [],
@@ -301,9 +300,11 @@ export default {
         },
         submitInvoice() {
             let { date, invoice_code, items, layout, remarks, total } = this.invoice;
+            let { account, id, name, tenantid } = this.loggeduser;
+
             let _invoice = { //invoice format for database
                 active: true,
-                agent: this.loggeduser,
+                agent: { account, id, name },
                 client: this.recipient.client,
                 created_date: this.$fireStoreObj.Timestamp.fromDate(new Date(date)),
                 invoice_code,
@@ -311,19 +312,22 @@ export default {
                 layout,
                 remarks,
                 set_date: this.$fireStoreObj.FieldValue.serverTimestamp(), //this format is set date from server side
-                tenant: '/tenants/HiternQX1hmdvcxnrSIr',
+                tenant: tenantid,
                 total
             };
 
             // console.log(_invoice);
             this.$store.dispatch('invoices/add', _invoice)
             .then((ref) => {
-                console.log(ref)
+                console.log(ref);
                 console.log('Redirect');
             })
             .catch(err => {
                 console.error('Error in Store!');
             });
+        },
+        onSubmit() {
+            this.$router.push({ path: `/invoices` });
         }
     },
     computed: {
@@ -358,11 +362,13 @@ export default {
         },
         ...mapState({
             accounts: state => state.accounts.list,
-            loggeduser: state => state.auth.loggeduser
+            loggeduser: state => state.auth.loggeduser,
+            invoice_number: state => state.invoices.current
         })
     },
     async asyncData({store}) {
         await store.dispatch('accounts/get');
+        await store.dispatch('invoices/next');
     },
     created() {
         this.presets();

@@ -3,7 +3,8 @@ import moment from 'moment';
 
 export const state = () => ({
   list: [],
-  invoice: {}
+  invoice: {},
+  current: null
 });
 
 export const actions = {
@@ -53,6 +54,23 @@ export const actions = {
         //const response = await axios.post('https://jsonplaceholder.typicode.com/todos', { title, completed: false });
         console.log(invoice);
         return await this.$fireStore.collection('invoices').add(invoice);
+    },
+    async next({ commit }) {
+        let invoice_code = 0;
+
+        await this.$fireStore
+          .collection("tenant_invoices")
+          .doc("HiternQX1hmdvcxnrSIr")
+          .get()
+          .then(doc => {
+            let tenant_invoices = doc.data();
+            invoice_code = tenant_invoices.next_invoice;
+          })
+          .catch(err => {
+            console.log("Error getting documents", err);
+          });
+
+        commit("setNext", invoice_code);
     }
 };
 
@@ -60,5 +78,8 @@ export const mutations = {
     setList: (state, invoices) => (state.list = invoices),
     setInvoice(state, invoice) {
         state.invoice = invoice;
+    },
+    setNext(state, invoice) {
+        state.current = invoice;
     }
 };
