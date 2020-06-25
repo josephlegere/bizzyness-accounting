@@ -5,151 +5,170 @@
             <h3>Invoice</h3>
             <h2>{{invoice_number}}</h2>
 
-            <v-container>
-                <v-autocomplete
-                    v-model="recipient"
-                    :items="accounts"
-                    :loading="isLoadingAccounts"
-                    hide-no-data
-                    filled
-                    chips
-                    placeholder="Accounts"
-                    item-text="name"
-                    item-value="name"
-                    dense
-                    return-object
-                >
-                    <template v-slot:selection="data">
-                        <v-chip
-                            v-bind="data.attrs"
-                            :input-value="data.selected"
-                            close
-                            @click="data.select"
-                            @click:close="remove(data.item)"
-                        >
-                            {{ data.item.name }}
-                        </v-chip>
-                    </template>
-                    <template v-slot:item="data">
-                        <template v-if="typeof data.item !== 'object'">
-                            <v-list-item-content v-text="data.item"></v-list-item-content>
+            <v-form
+                ref="form"
+                v-model="validate"
+            >
+                <v-container>
+                    <v-autocomplete
+                        v-model="recipient"
+                        :rules="recipientRules"
+                        :items="accounts"
+                        :loading="isLoadingAccounts"
+                        hide-no-data
+                        filled
+                        chips
+                        placeholder="Accounts"
+                        item-text="name"
+                        item-value="name"
+                        dense
+                        return-object
+                    >
+                        <template v-slot:selection="data">
+                            <v-chip
+                                v-bind="data.attrs"
+                                :input-value="data.selected"
+                                close
+                                @click="data.select"
+                                @click:close="remove(data.item)"
+                            >
+                                {{ data.item.name }}
+                            </v-chip>
                         </template>
-                        <template v-else>
-                            <v-list-item-content>
-                                <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                                <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
-                            </v-list-item-content>
+                        <template v-slot:item="data">
+                            <template v-if="typeof data.item !== 'object'">
+                                <v-list-item-content v-text="data.item"></v-list-item-content>
+                            </template>
+                            <template v-else>
+                                <v-list-item-content>
+                                    <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                                    <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
+                                </v-list-item-content>
+                            </template>
                         </template>
-                    </template>
-                </v-autocomplete>
+                    </v-autocomplete>
 
-                <v-dialog
-                    ref="dialog"
-                    v-model="datepicker"
-                    :return-value.sync="date"
-                    persistent
-                    width="290px"
-                >
-                    <template v-slot:activator="{ on }">
-                        <v-text-field
-                            v-model="dateStringFormat"
-                            placeholder="Date"
-                            readonly
-                            dense
-                            v-on="on"
-                        ></v-text-field>
-                    </template>
-                    <v-date-picker v-model="date" scrollable>
+                    <v-dialog
+                        ref="dialog"
+                        v-model="datepicker"
+                        :return-value.sync="date"
+                        persistent
+                        width="290px"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                v-model="dateStringFormat"
+                                placeholder="Date"
+                                readonly
+                                dense
+                                v-on="on"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="date" scrollable>
+                            <v-spacer></v-spacer>
+                            <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
+                            <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
+                        </v-date-picker>
+                    </v-dialog>
+                </v-container>
+
+                <v-container>
+                    <v-toolbar
+                        class="mb-1"
+                        height="30"
+                        elevation="2"
+                        collapse
+                    >
+                        <v-btn icon @click="add">
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+
                         <v-spacer></v-spacer>
-                        <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
-                        <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
-                    </v-date-picker>
-                </v-dialog>
-            </v-container>
 
-            <v-container>
-                <v-toolbar
-                    class="mb-1"
-                    height="30"
-                    elevation="2"
-                    collapse
-                >
-                    <v-btn icon @click="add">
-                        <v-icon>mdi-plus</v-icon>
-                    </v-btn>
+                        <v-btn icon>
+                            <v-icon>mdi-dots-vertical</v-icon>
+                        </v-btn>
+                    </v-toolbar>
 
-                    <v-spacer></v-spacer>
+                    <draggable-nested class="drag-list mt-md-3" :headers="headers" :items="list" />
+                </v-container>
 
-                    <v-btn icon>
-                        <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                </v-toolbar>
+                <br>
+                <br>
 
-                <draggable-nested class="drag-list mt-md-3" :headers="headers" :items="list" />
-            </v-container>
+                <v-sheet
+                    dark
+                    class="form-toolbar">
+                    <v-toolbar
+                        color="secondary"
+                        flat
+                        height="60">
 
-            <br>
+                        <v-toolbar-title class="mr-4">Total:</v-toolbar-title>
 
-            <v-sheet
-                dark
-                class="form-toolbar">
-                <v-toolbar
-                    color="secondary"
-                    flat
-                    height="50">
-                    <v-toolbar-title class="mr-4">Total: {{accumulate.toFixed(2)}}</v-toolbar-title>
+                        <v-spacer></v-spacer>
 
-                    <v-spacer></v-spacer>
-                    
-                    <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Preview -->
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                icon
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                                <v-icon>mdi-printer-search</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-card dark>
-                            <v-toolbar dark color="primary">
-                                <v-btn icon dark @click="preview = false">
-                                    <v-icon>mdi-close</v-icon>
-                                </v-btn>
-                                <v-toolbar-title>Invoice</v-toolbar-title>
-                            </v-toolbar>
-                            <div v-if="preview">
-                                <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=false />
-                            </div>
+                        <!-- Total: -->
+                        <v-text-field
+                            v-model="accumulate"
+                            :rules="[v => parseInt(v) > 0 || 'Total is required']"
+                            label="Total"
+                            readonly
+                            solo
+                            flat
+                            dense
+                            hide-details="auto"
+                            background-color="rgba(255,255,255, 0)"
+                            style="width:120px; margin: auto 0"
+                        ></v-text-field>
 
-                        </v-card>
-                    </v-dialog>
-                    
-                    <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Print -->
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                icon
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                                <v-icon>mdi-send-circle-outline</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-card dark>
-                            <v-toolbar dark color="primary">
-                                <v-btn icon dark @click="onSubmit">
-                                    <v-icon>mdi-close</v-icon>
-                                </v-btn>
-                                <v-toolbar-title>Invoice</v-toolbar-title>
-                            </v-toolbar>
-                            <div v-if="print">
-                                <InvoiceView :invoice="invoice" :key="viewerwKey" />
-                            </div>
-                        </v-card>
-                    </v-dialog>
+                        <v-spacer></v-spacer>
+                        
+                        <v-btn
+                            icon
+                            @click="checkValidation(true, 'preview')"
+                        >
+                            <v-icon>mdi-printer-search</v-icon>
+                        </v-btn>
+                        <v-btn
+                            icon
+                            @click="checkValidation(true, 'print')"
+                        >
+                            <v-icon>mdi-send-circle-outline</v-icon>
+                        </v-btn>
 
-                </v-toolbar>
-            </v-sheet>
+                        <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Preview -->
+                            <v-card dark>
+                                <v-toolbar dark color="primary">
+                                    <v-btn icon dark @click="preview = false">
+                                        <v-icon>mdi-close</v-icon>
+                                    </v-btn>
+                                    <v-toolbar-title>Invoice</v-toolbar-title>
+                                </v-toolbar>
+                                <div v-if="preview">
+                                    <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=false />
+                                </div>
+
+                            </v-card>
+                        </v-dialog>
+                        
+                        <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Print -->
+                            <v-card dark>
+                                <v-toolbar dark color="primary">
+                                    <v-btn icon dark @click="onSubmit">
+                                        <v-icon>mdi-close</v-icon>
+                                    </v-btn>
+                                    <v-toolbar-title>Invoice</v-toolbar-title>
+                                </v-toolbar>
+                                <div v-if="print">
+                                    <InvoiceView :invoice="invoice" :key="viewerwKey" />
+                                </div>
+                            </v-card>
+                        </v-dialog>
+
+                    </v-toolbar>
+                </v-sheet>
+            </v-form>
         </v-col>
     </v-row>
 </template>
@@ -163,10 +182,14 @@ import { mapActions, mapState } from 'vuex';
 export default {
     data () {
         return {
+            validate: false,
             name: 'invoice-create',
             date: new Date().toISOString().substr(0, 10), //no need to specify time as date is user defined
             datepicker: false,
             recipient: null,
+            recipientRules: [
+                v => !!v || 'Recipient is required'
+            ],
             // accounts: [],
             isLoadingAccounts: false,
             rowtypes: ['materials', 'jobs'],
@@ -328,6 +351,16 @@ export default {
         },
         onSubmit() {
             this.$router.push({ path: `/invoices` });
+        },
+        checkValidation (isOpen, type) {
+            this.$refs.form.validate();
+
+            if (this.validate && isOpen) {
+                if (type === 'preview')
+                    this.preview = true;
+                else if (type === 'print')
+                    this.print = true;
+            }
         }
     },
     computed: {
@@ -335,7 +368,7 @@ export default {
             return new Date(this.date).toDateString().substr(3, 12);
         },
         accumulate () {
-            return this.accumulate_list(this.list, this.headers);
+            return this.accumulate_list(this.list, this.headers).toFixed(2);
         },
         invoice () {            
             let _records = this.extractData(this.list);
