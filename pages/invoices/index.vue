@@ -55,7 +55,7 @@
         data () {
             return {
                 datefilter: [],
-                suggests: ['2020-05-24', '2020-05-29'],
+                suggests: [],
                 search: '',
                 headers: [
                     {
@@ -75,11 +75,15 @@
         methods: {
             updateDateFilter(range) {
                 this.datefilter = range;
+                this.filterData();
             },
             open(invoice) {
                 //console.log(invoice)
                 this.$store.commit('invoices/setInvoice', invoice);
                 this.$router.push({ path: `/invoices/${invoice.invoice_code}` });
+            },
+            filterData() {
+                console.log('filter');
             }
         },
         computed: {
