@@ -73,12 +73,16 @@ export default {
         }
     },
     methods: {
+        setDefault() {
+            this.dates = this.presuggests[0].dates;
+            this.$emit('update-range', this.dates);
+        },
         setSuggested(action) {
             console.log(action.value)
             this.dates = action.dates;
             this.$emit('update-range', this.dates);
         },
-        updateRange(refs) {
+        updateRange() {
             this.$refs.dialog.save(this.dates);
             this.$emit('update-range', this.dates);
         }
@@ -100,6 +104,9 @@ export default {
             this.dates = _range;
             return _range;
         }
+    },
+    created() {
+        this.setDefault();
     }
 }
 </script>

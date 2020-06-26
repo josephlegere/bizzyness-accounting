@@ -8,8 +8,9 @@ export const state = () => ({
 });
 
 export const actions = {
-    async get({ commit, state, rootState }) {
+    async get({ commit, state, rootState }, dates) {
         let _list = [];
+        console.log(dates)
         // const ref = this.$fireStore.collection('users').doc(userId);
         // try {
             // await exerciseRef.update({
@@ -18,29 +19,35 @@ export const actions = {
         // } catch (e) {
         //     return Promise.reject(e);
         // }
-        await this.$fireStore.collection('invoices')
-            .get()
-            .then(snapshot => {
-                snapshot.forEach(doc => {
-                    console.log(doc.id, "=>", doc.data());
-                    let _invoice = doc.data();
+        
+        await this.$fireStore
+          .collection("invoices")
+          .where("created_date", ">", new Date(dates[0]))
+          .where("created_date", "<", new Date(dates[dates.length - 1]))
+          .orderBy("created_date")
+          //.orderBy("invoice_code")
+          .get()
+          .then(snapshot => {
+            snapshot.forEach(doc => {
+              console.log(doc.id, "=>", doc.data());
+              let _invoice = doc.data();
 
-                    _list.push({
-                        invoice_code: _invoice.invoice_code,
-                        date: moment.unix(_invoice.created_date.seconds),
-                        client: _invoice.client,
-                        total: _invoice.total,
-                        author: _invoice.agent.name,
-                        remarks: _invoice.remarks,
-                        items: _invoice.items,
-                        layout: _invoice.layout,
-                        id: doc.id
-                    });
-                });
-            })
-            .catch(err => {
-                console.log("Error getting documents", err);
+              _list.push({
+                invoice_code: _invoice.invoice_code,
+                date: moment.unix(_invoice.created_date.seconds),
+                client: _invoice.client,
+                total: _invoice.total,
+                author: _invoice.agent.name,
+                remarks: _invoice.remarks,
+                items: _invoice.items,
+                layout: _invoice.layout,
+                id: doc.id
+              });
             });
+          })
+          .catch(err => {
+            console.log("Error getting documents", err);
+          });
 
         commit("setList", _list);
     },

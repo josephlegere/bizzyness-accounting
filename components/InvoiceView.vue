@@ -152,7 +152,7 @@ export default {
             doc.text(`Cash/Credit Invoice`, 85, 42);
             doc.text(`No. ${this.invoice.invoice_code}`, 14, 52);
             doc.text(`To: ${this.invoice.client.account}`, 14, 58);
-            doc.text(`${moment(this.invoice.date).format("MMMM Do YYYY")}`, 170, 52);
+            doc.text(`${moment(this.invoice.date).format("MMMM DD, YYYY")}`, 170, 52);
 
             doc.autoTable({
                 head: this.headers,
