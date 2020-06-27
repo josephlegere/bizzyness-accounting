@@ -166,6 +166,39 @@
                             </v-card>
                         </v-dialog>
 
+                        <v-dialog
+                            v-model="confirmPrint"
+                            max-width="290"
+                        >
+                            <v-card>
+                                <v-card-title class="headline">Confirm Submit</v-card-title>
+
+                                <v-card-text>
+                                    Are you sure you want to submit? Check all the details of the invoice before submission.
+                                </v-card-text>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+
+                                    <v-btn
+                                        color="red darken-1"
+                                        text
+                                        @click="confirmPrint = false"
+                                    >
+                                        Cancel
+                                    </v-btn>
+
+                                    <v-btn
+                                        color="primary"
+                                        text
+                                        @click="confirmPrint = false; print = true"
+                                    >
+                                        Confirm
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+
                     </v-toolbar>
                 </v-sheet>
             </v-form>
@@ -213,6 +246,7 @@ export default {
             list: [],
             currency: 'QR',
             preview: false,
+            confirmPrint: false,
             print: false
         }
     },
@@ -359,7 +393,7 @@ export default {
                 if (type === 'preview')
                     this.preview = true;
                 else if (type === 'print')
-                    this.print = true;
+                    this.confirmPrint = true;
             }
         }
     },

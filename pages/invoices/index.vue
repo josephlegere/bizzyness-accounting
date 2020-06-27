@@ -27,7 +27,7 @@
                         <tr>
                             <th class="d-flex justify-space-between align-center">TOTAL <span class="d-sm-none">{{total}}</span></th>
                             <th colspan="2" class="pa-0"></th>
-                            <th class="d-none d-sm-block align-center">{{total}}</th> 
+                            <th class="d-none d-sm-block align-center">{{total.toFixed(2)}}</th> 
                             <th colspan="2" class="pa-0"></th>
                         </tr>
                     </template>
