@@ -2,9 +2,9 @@
 import moment from 'moment';
 
 export const state = () => ({
-  list: [],
-  invoice: {},
-  current: null
+	list: [],
+	invoice: {},
+	current: null
 });
 
 export const actions = {
@@ -21,33 +21,33 @@ export const actions = {
         // }
         
         await this.$fireStore
-          .collection("invoices")
-          .where("created_date", ">", new Date(dates[0]))
-          .where("created_date", "<", new Date(dates[dates.length - 1]))
-          .orderBy("created_date")
-          //.orderBy("invoice_code")
-          .get()
-          .then(snapshot => {
-            snapshot.forEach(doc => {
-              console.log(doc.id, "=>", doc.data());
-              let _invoice = doc.data();
+			.collection("invoices")
+			.where("created_date", ">", new Date(dates[0]))
+			.where("created_date", "<", new Date(dates[dates.length - 1]))
+			.orderBy("created_date")
+			//.orderBy("invoice_code")
+			.get()
+			.then(snapshot => {
+				snapshot.forEach(doc => {
+					console.log(doc.id, "=>", doc.data());
+					let _invoice = doc.data();
 
-              _list.push({
-                invoice_code: _invoice.invoice_code,
-                date: moment.unix(_invoice.created_date.seconds),
-                client: _invoice.client,
-                total: _invoice.total,
-                author: _invoice.agent.name,
-                remarks: _invoice.remarks,
-                items: _invoice.items,
-                layout: _invoice.layout,
-                id: doc.id
-              });
-            });
-          })
-          .catch(err => {
-            console.log("Error getting documents", err);
-          });
+					_list.push({
+						invoice_code: _invoice.invoice_code,
+						date: moment.unix(_invoice.created_date.seconds),
+						client: _invoice.client,
+						total: _invoice.total,
+						author: _invoice.agent.name,
+						remarks: _invoice.remarks,
+						items: _invoice.items,
+						layout: _invoice.layout,
+						id: doc.id
+					});
+				});
+			})
+			.catch(err => {
+				console.log("Error getting documents", err);
+			});
 
         commit("setList", _list);
     },
@@ -66,16 +66,16 @@ export const actions = {
         let invoice_code = 0;
 
         await this.$fireStore
-          .collection("tenant_invoices")
-          .doc("HiternQX1hmdvcxnrSIr")
-          .get()
-          .then(doc => {
-            let tenant_invoices = doc.data();
-            invoice_code = tenant_invoices.next_invoice;
-          })
-          .catch(err => {
-            console.log("Error getting documents", err);
-          });
+			.collection("tenant_invoices")
+			.doc("HiternQX1hmdvcxnrSIr")
+			.get()
+			.then(doc => {
+				let tenant_invoices = doc.data();
+				invoice_code = tenant_invoices.next_invoice;
+			})
+			.catch(err => {
+			console.log("Error getting documents", err);
+			});
 
         commit("setNext", invoice_code);
     }

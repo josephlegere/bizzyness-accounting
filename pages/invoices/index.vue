@@ -82,9 +82,9 @@
                 this.$store.commit('invoices/setInvoice', invoice);
                 this.$router.push({ path: `/invoices/${invoice.invoice_code}` });
             },
-            async filterData() {
+            filterData() {
                 console.log('filter');
-                await this.$store.dispatch('invoices/get', this.datefilter);
+                this.$store.dispatch('invoices/get', this.datefilter);
             }
         },
         computed: {

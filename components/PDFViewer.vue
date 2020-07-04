@@ -59,9 +59,6 @@ export default {
             }
         }
     },
-    updated() {
-        //console.log(this.toPrint)
-    },
     components: {
         PDFRender
     }
