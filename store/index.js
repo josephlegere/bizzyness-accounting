@@ -7,7 +7,7 @@ export const actions = {
         if (!req.headers.cookie) return;
 
         const parsed = cookieparser.parse(req.headers.cookie);
-        const accessTokenCookie = parsed.acces_token;
+        const accessTokenCookie = parsed.access_token;
 
         if (!accessTokenCookie) return;
 
@@ -15,7 +15,8 @@ export const actions = {
 
         if (decoded) {
             commit('auth/setUser', {
-                uid: decoded.user_id
+                uid: decoded.user_id,
+                email: decoded.email
             });
         }
     }

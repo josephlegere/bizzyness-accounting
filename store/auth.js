@@ -6,38 +6,46 @@ export const state = () => ({
 
 export const actions = {
 	async signUp({ commit }, { email, password }) {
-		await this.$fireAuth.createUserWithEmailAndPassword(email, password).then(cred => {
-			return this.$fireStore.collection('users').doc(cred.user.uid).set({
-				name: ''
+		await this.$fireAuth
+			.createUserWithEmailAndPassword(email, password)
+			.then(cred => {
+			return this.$fireStore
+				.collection("users")
+				.doc(cred.user.uid)
+				.set({
+				name: ""
+				});
 			});
-		});
 	},
 
-	async signInWithEmail({ commit }, { email, password }) {
+	async signInWithEmail({ commit }, access) {
 		//console.log(email)
 		try {
 			//Login the user
-			await this.$fireAuth.signInWithEmailAndPassword(email, password);
+			await this.$fireAuth.signInWithEmailAndPassword(
+				access.email,
+				access.password
+			);
 
 			//Get JWT from Firebase
 			const token = await this.$fireAuth.currentUser.getIdToken();
-			let { uid } = await this.$fireAuth.currentUser;
+			let { email, uid } = await this.$fireAuth.currentUser;
 
 			//Set the JWT to the cookie
-			Cookie.set('access_token', token);
+			Cookie.set("access_token", token);
 
 			//Set the user locally
-			commit('setUser', { uid });
-		}
-		catch (err) {
+			commit("setUser", { email, uid });
+		} catch (err) {
 			console.error(err.message);
 			throw err;
 		}
 	},
 
-	signOut() {
-		console.log('Log Out')
-		return this.$fireAuth.signOut()
+	signOut({ commit }) {
+		console.log("Log Out");
+		commit("setUser", null);
+		return this.$fireAuth.signOut();
 	}
 };
 

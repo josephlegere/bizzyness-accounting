@@ -55,11 +55,6 @@ export default {
 					email: this.email,
 					password: this.password
 				})
-				// .then((res) => {
-				// 	console.log(res)
-				// 	this.email = '';
-				// 	this.password = '';
-                // })
                 .then(() => {
                     this.$router.push('/');
                 })

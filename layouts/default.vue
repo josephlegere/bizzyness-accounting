@@ -130,26 +130,6 @@ export default {
 		}
 	},
 	methods: {
-		setupFirebase() {
-			this.$fireAuthObj().onAuthStateChanged(user => {
-				if (user) {
-					console.log('signed in');
-
-					this.$fireAuthObj()
-						.currentUser.getIdToken(true)
-						.then(token => Cookies.set('access_token', token));
-
-					this.loggedIn = true;
-				}
-				else {
-					Cookies.remove('access_token');
-
-					// No user is signed in.
-					this.loggedIn = false;
-					console.log('signed out', this.loggedIn);
-				}
-			});
-		},
         signOut: function(err) {
 			this.$store.dispatch('auth/signOut')
 				.then(() => {
@@ -159,9 +139,6 @@ export default {
 					alert(err.message);
 				});
         }
-	},
-	mounted() {
-		//this.setupFirebase();
 	}
 }
 </script>

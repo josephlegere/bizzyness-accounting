@@ -30,7 +30,10 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/vue-moment.js"],
+  plugins: [
+    "~/plugins/vue-moment.js",
+    { src: '~/plugins/localStorage.js', ssr: false }
+  ],
   /**
    * Router settings
    */

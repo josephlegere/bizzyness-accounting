@@ -26,7 +26,8 @@
     "to-words": "^2.1.1",
     "vue-moment": "^4.1.0",
     "vue-pdf": "^4.0.8",
-    "vuedraggable": "^2.23.2"
+    "vuedraggable": "^2.23.2",
+    "vuex-persistedstate": "^3.0.1"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.0.0"
