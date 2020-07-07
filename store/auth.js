@@ -42,10 +42,11 @@ export const actions = {
 		}
 	},
 
-	signOut({ commit }) {
+	async signOut({ commit }) {
 		console.log("Log Out");
+		await this.$fireAuth.signOut();
+		await Cookie.remove("access_token");
 		commit("setUser", null);
-		return this.$fireAuth.signOut();
 	}
 };
 

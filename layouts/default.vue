@@ -94,34 +94,31 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie';
-
 export default {
 	data () {
 		return {
-			loggedIn: false,
 			drawer: true,
 			items: [
-			{
-				icon: 'mdi-apps',
-				title: 'Welcome',
-				to: '/'
-			},
-			{
-				icon: 'mdi-form-select',
-				title: 'Invoices',
-				to: '/invoices'
-			},
-			{
-				icon: 'mdi-text-box-plus-outline',
-				title: 'Create Invoice',
-				to: '/invoices/create'
-			},
-			{
-				icon: 'mdi-chart-bubble',
-				title: 'Inspire',
-				to: '/inspire'
-			}
+				{
+					icon: 'mdi-apps',
+					title: 'Welcome',
+					to: '/'
+				},
+				{
+					icon: 'mdi-form-select',
+					title: 'Invoices',
+					to: '/invoices'
+				},
+				{
+					icon: 'mdi-text-box-plus-outline',
+					title: 'Create Invoice',
+					to: '/invoices/create'
+				},
+				{
+					icon: 'mdi-chart-bubble',
+					title: 'Inspire',
+					to: '/inspire'
+				}
 			],
 			miniVariant: false,
 			right: true,

@@ -32,6 +32,7 @@
 
 <script>
 export default {
+    layout: 'guest',
 	data () {
 		return {
 			email: '',
