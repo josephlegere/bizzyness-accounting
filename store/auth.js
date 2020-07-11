@@ -29,13 +29,32 @@ export const actions = {
 
 			//Get JWT from Firebase
 			const token = await this.$fireAuth.currentUser.getIdToken();
-			let { email, uid } = await this.$fireAuth.currentUser;
+			let { email, uid, displayName } = await this.$fireAuth.currentUser;
+			let _details = null;
+
+			await this.$fireStore
+				.collection('users')
+				.doc(uid)
+				.get()
+				.then(doc => {
+					let _user = doc.data();
+					_details = {
+						id: `users/${uid}`,
+						account: _user.tenant_group.account,
+						tenantid: _user.tenant_group.tenantid
+					}
+				})
+				.catch(err => {
+					console.log("Error getting documents", err);
+				});
 
 			//Set the JWT to the cookie
 			Cookie.set("access_token", token);
 
+			let { id, account, tenantid } = _details;
+
 			//Set the user locally
-			commit("setUser", { email, uid });
+			commit("setUser", { email, uid, name: displayName, id, account, tenantid });
 		} catch (err) {
 			console.error(err.message);
 			throw err;

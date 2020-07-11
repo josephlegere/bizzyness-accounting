@@ -431,14 +431,15 @@ export default {
             accounts: state => state.accounts.list,
             loggeduser: state => state.auth.loggeduser,
             invoice_number: state => state.invoices.current
-        })
+        }),
+        tenant() {
+            return this.loggeduser.tenantid.split('/')[1];
+        }
     },
-    async asyncData({store}) {
-        await store.dispatch('accounts/get');
-        await store.dispatch('invoices/next');
-    },
-    created() {
+    async created() {
         this.presets();
+        await this.$store.dispatch('accounts/get', this.tenant);
+        await this.$store.dispatch('invoices/next', this.tenant);
         // this.temp_accounts();
         //console.log(this.extractData(this.list));
     },

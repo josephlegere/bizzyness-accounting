@@ -3,12 +3,12 @@ export const state = () => ({
 });
 
 export const actions = {
-    async get({ commit, state, rootState }) {
+  async get({ commit }, tenant) {
         let _list = [];
 
         await this.$fireStore
           .collection("tenant_accounts")
-          .doc('HiternQX1hmdvcxnrSIr')
+          .doc(tenant)
           .collection("accounts")
           .get()
           .then(snapshot => {

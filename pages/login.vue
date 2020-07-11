@@ -3,30 +3,38 @@
 		v-model="validate"
 		ref="form"
 	>
-        <v-col cols="12" sm="6" md="3">
-            <v-text-field
-                v-model="email"
-                label="Email"
-                :rules="emailRules"
-            ></v-text-field>
-        </v-col>
+        <v-card>
+            <v-list-item>
+                <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                        v-model="email"
+                        label="Email"
+                        :rules="emailRules"
+                    ></v-text-field>
+                </v-col>
+            </v-list-item>
 
-        <v-col cols="12" sm="6" md="3">
-            <v-text-field
-                v-model="password"
-                label="Password"
-                type="password"
-                :rules="passwordRules"
-            ></v-text-field>
-        </v-col>
+            <v-list-item>
+                <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                        v-model="password"
+                        label="Password"
+                        type="password"
+                        :rules="passwordRules"
+                    ></v-text-field>
+                </v-col>
+            </v-list-item>
 
-        <v-btn
-            color="primary"
-            class="mr-4"
-            @click="userSignIn"
-        >
-            Sign In
-        </v-btn>
+            <v-list-item>
+                <v-btn
+                    color="primary"
+                    class="mr-4"
+                    @click="userSignIn"
+                >
+                    Sign In
+                </v-btn>
+            </v-list-item>
+        </v-card>
 	</v-form>
 </template>
 

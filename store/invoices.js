@@ -11,14 +11,6 @@ export const actions = {
     async get({ commit, state, rootState }, dates) {
         let _list = [];
         console.log(dates)
-        // const ref = this.$fireStore.collection('users').doc(userId);
-        // try {
-            // await exerciseRef.update({
-            //     [`randomFoo.FooFoo`]: this.$fireStoreObj.FieldValue.delete()
-            // });
-        // } catch (e) {
-        //     return Promise.reject(e);
-        // }
         
         await this.$fireStore
 			.collection("invoices")
@@ -62,12 +54,12 @@ export const actions = {
         console.log(invoice);
         return await this.$fireStore.collection('invoices').add(invoice);
     },
-    async next({ commit }) {
+	async next({ commit }, tenant) {
         let invoice_code = 0;
 
         await this.$fireStore
 			.collection("tenant_invoices")
-			.doc("HiternQX1hmdvcxnrSIr")
+			.doc(tenant)
 			.get()
 			.then(doc => {
 				let tenant_invoices = doc.data();
