@@ -83,21 +83,27 @@
                 this.$router.push({ path: `/invoices/${invoice.invoice_code}` });
             },
             filterData() {
-                console.log('filter');
-                this.$store.dispatch('invoices/get', this.datefilter);
+                this.$store.dispatch('invoices/get', { dates: this.datefilter, tenant: this.tenant });
             }
         },
         computed: {
             total: function() {
                 return this.invoices.reduce(function(a, c) { return a + Number((c.total) || 0) }, 0);
             },
+            tenant() {
+                return this.loggeduser.tenantid;
+            },
             ...mapState({
-                invoices: state => state.invoices.list
+                invoices: state => state.invoices.list,
+                loggeduser: state => state.auth.loggeduser
             })
         },
-        async mounted() {
-            //await this.$store.dispatch('invoices/get', this.datefilter);
+        async created() {
+            
         },
+        // async mounted() {
+            //await this.$store.dispatch('invoices/get', this.datefilter);
+        // },
         // async asyncData({store}) {
         //     await store.dispatch('invoices/get', this.datefilter);
         // },

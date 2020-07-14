@@ -8,16 +8,18 @@ export const state = () => ({
 });
 
 export const actions = {
-    async get({ commit, state, rootState }, dates) {
+    async get({ commit, state, rootState }, { dates, tenant }) {
         let _list = [];
-        console.log(dates)
+		console.log(dates)
+		console.log(tenant)
         
         await this.$fireStore
 			.collection("invoices")
 			.where("created_date", ">", new Date(dates[0]))
 			.where("created_date", "<", new Date(dates[dates.length - 1]))
+			.where('tenant', '==', tenant)
 			.orderBy("created_date")
-			//.orderBy("invoice_code")
+			.orderBy("invoice_code")
 			.get()
 			.then(snapshot => {
 				snapshot.forEach(doc => {
