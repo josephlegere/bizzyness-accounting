@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+require("dotenv").config();
 
 export default {
   mode: "universal",
@@ -54,14 +55,14 @@ export default {
       "@nuxtjs/firebase",
       {
         config: {
-          apiKey: "AIzaSyDSYhJA_C5vsXlew2g5eZDW4HEMLc2E0Cw",
-          authDomain: "bizzyness-ddf6e.firebaseapp.com",
-          databaseURL: "https://bizzyness-ddf6e.firebaseio.com",
-          projectId: "bizzyness-ddf6e",
-          storageBucket: "bizzyness-ddf6e.appspot.com",
-          messagingSenderId: "517832530982",
-          appId: "1:517832530982:web:9c39042d1dd506ce74dae7",
-          measurementId: "G-LXMTMYK0MG"
+          apiKey: process.env.NUXT_ENV_API_KEY,
+          authDomain: process.env.NUXT_ENV_AUTH_DOMAIN,
+          databaseURL: process.env.NUXT_ENV_DATABASE_URL,
+          projectId: process.env.NUXT_ENV_PROJECT_ID,
+          storageBucket: process.env.NUXT_ENV_STORAGE_BUCKET,
+          messagingSenderId: process.env.NUXT_ENV_MESSAGE_SENDER_ID,
+          appId: process.env.NUXT_ENV_APP_ID,
+          measurementId: process.env.NUXT_ENV_MEASUREMENT_ID
         },
         services: {
           auth: true, // Just as example. Can be any other service.

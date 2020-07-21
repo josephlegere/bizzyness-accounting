@@ -10,8 +10,7 @@ export const state = () => ({
 export const actions = {
     async get({ commit, state, rootState }, { dates, tenant }) {
         let _list = [];
-		console.log(dates)
-		console.log(tenant)
+		console.log(dates, tenant)
         
         await this.$fireStore
 			.collection("invoices")
