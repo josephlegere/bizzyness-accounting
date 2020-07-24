@@ -13,12 +13,12 @@
                     <v-autocomplete
                         v-model="recipient"
                         :rules="recipientRules"
-                        :items="accounts"
-                        :loading="isLoadingAccounts"
+                        :items="customers"
+                        :loading="isLoadingCustomers"
                         hide-no-data
                         filled
                         chips
-                        placeholder="Accounts"
+                        placeholder="Customers"
                         item-text="name"
                         item-value="name"
                         dense
@@ -223,8 +223,8 @@ export default {
             recipientRules: [
                 v => !!v || 'Recipient is required'
             ],
-            // accounts: [],
-            isLoadingAccounts: false,
+            // customers: [],
+            isLoadingCustomers: false,
             rowtypes: ['materials', 'jobs'],
             headers: [
                 { value: 'key', text: 'Key' },
@@ -286,8 +286,8 @@ export default {
 
             this.list = _items;
         },
-        temp_accounts() {
-            this.accounts = [
+        temp_customers() {
+            this.customers = [
                 { header: 'Group 1' },
                 { name: 'Sandra Adams', group: 'Group 1' },
                 { name: 'Ali Connors', group: 'Group 1' },
@@ -362,7 +362,7 @@ export default {
             let _invoice = { //invoice format for database
                 active: true,
                 agent: { account, id, name },
-                client: this.recipient.client,
+                customer: this.recipient.customer,
                 created_date: this.$fireStoreObj.Timestamp.fromDate(new Date(date)),
                 invoice_code,
                 items,
@@ -409,7 +409,7 @@ export default {
 
             return {
                 author: 'Joseph Legere',
-                client: this.recipient.client,
+                customer: this.recipient.customer,
                 date: this.date,
                 invoice_code: this.invoice_number,
                 items: _records.items, //local
@@ -428,7 +428,7 @@ export default {
                 return 0; //closed
         },
         ...mapState({
-            accounts: state => state.accounts.list,
+            customers: state => state.customers.list,
             loggeduser: state => state.auth.loggeduser,
             invoice_number: state => state.invoices.current
         }),
@@ -438,9 +438,9 @@ export default {
     },
     async created() {
         this.presets();
-        await this.$store.dispatch('accounts/get', this.tenant);
+        await this.$store.dispatch('customers/get', this.tenant);
         await this.$store.dispatch('invoices/next', this.tenant);
-        // this.temp_accounts();
+        // this.temp_customers();
         //console.log(this.extractData(this.list));
     },
     components: {

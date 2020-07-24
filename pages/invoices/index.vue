@@ -35,7 +35,7 @@
                         <tr :active="props.selected" @click="open(props.item)">
                             <td>{{ props.item.invoice_code }}</td>
                             <td>{{ props.item.date | moment("dddd, MMMM Do YYYY") }}</td>
-                            <td>{{ props.item.client.account }}</td>
+                            <td>{{ props.item.customer.account }}</td>
                             <td>{{ props.item.total }}</td>
                             <td>{{ props.item.author }}</td>
                             <td>{{ props.item.remarks }}</td>
@@ -65,7 +65,7 @@
                         value: 'invoice',
                     },
                     { text: 'Date', value: 'date' },
-                    { text: 'Client', value: 'client' },
+                    { text: 'Customer', value: 'customer' },
                     { text: 'Total', value: 'total' },
                     { text: 'Author', value: 'author' },
                     { text: 'Remarks', value: 'remarks' }

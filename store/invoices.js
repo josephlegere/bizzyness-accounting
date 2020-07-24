@@ -28,7 +28,7 @@ export const actions = {
 					_list.push({
 						invoice_code: _invoice.invoice_code,
 						date: moment.unix(_invoice.created_date.seconds),
-						client: _invoice.client,
+						customer: _invoice.customer,
 						total: _invoice.total,
 						author: _invoice.agent.name,
 						remarks: _invoice.remarks,
