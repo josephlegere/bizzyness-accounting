@@ -16,7 +16,7 @@
             </v-tabs>
             <v-tabs-items v-model="tab">
                 <v-tab-item
-                    v-for="(item, key, i) in items"
+                    v-for="(item, key, i) in fillAccounts"
                     :key="i"
                 >
                     <v-simple-table
@@ -44,6 +44,9 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import _ from 'lodash';
+
 export default {
     data () {
         return {
@@ -52,18 +55,7 @@ export default {
                 assets: {
                     title: 'Assets',
                     accounts: {
-                        'Cash and Bank': {
-                            'Cash On Hand': {
-                                name: 'Cash On Hand',
-                                currency: 'PHP (Php) - Philippine Peso',
-                                description: ''
-                            },
-                            'Joseph - Ahlibank Visa': {
-                                name: 'Joseph - Ahlibank Visa',
-                                currency: 'QAR (Qar) - Qatari Riyal',
-                                description: ''
-                            }
-                        },
+                        'Cash and Bank': {},
                         'Money in Transit': {},
                         'Expected Payments from Customers': {},
                         'Inventory': {},
@@ -77,13 +69,7 @@ export default {
                 liabilities: {
                     title: 'Liabilities & Credit Cards',
                     accounts: {
-                        'Credit Card': {
-                            'Arman James - BDO Mastercard': {
-                                name: 'Arman James - BDO Mastercard',
-                                currency: 'PHP (Php) - Philippine Peso',
-                                description: ''
-                            }
-                        },
+                        'Credit Card': {},
                         'Loan and Line of Credit': {}
                     }
                 },
@@ -97,13 +83,7 @@ export default {
                 expenses: {
                     title: 'Expenses',
                     accounts: {
-                        'Operating Expense': {
-                            'Accounting Fees': {
-                                name: 'Accounting Fees',
-                                currency: 'PHP (Php) - Philippine Peso',
-                                description: ''
-                            }
-                        },
+                        'Operating Expense': {},
                         'Cost of Goods Sold': {}
                     }
                 },
@@ -114,133 +94,63 @@ export default {
                         'Cost of Goods Sold': {}
                     }
                 }
-            },
-            // user_accounts: {
-            //     'assets': {
-            //         'Cash and Bank': {
-            //             'accountid1': {
-            //                 name: 'Cash On Hand',
-            //                 currency: 'PHP (Php) - Philippine Peso',
-            //                 description: ''
-            //             },
-            //             'Joseph - Ahlibank Visa': {}
-            //         }
-            //         accounts: [
-            //             {
-            //                 category: 'Cash and Bank',
-            //                 records: [
-            //                     {
-            //                         name: 'Cash On Hand',
-            //                         currency: 'PHP (Php) - Philippine Peso',
-            //                         description: ''
-            //                     },
-            //                     {
-            //                         name: 'Joseph - Ahlibank Visa',
-            //                         currency: 'QAR (Qar) - Qatari Riyal',
-            //                         description: ''
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 category: 'Money in Transit',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Expected Payments from Customers',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Inventory',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Property, Plant, Equipment',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Depreciation and Amortization',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Vendor Prepayments and Vendor Credits',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Other Short-Term Asset',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Other Long-Term Asset',
-            //                 records: []
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         title: 'Liabilities & Credit Cards',
-            //         accounts: [
-            //             {
-            //                 category: 'Credit Card',
-            //                 records: [
-            //                     {
-            //                         name: 'Arman James - BDO Mastercard',
-            //                         currency: 'PHP (Php) - Philippine Peso',
-            //                         description: ''
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 category: 'Loan and Line of Credit',
-            //                 records: []
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         title: 'Income',
-            //         accounts: [
-            //             {
-            //                 category: 'Income',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Discount',
-            //                 records: []
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         title: 'Expenses',
-            //         accounts: [
-            //             {
-            //                 category: 'Operating Expense',
-            //                 records: [
-            //                     {
-            //                         name: 'Accounting Fees',
-            //                         currency: 'PHP (Php) - Philippine Peso',
-            //                         description: ''
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 category: 'Cost of Goods Sold',
-            //                 records: []
-            //             }
-            //         ]
-            //     },
-            //     {
-            //         title:'Equity',
-            //         accounts: [
-            //             {
-            //                 category: 'Business Owner Contribution and Drawing',
-            //                 records: []
-            //             },
-            //             {
-            //                 category: 'Cost of Goods Sold',
-            //                 records: []
-            //             }
-            //         ]
-            //     }
-            // }
+            }
         }
+    },
+    methods: {
+        fillAccounts() {
+            console.log(this.accounts)
+            Object.entries(this.accounts).forEach(elem => {
+                let _key = elem[0];
+                let { account_category, account_type, currency, currency_detail, description, name, set_date } = elem[1];
+
+                this.items[account_category].accounts[account_type][_key] = {
+                    currency,
+                    currency_detail,
+                    description,
+                    name,
+                    set_date
+                }
+            });
+            console.log(this.items)
+        }
+    },
+    computed: {
+        ...mapState({
+            accounts: state => state.accounts.list,
+            loggeduser: state => state.auth.loggeduser
+        }),
+        tenant() {
+            return this.loggeduser.tenantid.split('/')[1];
+        },
+        fillAccounts: {
+            get () {
+                //console.log(this.accounts)
+                let _accounts = _.cloneDeep(this.items);
+                Object.entries(this.accounts).forEach(elem => {
+                    let _key = elem[0];
+                    let { account_category, account_type, currency, currency_detail, description, name, set_date } = elem[1];
+
+                    _accounts[account_category].accounts[account_type][_key] = {
+                        currency,
+                        currency_detail,
+                        description,
+                        name,
+                        set_date
+                    }
+                });
+
+                return _accounts;
+            },
+            set (_accounts) {
+                return _accounts;
+            }
+            //console.log(this.items)
+        }
+    },
+    async created() {
+        await this.$store.dispatch('accounts/get', this.tenant);
+        //this.fillAccounts();
     }
 }
 </script>

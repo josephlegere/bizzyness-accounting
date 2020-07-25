@@ -1,39 +1,38 @@
 export const state = () => ({
-    list: []
+	list: []
 });
 
 export const actions = {
-  async get({ commit }, tenant) {
-        let _list = [];
+	async get({ commit }, tenant) {
+		let _list = {};
 
-        await this.$fireStore
-          .collection("tenant_accounts")
-          .doc(tenant)
-          .collection("accounts")
-          .get()
-          .then(snapshot => {
-            snapshot.forEach(doc => {
-              //console.log(doc.id, "=>", doc.data());
-              let { account_name, company, representatives } = doc.data();
+		await this.$fireStore
+			.collection("tenant_accounts")
+			.doc(tenant)
+			.collection("accounts")
+			.get()
+			.then(snapshot => {
+				snapshot.forEach(doc => {
+					//console.log(doc.id, "=>", doc.data());
+					let { account_category, account_type, currency, currency_detail, description, name, set_date } = doc.data();
 
-              _list.push({
-                name: account_name,
-                group: company,
-                client: {
-                  account: account_name,
-                  id: representatives[0].id,
-                  name: representatives[0].name
-                },
-                id: doc.id
-              });
-            });
-          })
-          .catch(err => {
-            console.log("Error getting documents", err);
-          });
+					_list[doc.id] = {
+						account_category,
+						account_type,
+						currency,
+						currency_detail,
+						description,
+						name,
+						set_date
+					};
+				});
+			})
+			.catch(err => {
+				console.log("Error getting documents", err);
+			});
 
-        commit("setList", _list);
-    }
+		commit("setList", _list);
+	}
 };
 
 export const mutations = {
