@@ -1,5 +1,3 @@
-import Cookie from 'js-cookie';
-
 export const state = () => ({
 	loggeduser: null
 });
@@ -19,7 +17,7 @@ export const actions = {
 	},
 
 	async signInWithEmail({ commit }, access) {
-		//console.log(email)
+		console.log(access);
 		try {
 			//Login the user
 			await this.$fireAuth.signInWithEmailAndPassword(
@@ -29,32 +27,31 @@ export const actions = {
 
 			//Get JWT from Firebase
 			const token = await this.$fireAuth.currentUser.getIdToken();
-			let { email, uid, displayName } = await this.$fireAuth.currentUser;
-			let _details = null;
+			let { email, uid, displayName } = await this.$fireAuth.currentUser;// displayName is for testing purposes, is used by other signIn options
 
-			await this.$fireStore
+			let doc = await this.$fireStore
 				.collection('users')
 				.doc(uid)
-				.get()
-				.then(doc => {
-					let _user = doc.data();
-					_details = {
-						id: `users/${uid}`,
-						account: _user.tenant_group.account,
-						tenantid: _user.tenant_group.tenantid
-					}
-				})
-				.catch(err => {
-					console.log("Error getting documents", err);
-				});
+				.get();
+			
+			let { name, employee_code, tenant_group } = doc.data();
+			let { account, tenantid, system_config, daysoff } = tenant_group;
 
-			//Set the JWT to the cookie
-			Cookie.set("access_token", token);
+			let _user = {
+				uid,
+				id: `users/${uid}`,
+				email,
+				name,
+				account,
+				tenantid,
+				system_config,
+				daysoff
+			};
 
-			let { id, account, tenantid } = _details;
+			if (employee_code) _user.employee_code = employee_code;
 
 			//Set the user locally
-			commit("setUser", { email, uid, name: displayName, id, account, tenantid });
+			commit("setUser", _user);
 		} catch (err) {
 			console.error(err.message);
 			throw err;
@@ -64,7 +61,6 @@ export const actions = {
 	async signOut({ commit }) {
 		console.log("Log Out");
 		await this.$fireAuth.signOut();
-		await Cookie.remove("access_token");
 		commit("setUser", null);
 	}
 };

@@ -2,7 +2,6 @@ import colors from 'vuetify/es5/util/colors'
 require("dotenv").config();
 
 export default {
-  mode: "universal",
   /*
    ** Headers of the page
    */
@@ -51,6 +50,7 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     "@nuxtjs/axios",
+    'cookie-universal-nuxt',
     [
       "@nuxtjs/firebase",
       {
