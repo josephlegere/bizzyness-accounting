@@ -11,7 +11,7 @@ export const actions = {
         let _list = [];
 		console.log(dates, tenant)
         
-        await this.$fireStore
+        await this.$fire.firestore
 			.collection("invoices")
 			.where("created_date", ">", new Date(dates[0]))
 			.where("created_date", "<", new Date(dates[dates.length - 1]))
@@ -52,12 +52,12 @@ export const actions = {
     async add({ commit }, invoice) {
         //const response = await axios.post('https://jsonplaceholder.typicode.com/todos', { title, completed: false });
         console.log(invoice);
-        return await this.$fireStore.collection('invoices').add(invoice);
+        return await this.$fire.firestore.collection('invoices').add(invoice);
     },
 	async next({ commit }, tenant) {
         let invoice_code = 0;
 
-        await this.$fireStore
+        await this.$fire.firestore
 			.collection("tenant_invoices")
 			.doc(tenant)
 			.get()

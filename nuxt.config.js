@@ -32,7 +32,7 @@ export default {
    */
   plugins: [
     "~/plugins/vue-moment.js",
-    { src: '~/plugins/localStorage.js', ssr: false }
+    '~/plugins/localStorage.js'
   ],
   /**
    * Router settings

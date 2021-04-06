@@ -6,7 +6,7 @@ export const actions = {
     async get({ commit }, tenant) {
         let _list = [];
 
-        await this.$fireStore
+        await this.$fire.firestore
             .collection("tenant_customers")
             .doc(tenant)
             .collection("customers")

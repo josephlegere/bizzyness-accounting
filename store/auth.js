@@ -4,10 +4,10 @@ export const state = () => ({
 
 export const actions = {
 	async signUp({ commit }, { email, password }) {
-		await this.$fireAuth
+		await this.$fire.auth
 			.createUserWithEmailAndPassword(email, password)
 			.then(cred => {
-			return this.$fireStore
+			return this.$fire.firestore
 				.collection("users")
 				.doc(cred.user.uid)
 				.set({
@@ -20,16 +20,16 @@ export const actions = {
 		console.log(access);
 		try {
 			//Login the user
-			await this.$fireAuth.signInWithEmailAndPassword(
+			await this.$fire.auth.signInWithEmailAndPassword(
 				access.email,
 				access.password
 			);
 
 			//Get JWT from Firebase
-			const token = await this.$fireAuth.currentUser.getIdToken();
-			let { email, uid, displayName } = await this.$fireAuth.currentUser;// displayName is for testing purposes, is used by other signIn options
+			const token = await this.$fire.auth.currentUser.getIdToken();
+			let { email, uid, displayName } = await this.$fire.auth.currentUser;// displayName is for testing purposes, is used by other signIn options
 
-			let doc = await this.$fireStore
+			let doc = await this.$fire.firestore
 				.collection('users')
 				.doc(uid)
 				.get();
@@ -60,7 +60,7 @@ export const actions = {
 
 	async signOut({ commit }) {
 		console.log("Log Out");
-		await this.$fireAuth.signOut();
+		await this.$fire.auth.signOut();
 		commit("setUser", null);
 	}
 };
