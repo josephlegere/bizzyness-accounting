@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import PDFRender from 'vue-pdf';
 
 export default {
     props: {
@@ -58,9 +57,6 @@ export default {
                     this.currentPage++
             }
         }
-    },
-    components: {
-        PDFRender
     }
 }
 </script>
