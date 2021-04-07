@@ -14,15 +14,19 @@ export const actions = {
             .then(snapshot => {
                 snapshot.forEach(doc => {
                     //console.log(doc.id, "=>", doc.data());
-                    let { account_name, company, representatives } = doc.data();
+                    let { account, group, account_type } = doc.data();
+                    let id = '';
+
+                    if (account_type === 'tenant') id = `tenants/${doc.id}`;
+                    else id = `customers/${doc.id}`;
 
                     _list.push({
-                        name: account_name,
-                        group: company,
+                        name: account,
+                        group,
                         customer: {
-                            account: account_name,
-                            id: representatives[0].id,
-                            name: representatives[0].name
+                            account,
+                            id,
+                            account_type
                         },
                         id: doc.id
                     });

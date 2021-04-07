@@ -16,12 +16,10 @@
                         :items="customers"
                         :loading="isLoadingCustomers"
                         hide-no-data
-                        filled
                         chips
-                        placeholder="Customers"
+                        label="Customers"
                         item-text="name"
                         item-value="name"
-                        dense
                         return-object
                     >
                         <template v-slot:selection="data">
@@ -363,12 +361,12 @@ export default {
                 active: true,
                 agent: { account, id, name },
                 customer: this.recipient.customer,
-                created_date: this.$fireStoreObj.Timestamp.fromDate(new Date(date)),
+                created_date: this.$fireModule.firestore.Timestamp.fromDate(new Date(date)),
                 invoice_code,
                 items,
                 layout,
                 remarks,
-                set_date: this.$fireStoreObj.FieldValue.serverTimestamp(), //this format is set date from server side
+                set_date: this.$fireModule.firestore.FieldValue.serverTimestamp(), //this format is set date from server side
                 tenant: tenantid,
                 total
             };

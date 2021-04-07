@@ -6,7 +6,7 @@
 
 <script>
 import PDFViewer from './PDFViewer';
-// import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 // import 'jspdf-autotable';
 // import num_convert from 'number-to-words';
 import { ToWords } from 'to-words';
@@ -142,7 +142,6 @@ export default {
     computed: {
         generatePDF() {
             if (process.client) {
-                const jsPDF = require('jspdf');
                 require('jspdf-autotable');
                 
                 let doc = new jsPDF(); //default => unit: 'mm', format: 'a4',
