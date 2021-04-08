@@ -4,23 +4,24 @@
             <v-tabs
                 v-model="tab"
                 fixed-tabs
-                background-color="indigo"
-                dark
+                center-active
+                class="mt-4"
             >
                 <v-tab
-                    v-for="(item, i) in items"
+                    v-for="(category, i) in account_category"
                     :key="i"
                 >
-                    {{ item.title }}
+                    {{ category.title }}
                 </v-tab>
             </v-tabs>
+
             <v-tabs-items v-model="tab">
                 <v-tab-item
-                    v-for="(item, key, i) in fillAccounts"
+                    v-for="(category, key, i) in fillAccounts"
                     :key="i"
                 >
                     <v-simple-table
-                        v-for="(account, key2, j) in item.accounts"
+                        v-for="(account, key2, j) in category.accounts"
                         :key="j"
                     >
                         <template v-slot:default>
@@ -32,13 +33,118 @@
                             <tbody>
                                 <tr v-for="(record, key3) in account" :key="key3">
                                     <td>{{ record.name }}</td>
-                                    <td>{{ record.currency }}</td>
+                                    <td>{{ record.currency.code }}</td>
                                 </tr>
                             </tbody>
                         </template>
                     </v-simple-table>
                 </v-tab-item>
             </v-tabs-items>
+
+            <v-row
+                class="toolbar-container"
+                no-gutters
+            >
+                <v-col
+                    md="2"
+                    class="ml-md-auto"
+                >
+                    <v-sheet
+                        color="transparent"
+                        class="form-toolbar">
+                        <v-toolbar
+                            dark
+                            height="60"
+                            class="d-flex justify-center">
+
+                            <v-btn
+                                outlined
+                                @click="addAccountModal = !addAccountModal"
+                            >
+                                Add Account
+                            </v-btn>
+                            
+                            <v-bottom-sheet v-model="addAccountModal" scrollable transition="dialog-bottom-transition">
+                                <v-card class="rounded-t-xl">
+                                    <v-toolbar dark dense class="rounded-t-xl">
+                                        <v-btn icon dark @click="addAccountModal = !addAccountModal">
+                                            <v-icon>mdi-close</v-icon>
+                                        </v-btn>
+                                        <v-toolbar-title>Add an Account</v-toolbar-title>
+                                    </v-toolbar>
+
+                                    <v-card-text class="my-md-16">
+                                        <v-container>
+                                            <v-form ref="form" v-model="validate" lazy-validation>
+                                                <v-row>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-autocomplete
+                                                            v-model="newAccount.type"
+                                                            :items="fillAccountTypes"
+                                                            label="Account Type *"
+                                                            :rules="[v => !!v || 'Account Type is required']"
+                                                        ></v-autocomplete>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-text-field
+                                                            v-model="newAccount.name"
+                                                            label="Account Name *"
+                                                            :rules="[v => !!v || 'Account Name is required']"
+                                                        ></v-text-field>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-autocomplete
+                                                            v-model="newAccount.currency"
+                                                            :items="fillAccountTypes"
+                                                            label="Currency"
+                                                            :rules="[v => !!v || 'Currency is required']"
+                                                        ></v-autocomplete>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-textarea
+                                                            v-model="newAccount.description"
+                                                            label="Description"
+                                                            autoGrow
+                                                            dense
+                                                            hide-details
+                                                            rows="3"
+                                                        ></v-textarea>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-btn dark block @click="submitInvoice">Submit</v-btn>
+                                                        <small>* indicates required field</small>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-form>
+                                        </v-container>
+                                    </v-card-text>
+                                </v-card>
+                            </v-bottom-sheet>
+
+                        </v-toolbar>
+                    </v-sheet>
+                </v-col>
+            </v-row>
         </v-col>
     </v-row>
 </template>
@@ -51,7 +157,7 @@ export default {
     data () {
         return {
             tab: null,
-            items: {
+            account_category: {
                 assets: {
                     title: 'Assets',
                     accounts: {
@@ -94,25 +200,21 @@ export default {
                         'Cost of Goods Sold': {}
                     }
                 }
-            }
+            },
+            addAccountModal: false,
+            newAccount: {
+                type: null,
+                name: null
+            },
+            validate: false
         }
     },
     methods: {
-        fillAccounts() {
-            console.log(this.accounts)
-            Object.entries(this.accounts).forEach(elem => {
-                let _key = elem[0];
-                let { account_category, account_type, currency, currency_detail, description, name, set_date } = elem[1];
-
-                this.items[account_category].accounts[account_type][_key] = {
-                    currency,
-                    currency_detail,
-                    description,
-                    name,
-                    set_date
-                }
-            });
-            console.log(this.items)
+        capitalizeFirst(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        submitInvoice() {
+            this.$refs.form.validate();
         }
     },
     computed: {
@@ -126,7 +228,7 @@ export default {
         fillAccounts: {
             get () {
                 //console.log(this.accounts)
-                let _accounts = _.cloneDeep(this.items);
+                let _accounts = _.cloneDeep(this.account_category);
                 Object.entries(this.accounts).forEach(elem => {
                     let _key = elem[0];
                     let { account_category, account_type, currency, currency_detail, description, name, set_date } = elem[1];
@@ -145,7 +247,27 @@ export default {
             set (_accounts) {
                 return _accounts;
             }
-            //console.log(this.items)
+            //console.log(this.account_category)
+        },
+        fillAccountTypes: function () {
+            let _types = [];
+
+            Object.entries(this.account_category).forEach((category, cat_key) => {
+                _types.push({ header: this.capitalizeFirst(category[0]) });
+
+                Object.keys(category[1].accounts).forEach(accounts => {
+                    _types.push({ text: accounts, value: accounts });
+                });
+
+                if (cat_key + 1 < Object.keys(this.account_category).length) _types.push({ divider: true });
+            });
+
+            return _types;
+        }
+    },
+    watch: {
+        addAccountModal (val) { // For resetting Add Account Form
+            !val && this.$refs.form.reset()
         }
     },
     async created() {
@@ -155,6 +277,24 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .toolbar-container {
+        width:                  100%;
+        position:               fixed;
+        z-index:                4;
+        bottom:                 35px;
+        right:                  0;
+    }
+    .toolbar-container .col {
+        width:                  100%;
+    }
+    .form-toolbar {
+        width:                  100%;
+    }
+    .form-toolbar .v-toolbar {
+        /* v-sheet default color is white, need to turn it transparent to remove for the border-radius apply its design */
+        /* v-sheet need to contain the toolbar in order for the border radius to take effect */
+        box-shadow:             0px -2px 4px -1px rgb(0 0 0 / 20%), 0px -2px 5px 0px rgb(0 0 0 / 14%);
+        border-radius:          15px 15px 0 0;
+    }
 </style>

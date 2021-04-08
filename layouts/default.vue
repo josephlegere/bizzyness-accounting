@@ -118,6 +118,11 @@ export default {
 					icon: 'mdi-account-box-multiple-outline',
 					title: 'Chart of Accounts',
 					to: '/accounts'
+				},
+				{
+					icon: 'mdi-account-box-multiple-outline',
+					title: 'Reports',
+					to: '/accounts'
 				}
 			],
 			miniVariant: false,
