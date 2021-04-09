@@ -34,11 +34,16 @@ export const actions = {
 
 		commit("setList", _list);
 	},
-	add({ commit }, { account, tenant }) {
-		// return await this.$fire.firestore.collection('tenant_accounts').add(account);
+	async add({ commit }, { newAccount, tenant }) {
+		console.log(newAccount);
+		console.log(tenant);
+		// commit("insert", newAccount);
+
+		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').add(newAccount);
 	}
 };
 
 export const mutations = {
-    setList: (state, accounts) => (state.list = accounts)
+    setList: (state, accounts) => (state.list = accounts),
+	insert: (state, newAccount) => (state.list = { ...state.list, ...newAccount })
 };

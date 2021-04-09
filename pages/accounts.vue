@@ -221,6 +221,23 @@ export default {
         },
         submitInvoice() {
             this.$refs.form.validate();
+
+            if (this.validate) {
+                let { details, currency, name, description } = this.newAccount;
+                let { account_category, account_type } = details;
+                let newAccount = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp() };
+                if (description) newAccount.description = description;
+
+                this.$store.dispatch('accounts/add', { newAccount, tenant: this.tenant})
+                .then((ref) => {
+                    this.$store.commit('accounts/insert', { [ref.id]: newAccount });
+                    this.addAccountModal = false;
+                })
+                .catch(err => {
+                    console.log(err);
+                    console.error('Error in Store!');
+                });
+            }
         }
     },
     computed: {
