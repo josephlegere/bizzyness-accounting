@@ -83,9 +83,11 @@
                                                         offset-md="3"
                                                     >
                                                         <v-autocomplete
-                                                            v-model="newAccount.type"
+                                                            v-model="newAccount.details"
                                                             :items="fillAccountTypes"
                                                             label="Account Type *"
+                                                            item-text="account_type"
+                                                            return-object
                                                             :rules="[v => !!v || 'Account Type is required']"
                                                         ></v-autocomplete>
                                                     </v-col>
@@ -107,8 +109,10 @@
                                                     >
                                                         <v-autocomplete
                                                             v-model="newAccount.currency"
-                                                            :items="fillAccountTypes"
+                                                            :items="currency"
                                                             label="Currency"
+                                                            item-text="name"
+                                                            return-object
                                                             :rules="[v => !!v || 'Currency is required']"
                                                         ></v-autocomplete>
                                                     </v-col>
@@ -203,8 +207,10 @@ export default {
             },
             addAccountModal: false,
             newAccount: {
-                type: null,
-                name: null
+                details: null, // contains category and type
+                name: null,
+                currency: null,
+                description: null
             },
             validate: false
         }
@@ -256,13 +262,21 @@ export default {
                 _types.push({ header: this.capitalizeFirst(category[0]) });
 
                 Object.keys(category[1].accounts).forEach(accounts => {
-                    _types.push({ text: accounts, value: accounts });
+                    _types.push({ account_type: accounts, account_category: category[0] });
                 });
 
                 if (cat_key + 1 < Object.keys(this.account_category).length) _types.push({ divider: true });
             });
 
             return _types;
+        },
+        currency: function () {
+            return this.rawCurrency.map(elem => {
+                return {
+                    code: elem.AlphabeticCode,
+                    name: `${elem.AlphabeticCode} - ${elem.Currency}`
+                }
+            });
         }
     },
     watch: {
@@ -272,7 +286,15 @@ export default {
     },
     async created() {
         await this.$store.dispatch('accounts/get', this.tenant);
-        //this.fillAccounts();
+    },
+    async asyncData({ $axios }) {
+        let rawCurrency = [];
+        if (process.server) {
+            rawCurrency = JSON.parse(require('fs').readFileSync('./static/data/currency.json', 'utf8'))
+        } else {
+            rawCurrency = await $axios.get('/data/currency.json').then(res => res.data)
+        }
+        return { rawCurrency };
     }
 }
 </script>

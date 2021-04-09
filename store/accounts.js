@@ -1,5 +1,6 @@
 export const state = () => ({
-	list: []
+	list: [],
+	new: {}
 });
 
 export const actions = {
@@ -32,6 +33,9 @@ export const actions = {
 			});
 
 		commit("setList", _list);
+	},
+	add({ commit }, { account, tenant }) {
+		// return await this.$fire.firestore.collection('tenant_accounts').add(account);
 	}
 };
 
