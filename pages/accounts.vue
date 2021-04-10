@@ -27,13 +27,18 @@
                         <template v-slot:default>
                             <thead>
                                 <tr>
-                                    <th class="text-left" colspan="2">{{ key2 }}</th>
+                                    <th class="text-left" colspan="3">{{ key2 }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(record, key3) in account" :key="key3">
                                     <td>{{ record.name }}</td>
                                     <td>{{ record.currency.code }}</td>
+                                    <td>
+                                        <v-btn icon @click="editAccount(record)">
+                                            <v-icon>mdi-pencil-outline</v-icon>
+                                        </v-btn>
+                                    </td>
                                 </tr>
                             </tbody>
                         </template>
@@ -83,12 +88,13 @@
                                                         offset-md="3"
                                                     >
                                                         <v-autocomplete
-                                                            v-model="newAccount.details"
+                                                            v-model="formEntry.details"
                                                             :items="fillAccountTypes"
                                                             label="Account Type *"
                                                             item-text="account_type"
                                                             return-object
                                                             :rules="[v => !!v || 'Account Type is required']"
+                                                            :disabled="editingAccount"
                                                         ></v-autocomplete>
                                                     </v-col>
                                                     <v-col
@@ -97,7 +103,7 @@
                                                         offset-md="3"
                                                     >
                                                         <v-text-field
-                                                            v-model="newAccount.name"
+                                                            v-model="formEntry.name"
                                                             label="Account Name *"
                                                             :rules="[v => !!v || 'Account Name is required']"
                                                         ></v-text-field>
@@ -108,12 +114,13 @@
                                                         offset-md="3"
                                                     >
                                                         <v-autocomplete
-                                                            v-model="newAccount.currency"
+                                                            v-model="formEntry.currency"
                                                             :items="currency"
                                                             label="Currency"
                                                             item-text="name"
                                                             return-object
                                                             :rules="[v => !!v || 'Currency is required']"
+                                                            :disabled="editingAccount"
                                                         ></v-autocomplete>
                                                     </v-col>
                                                     <v-col
@@ -122,7 +129,7 @@
                                                         offset-md="3"
                                                     >
                                                         <v-textarea
-                                                            v-model="newAccount.description"
+                                                            v-model="formEntry.description"
                                                             label="Description"
                                                             autoGrow
                                                             dense
@@ -134,17 +141,31 @@
                                                         cols="12"
                                                         md="6"
                                                         offset-md="3"
+                                                        class="d-flex flex-row-reverse"
                                                     >
-                                                        <div class="button-overlay-color">
+                                                        <span class="button-overlay-color ml-2">
                                                             <v-btn
                                                                 dark
-                                                                block
                                                                 @click="submitAccount"
-                                                                :loading="submittingNew"
-                                                                :disabled="submittingNew"
-                                                                
-                                                            >Submit</v-btn>
-                                                        </div>
+                                                                :loading="submittingForm"
+                                                                :disabled="submittingForm"
+                                                            >{{ editingAccount ? 'Edit' : 'Submit' }}</v-btn>
+                                                        </span>
+                                                        <span class="button-overlay-color">
+                                                        <v-btn
+                                                            v-if="editingAccount"
+                                                            dark
+                                                            @click="submitAccount"
+                                                            :loading="submittingForm"
+                                                            :disabled="submittingForm"
+                                                        >Archieve</v-btn>
+                                                        </span>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
                                                         <small>* indicates required field</small>
                                                     </v-col>
                                                 </v-row>
@@ -215,14 +236,15 @@ export default {
                 }
             },
             addAccountModal: false,
-            newAccount: {
+            formEntry: {
                 details: null, // contains category and type
                 name: null,
                 currency: null,
                 description: null
             },
             validate: false,
-            submittingNew: false
+            submittingForm: false,
+            editingAccount: false
         }
     },
     methods: {
@@ -233,26 +255,64 @@ export default {
             this.$refs.form.validate();
 
             if (this.validate) {
-                this.submittingNew = true;
-                let { details, currency, name, description } = this.newAccount;
-                let { account_category, account_type } = details;
-                let newAccount = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp() };
-                if (description) newAccount.description = description;
+                this.submittingForm = true;
 
-                this.$store.dispatch('accounts/add', { newAccount, tenant: this.tenant})
-                .then((ref) => {
-                    this.$store.commit('accounts/insert', { [ref.id]: newAccount });
-                    this.addAccountModal = false;
-                })
-                .catch(err => {
-                    console.log(err);
-                    console.error('Error in Store!');
-                })
-                .finally(() => {
-                    this.validate = false;
-                    this.submittingNew = false;
-                });
+                if (!this.editingAccount) { //add an account
+                    let { details, currency, name, description } = this.formEntry;
+                    let { account_category, account_type } = details;
+                    let formEntry = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp() };
+                    if (description) formEntry.description = description;
+
+                    this.$store.dispatch('accounts/add', { newAccount: formEntry, tenant: this.tenant })
+                    .then((ref) => {
+                        this.$store.commit('accounts/insert', { [ref.id]: formEntry });
+                        this.addAccountModal = false;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        console.error('Error in Store!');
+                    })
+                    .finally(() => {
+                        this.validate = false;
+                        this.submittingForm = false;
+                    });
+                }
+                else { // updates an account
+                    let { details, name, description } = this.formEntry;
+                    let formEntry = { name };
+                    if (description) formEntry.description = description;
+
+                    this.$store.dispatch('accounts/edit', { tenant: this.tenant, account: details.key, updates: formEntry })
+                    .then((ref) => {
+                        this.$store.commit('accounts/update', { key: details.key, updates: formEntry });
+                        this.addAccountModal = false;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        console.error('Error in Store!');
+                    })
+                    .finally(() => {
+                        this.validate = false;
+                        this.submittingForm = false;
+                    });
+                }
             }
+        },
+        editAccount(record) {
+            console.log(record);
+            let { key, account_type, currency, name, description } = record;
+            this.editingAccount = true;
+            this.addAccountModal = true;
+
+            this.formEntry = {
+                details: {
+                    account_type,
+                    key
+                },
+                name,
+                currency,
+                description
+            };
         }
     },
     computed: {
@@ -269,15 +329,17 @@ export default {
                 let _accounts = _.cloneDeep(this.account_category);
                 Object.entries(this.accounts).forEach(elem => {
                     let _key = elem[0];
-                    let { account_category, account_type, currency, currency_detail, description, name, set_date } = elem[1];
+                    let { account_category, account_type, currency, description, name, set_date } = elem[1];
 
                     _accounts[account_category].accounts[account_type][_key] = {
+                        key: _key,
+                        account_type,
                         currency,
-                        currency_detail,
-                        description,
                         name,
                         set_date
                     }
+
+                    if (description) _accounts[account_category].accounts[account_type][_key].description = description;
                 });
 
                 return _accounts;
@@ -313,6 +375,7 @@ export default {
     },
     watch: {
         addAccountModal (val) { // For resetting Add Account Form
+            if (!val) this.editingAccount = false;
             !val && this.$refs.form.reset()
         }
     },
@@ -352,6 +415,8 @@ export default {
         border-radius:          15px 15px 0 0;
     }
     .button-overlay-color {
-        background-color:       #272727 !important;
+        background-color:       #272727;
+        display:                inline-block;
+        border-radius:          4px;
     }
 </style>

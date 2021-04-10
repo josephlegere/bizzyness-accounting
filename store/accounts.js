@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export const state = () => ({
 	list: [],
 	new: {}
@@ -11,21 +13,22 @@ export const actions = {
 			.collection("tenant_accounts")
 			.doc(tenant)
 			.collection("accounts")
+			.where('archive', '==', false)
 			.get()
 			.then(snapshot => {
 				snapshot.forEach(doc => {
 					//console.log(doc.id, "=>", doc.data());
-					let { account_category, account_type, currency, currency_detail, description, name, set_date } = doc.data();
+					let { account_category, account_type, currency, description, name, set_date } = doc.data();
 
 					_list[doc.id] = {
 						account_category,
 						account_type,
 						currency,
-						currency_detail,
-						description,
 						name,
 						set_date
 					};
+
+					if (description) _list[doc.id].description = description;
 				});
 			})
 			.catch(err => {
@@ -40,10 +43,23 @@ export const actions = {
 		// commit("insert", newAccount);
 
 		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').add(newAccount);
+	},
+	async edit({ commit }, { tenant, account, updates }) {
+		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').doc(account).update(updates);
 	}
 };
 
 export const mutations = {
     setList: (state, accounts) => (state.list = accounts),
-	insert: (state, newAccount) => (state.list = { ...state.list, ...newAccount })
+	insert: (state, newAccount) => (state.list = { ...state.list, ...newAccount }),
+	update: (state, account) => {
+		let { key, updates } = account;
+		let _account = _.cloneDeep(state.list[key]);
+
+		Object.entries(updates).forEach(elem => {
+			_account[elem[0]] = elem[1];
+		});
+
+		state.list[key] = _account;
+	}
 };
