@@ -155,7 +155,7 @@
                                                         <v-btn
                                                             v-if="editingAccount"
                                                             dark
-                                                            @click="submitAccount"
+                                                            @click="archiveAccount"
                                                             :loading="submittingForm"
                                                             :disabled="submittingForm"
                                                         >Archieve</v-btn>
@@ -313,6 +313,24 @@ export default {
                 currency,
                 description
             };
+        },
+        archiveAccount() {
+            let { details } = this.formEntry;
+            this.submittingForm = true;
+
+            this.$store.dispatch('accounts/archive', { tenant: this.tenant, account: details.key })
+            .then((ref) => {
+                this.$store.commit('accounts/archive', { key: details.key });
+                this.addAccountModal = false;
+            })
+            .catch(err => {
+                console.log(err);
+                console.error('Error in Store!');
+            })
+            .finally(() => {
+                this.validate = false;
+                this.submittingForm = false;
+            });
         }
     },
     computed: {

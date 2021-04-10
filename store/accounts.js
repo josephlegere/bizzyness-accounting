@@ -37,15 +37,18 @@ export const actions = {
 
 		commit("setList", _list);
 	},
-	async add({ commit }, { newAccount, tenant }) {
+	async add({}, { newAccount, tenant }) {
 		console.log(newAccount);
 		console.log(tenant);
 		// commit("insert", newAccount);
 
 		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').add(newAccount);
 	},
-	async edit({ commit }, { tenant, account, updates }) {
+	async edit({}, { tenant, account, updates }) {
 		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').doc(account).update(updates);
+	},
+	async archive({}, { tenant, account }) {
+		return await this.$fire.firestore.collection('tenant_accounts').doc(tenant).collection('accounts').doc(account).update({ archive: true });
 	}
 };
 
@@ -61,5 +64,15 @@ export const mutations = {
 		});
 
 		state.list[key] = _account;
+	},
+	archive: (state, account) => {
+		let { key } = account;
+
+		state.list = Object.filter(state.list, _key => _key !== key); ;
 	}
 };
+
+Object.filter = (obj, predicate) => 
+    Object.keys(obj)
+          .filter( key => predicate(key) )
+          .reduce( (res, key) => (res[key] = obj[key], res), {} );
