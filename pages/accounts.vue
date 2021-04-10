@@ -75,7 +75,7 @@
 
                                     <v-card-text class="my-md-16">
                                         <v-container>
-                                            <v-form ref="form" v-model="validate" lazy-validation>
+                                            <v-form ref="form" v-model="validate">
                                                 <v-row>
                                                     <v-col
                                                         cols="12"
@@ -135,7 +135,16 @@
                                                         md="6"
                                                         offset-md="3"
                                                     >
-                                                        <v-btn dark block @click="submitInvoice">Submit</v-btn>
+                                                        <div class="button-overlay-color">
+                                                            <v-btn
+                                                                dark
+                                                                block
+                                                                @click="submitAccount"
+                                                                :loading="submittingNew"
+                                                                :disabled="submittingNew"
+                                                                
+                                                            >Submit</v-btn>
+                                                        </div>
                                                         <small>* indicates required field</small>
                                                     </v-col>
                                                 </v-row>
@@ -212,17 +221,19 @@ export default {
                 currency: null,
                 description: null
             },
-            validate: false
+            validate: false,
+            submittingNew: false
         }
     },
     methods: {
         capitalizeFirst(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
-        submitInvoice() {
+        submitAccount() {
             this.$refs.form.validate();
 
             if (this.validate) {
+                this.submittingNew = true;
                 let { details, currency, name, description } = this.newAccount;
                 let { account_category, account_type } = details;
                 let newAccount = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp() };
@@ -236,6 +247,10 @@ export default {
                 .catch(err => {
                     console.log(err);
                     console.error('Error in Store!');
+                })
+                .finally(() => {
+                    this.validate = false;
+                    this.submittingNew = false;
                 });
             }
         }
@@ -335,5 +350,8 @@ export default {
         /* v-sheet need to contain the toolbar in order for the border radius to take effect */
         box-shadow:             0px -2px 4px -1px rgb(0 0 0 / 20%), 0px -2px 5px 0px rgb(0 0 0 / 14%);
         border-radius:          15px 15px 0 0;
+    }
+    .button-overlay-color {
+        background-color:       #272727 !important;
     }
 </style>
