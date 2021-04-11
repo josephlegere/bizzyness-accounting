@@ -53,11 +53,9 @@
 			</v-btn>
 		</v-app-bar>
 
-		<v-content>
-			<v-container>
+		<v-main>
 			<nuxt />
-			</v-container>
-		</v-content>
+		</v-main>
 		<v-navigation-drawer
 			v-model="rightDrawer"
 			:right="right"
@@ -115,12 +113,17 @@ export default {
 					to: '/invoices/create'
 				},
 				{
+					icon: 'mdi-bank-transfer',
+					title: 'Transactions',
+					to: '/transactions'
+				},
+				{
 					icon: 'mdi-account-box-multiple-outline',
 					title: 'Chart of Accounts',
 					to: '/accounts'
 				},
 				{
-					icon: 'mdi-account-box-multiple-outline',
+					icon: 'mdi-chart-bar',
 					title: 'Reports',
 					to: '/accounts'
 				}

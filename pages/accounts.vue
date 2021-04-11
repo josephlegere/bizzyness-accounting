@@ -1,186 +1,188 @@
 <template>
-    <v-row no-gutters="">
-        <v-col>
-            <v-tabs
-                v-model="tab"
-                fixed-tabs
-                center-active
-                class="mt-4"
-            >
-                <v-tab
-                    v-for="(category, i) in account_category"
-                    :key="i"
+    <v-container>
+        <v-row no-gutters="">
+            <v-col>
+                <v-tabs
+                    v-model="tab"
+                    fixed-tabs
+                    center-active
+                    class="mt-4"
                 >
-                    {{ category.title }}
-                </v-tab>
-            </v-tabs>
-
-            <v-tabs-items v-model="tab">
-                <v-tab-item
-                    v-for="(category, key, i) in fillAccounts"
-                    :key="i"
-                >
-                    <v-simple-table
-                        v-for="(account, key2, j) in category.accounts"
-                        :key="j"
+                    <v-tab
+                        v-for="(category, i) in account_category"
+                        :key="i"
                     >
-                        <template v-slot:default>
-                            <thead>
-                                <tr>
-                                    <th class="text-left" colspan="3">{{ key2 }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(record, key3) in account" :key="key3">
-                                    <td>{{ record.name }}</td>
-                                    <td>{{ record.currency.code }}</td>
-                                    <td>
-                                        <v-btn icon @click="editAccount(record)">
-                                            <v-icon>mdi-pencil-outline</v-icon>
-                                        </v-btn>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
-                </v-tab-item>
-            </v-tabs-items>
+                        {{ category.title }}
+                    </v-tab>
+                </v-tabs>
 
-            <v-row
-                class="toolbar-container"
-                no-gutters
-            >
-                <v-col
-                    md="2"
-                    class="ml-md-auto"
+                <v-tabs-items v-model="tab">
+                    <v-tab-item
+                        v-for="(category, key, i) in fillAccounts"
+                        :key="i"
+                    >
+                        <v-simple-table
+                            v-for="(account, key2, j) in category.accounts"
+                            :key="j"
+                        >
+                            <template v-slot:default>
+                                <thead>
+                                    <tr>
+                                        <th class="text-left" colspan="3">{{ key2 }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(record, key3) in account" :key="key3">
+                                        <td>{{ record.name }}</td>
+                                        <td>{{ record.currency.code }}</td>
+                                        <td>
+                                            <v-btn icon @click="editAccount(record)">
+                                                <v-icon>mdi-pencil-outline</v-icon>
+                                            </v-btn>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </v-tab-item>
+                </v-tabs-items>
+
+                <v-row
+                    class="toolbar-container"
+                    no-gutters
                 >
-                    <v-sheet
-                        color="transparent"
-                        class="form-toolbar">
-                        <v-toolbar
-                            dark
-                            height="60"
-                            class="d-flex justify-center">
+                    <v-col
+                        md="2"
+                        class="ml-md-auto"
+                    >
+                        <v-sheet
+                            color="transparent"
+                            class="form-toolbar">
+                            <v-toolbar
+                                dark
+                                height="60"
+                                class="d-flex justify-center">
 
-                            <v-btn
-                                outlined
-                                @click="addAccountModal = !addAccountModal"
-                            >
-                                Add Account
-                            </v-btn>
-                            
-                            <v-bottom-sheet v-model="addAccountModal" scrollable transition="dialog-bottom-transition">
-                                <v-card class="rounded-t-xl">
-                                    <v-toolbar dark dense class="rounded-t-xl">
-                                        <v-btn icon dark @click="addAccountModal = !addAccountModal">
-                                            <v-icon>mdi-close</v-icon>
-                                        </v-btn>
-                                        <v-toolbar-title>Add an Account</v-toolbar-title>
-                                    </v-toolbar>
+                                <v-btn
+                                    outlined
+                                    @click="addAccountModal = !addAccountModal"
+                                >
+                                    Add Account
+                                </v-btn>
+                                
+                                <v-bottom-sheet v-model="addAccountModal" scrollable transition="dialog-bottom-transition">
+                                    <v-card class="rounded-t-xl">
+                                        <v-toolbar dark dense class="rounded-t-xl">
+                                            <v-btn icon dark @click="addAccountModal = !addAccountModal">
+                                                <v-icon>mdi-close</v-icon>
+                                            </v-btn>
+                                            <v-toolbar-title>Add an Account</v-toolbar-title>
+                                        </v-toolbar>
 
-                                    <v-card-text class="my-md-16">
-                                        <v-container>
-                                            <v-form ref="form" v-model="validate">
-                                                <v-row>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                    >
-                                                        <v-autocomplete
-                                                            v-model="formEntry.details"
-                                                            :items="fillAccountTypes"
-                                                            label="Account Type *"
-                                                            item-text="account_type"
-                                                            return-object
-                                                            :rules="[v => !!v || 'Account Type is required']"
-                                                            :disabled="editingAccount"
-                                                        ></v-autocomplete>
-                                                    </v-col>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                    >
-                                                        <v-text-field
-                                                            v-model="formEntry.name"
-                                                            label="Account Name *"
-                                                            :rules="[v => !!v || 'Account Name is required']"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                    >
-                                                        <v-autocomplete
-                                                            v-model="formEntry.currency"
-                                                            :items="currency"
-                                                            label="Currency"
-                                                            item-text="name"
-                                                            return-object
-                                                            :rules="[v => !!v || 'Currency is required']"
-                                                            :disabled="editingAccount"
-                                                        ></v-autocomplete>
-                                                    </v-col>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                    >
-                                                        <v-textarea
-                                                            v-model="formEntry.description"
-                                                            label="Description"
-                                                            autoGrow
-                                                            dense
-                                                            hide-details
-                                                            rows="3"
-                                                        ></v-textarea>
-                                                    </v-col>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                        class="d-flex flex-row-reverse"
-                                                    >
-                                                        <span class="button-overlay-color ml-2">
+                                        <v-card-text class="my-md-16">
+                                            <v-container>
+                                                <v-form ref="form" v-model="validate">
+                                                    <v-row>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-autocomplete
+                                                                v-model="formEntry.details"
+                                                                :items="fillAccountTypes"
+                                                                label="Account Type *"
+                                                                item-text="account_type"
+                                                                return-object
+                                                                :rules="[v => !!v || 'Account Type is required']"
+                                                                :disabled="editingAccount"
+                                                            ></v-autocomplete>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-text-field
+                                                                v-model="formEntry.name"
+                                                                label="Account Name *"
+                                                                :rules="[v => !!v || 'Account Name is required']"
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-autocomplete
+                                                                v-model="formEntry.currency"
+                                                                :items="currency"
+                                                                label="Currency"
+                                                                item-text="name"
+                                                                return-object
+                                                                :rules="[v => !!v || 'Currency is required']"
+                                                                :disabled="editingAccount"
+                                                            ></v-autocomplete>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-textarea
+                                                                v-model="formEntry.description"
+                                                                label="Description"
+                                                                autoGrow
+                                                                dense
+                                                                hide-details
+                                                                rows="3"
+                                                            ></v-textarea>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                            class="d-flex flex-row-reverse"
+                                                        >
+                                                            <span class="button-overlay-color ml-2">
+                                                                <v-btn
+                                                                    dark
+                                                                    @click="submitAccount"
+                                                                    :loading="submittingForm"
+                                                                    :disabled="submittingForm"
+                                                                >{{ editingAccount ? 'Edit' : 'Submit' }}</v-btn>
+                                                            </span>
+                                                            <span class="button-overlay-color">
                                                             <v-btn
+                                                                v-if="editingAccount"
                                                                 dark
-                                                                @click="submitAccount"
+                                                                @click="archiveAccount"
                                                                 :loading="submittingForm"
                                                                 :disabled="submittingForm"
-                                                            >{{ editingAccount ? 'Edit' : 'Submit' }}</v-btn>
-                                                        </span>
-                                                        <span class="button-overlay-color">
-                                                        <v-btn
-                                                            v-if="editingAccount"
-                                                            dark
-                                                            @click="archiveAccount"
-                                                            :loading="submittingForm"
-                                                            :disabled="submittingForm"
-                                                        >Archieve</v-btn>
-                                                        </span>
-                                                    </v-col>
-                                                    <v-col
-                                                        cols="12"
-                                                        md="6"
-                                                        offset-md="3"
-                                                    >
-                                                        <small>* indicates required field</small>
-                                                    </v-col>
-                                                </v-row>
-                                            </v-form>
-                                        </v-container>
-                                    </v-card-text>
-                                </v-card>
-                            </v-bottom-sheet>
+                                                            >Archieve</v-btn>
+                                                            </span>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <small>* indicates required field</small>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-form>
+                                            </v-container>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-bottom-sheet>
 
-                        </v-toolbar>
-                    </v-sheet>
-                </v-col>
-            </v-row>
-        </v-col>
-    </v-row>
+                            </v-toolbar>
+                        </v-sheet>
+                    </v-col>
+                </v-row>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
