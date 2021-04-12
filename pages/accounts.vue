@@ -76,7 +76,7 @@
                                             <v-btn icon dark @click="addAccountModal = !addAccountModal">
                                                 <v-icon>mdi-close</v-icon>
                                             </v-btn>
-                                            <v-toolbar-title>Add an Account</v-toolbar-title>
+                                            <v-toolbar-title>{{ editingAccount ? 'Edit' : 'Add'}} an Account</v-toolbar-title>
                                         </v-toolbar>
 
                                         <v-card-text class="my-md-16">

@@ -21,6 +21,54 @@
                     :search="search"
                     no-data-text="No Transactions Available"
                 >
+                    <template v-slot:item.date="{ item }">
+                        {{ item.date | moment("MMMM Do YYYY") }}
+                    </template>
+                    
+                    <template v-slot:item.description="{ item }">
+                        <v-edit-dialog
+                            large
+                            @save="saveEdit(item, 'description')"
+                            @open="openEdit(item.description, 'description')"
+                            @close="closeEdit('description')"
+                        >
+                            <!-- @open="open"
+                            @close="close" -->
+                            <div v-if="item.description !== '' && item.description !== null">{{ item.description }}</div>
+                            <div v-else class="text--disabled">Description</div>
+                            <template v-slot:input>
+                                <v-text-field
+                                    v-model="formEntry.description"
+                                    :rules="[v => v.length <= 300 || 'Input too long!']"
+                                    label="Edit Description"
+                                    single-line
+                                    counter
+                                ></v-text-field>
+                            </template>
+                        </v-edit-dialog>
+                    </template>
+                    
+                    <template v-slot:item.amount="{ item }">
+                        <v-edit-dialog
+                            large
+                            @save="saveEdit(item, 'amount')"
+                            @close="closeEdit('amount')"
+                        >
+                            <!-- @open="open"
+                            @close="close" -->
+                            <div v-if="item.amount !== '' && item.amount !== null">{{ item.amount }}</div>
+                            <div v-else class="text--disabled">Amount</div>
+                            <template v-slot:input>
+                                <v-text-field
+                                    v-model="formEntry.amount"
+                                    label="Edit Amount"
+                                    :rules="[numberRule]"
+                                    single-line
+                                ></v-text-field>
+                            </template>
+                        </v-edit-dialog>
+                    </template>
+
                     <template v-slot:item.actions="{ item }">
                         <v-icon
                             small
@@ -65,14 +113,16 @@
                             <v-btn
                                 outlined
                                 :small="$vuetify.breakpoint.smAndDown"
+                                @click="addEntry('Deposit')"
                             >
-                                <!-- @click="addAccountModal = !addAccountModal" -->
+                                <!-- @click="addEntryModal = !addEntryModal" -->
                                 Add Income
                             </v-btn>
 
                             <v-btn
                                 outlined
                                 :small="$vuetify.breakpoint.smAndDown"
+                                @click="addEntry('Widthraw')"
                                 class="ml-md-1"
                             >
                                 Add Expense
@@ -101,6 +151,81 @@
                                 </v-list>
                             </v-menu>
 
+                            <v-bottom-sheet v-model="addEntryModal" scrollable transition="dialog-bottom-transition">
+                                    <v-card class="rounded-t-xl">
+                                        <v-toolbar dark dense class="rounded-t-xl">
+                                            <v-btn icon dark @click="addEntryModal = !addEntryModal">
+                                                <v-icon>mdi-close</v-icon>
+                                            </v-btn>
+                                            <v-toolbar-title>{{ editingTransaction ? 'Edit' : 'Add'}} an Account</v-toolbar-title>
+                                        </v-toolbar>
+
+                                        <v-card-text class="my-md-16">
+                                            <v-container>
+                                                <v-form ref="form" v-model="validate">
+                                                    <v-row>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-text-field
+                                                                v-model="formEntry.name"
+                                                                label="Account Name *"
+                                                                :rules="[v => !!v || 'Account Name is required']"
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <v-textarea
+                                                                v-model="formEntry.description"
+                                                                label="Description"
+                                                                autoGrow
+                                                                dense
+                                                                hide-details
+                                                                rows="3"
+                                                            ></v-textarea>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                            class="d-flex flex-row-reverse"
+                                                        >
+                                                            <span class="button-overlay-color ml-2">
+                                                                <v-btn
+                                                                    dark
+                                                                    :loading="submittingForm"
+                                                                    :disabled="submittingForm"
+                                                                >{{ editingTransaction ? 'Edit' : 'Submit' }}</v-btn>
+                                                            </span>
+                                                            <span class="button-overlay-color">
+                                                            <v-btn
+                                                                v-if="editingTransaction"
+                                                                dark
+                                                                @click="archiveAccount"
+                                                                :loading="submittingForm"
+                                                                :disabled="submittingForm"
+                                                            >Archieve</v-btn>
+                                                            </span>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="6"
+                                                            offset-md="3"
+                                                        >
+                                                            <small>* indicates required field</small>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-form>
+                                            </v-container>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-bottom-sheet>
+
                         </v-toolbar>
                     </v-sheet>
                 </v-col>
@@ -111,6 +236,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import moment from 'moment';
 
 export default {
     data () {
@@ -123,7 +249,54 @@ export default {
                 { text: 'Category', value: 'category' },
                 { text: 'Amount', value: 'amount' },
                 { text: 'Actions', value: 'actions', sortable: false }
-            ]
+            ],
+            addEntryModal: false,
+            formEntry: {
+                description: '',
+                amount: '0'
+            },
+            validate: false,
+            submittingForm: false,
+            editingTransaction: false,
+            numberRule: v  => {
+                if (!v.trim()) return true;
+                if (!isNaN(parseFloat(v)) && v >= 0 && v <= 999) return true;
+                return 'Number has to be between 0 and 999';
+            }
+        }
+    },
+    methods: {
+        addEntry (type) {
+            console.log('Add Entry');
+            this.$store.commit('transactions/insert', {
+                date: moment().toDate(),
+                description: '',
+                account: null,
+                category: null,
+                amount: '0',
+                notes: '',
+                type,
+                created_by: {
+                    id: this.loggeduser.tenantid,
+                    name: this.loggeduser.name
+                },
+                id: Date.now(), // temp id
+                priority: 1,
+                datatype: 'record'
+            });
+        },
+        saveEdit (obj, key) {
+            let _value = this.formEntry[key];
+            if (key === 'amount') _value = parseFloat(_value).toFixed(2).toString();
+            this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
+        },
+        openEdit (value, key) {
+            this.formEntry[key] = key !== 'amount' ? value : parseFloat(value).toFixed(2).toString();
+        },
+        closeEdit (key) {
+            this.formEntry[key] = key !== 'amount' ? '' : '0';
+        },
+        cancel () {
         }
     },
     computed: {

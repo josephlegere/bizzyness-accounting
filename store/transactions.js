@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash';
 
 export const state = () => ({
 	list: [],
@@ -31,7 +32,9 @@ export const actions = {
                     notes,
                     type,
                     created_by,
-                    id: doc.id
+                    id: doc.id,
+                    priority: 2,
+                    datatype: 'record'
                 });
             });
 
@@ -45,5 +48,18 @@ export const actions = {
 };
 
 export const mutations = {
-    setList: (state, invoices) => (state.list = invoices)
+    setList: (state, transactions) => (state.list = transactions),
+    insert: (state, newTransaction) => {
+        console.log(newTransaction);
+        state.list.push(newTransaction);
+    },
+    update: (state, transaction) => {
+		let { id, updates } = transaction;
+        let _index = state.list.findIndex((elem) => elem.id === id);
+		let _transactions = _.cloneDeep(state.list);
+
+		_transactions[_index][Object.keys(updates)[0]] = Object.values(updates)[0];
+
+		state.list = _transactions;
+	}
 };

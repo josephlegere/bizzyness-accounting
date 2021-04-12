@@ -22,6 +22,7 @@
                     :headers="headers"
                     :items="invoices"
                     :search="search"
+                    @click:row="open"
                 >
                     <template slot="body.append">
                         <tr>
@@ -31,15 +32,11 @@
                             <th colspan="2" class="pa-0"></th>
                         </tr>
                     </template>
-                    <template v-slot:item="props">
-                        <tr :active="props.selected" @click="open(props.item)">
-                            <td>{{ props.item.invoice_code }}</td>
-                            <td>{{ props.item.date | moment("dddd, MMMM Do YYYY") }}</td>
-                            <td>{{ props.item.customer.account }}</td>
-                            <td>{{ props.item.total }}</td>
-                            <td>{{ props.item.author }}</td>
-                            <td>{{ props.item.remarks }}</td>
-                        </tr> 
+                    <template v-slot:item.date="{ item }">
+                        {{ item.date | moment("dddd, MMMM Do YYYY") }}
+                    </template>
+                    <template v-slot:item.customer="{ item }">
+                        {{ item.customer.account }}
                     </template>
                 </v-data-table>
             </v-card>
@@ -62,7 +59,7 @@
                         text: 'Invoice No.',
                         align: 'start',
                         sortable: false,
-                        value: 'invoice',
+                        value: 'invoice_code',
                     },
                     { text: 'Date', value: 'date' },
                     { text: 'Customer', value: 'customer' },

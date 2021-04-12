@@ -13,8 +13,8 @@ export const actions = {
         
         await this.$fire.firestore
 			.collection("invoices")
-			.where("created_date", ">", new Date(dates[0]))
-			.where("created_date", "<", new Date(dates[dates.length - 1]))
+			.where("created_date", ">=", new Date(dates[0]))
+			.where("created_date", "<=", new Date(dates[dates.length - 1]))
 			.where('tenant', '==', tenant)
 			.orderBy("created_date")
 			.orderBy("invoice_code")
