@@ -32,8 +32,7 @@
                             @open="openEdit(item.description, 'description')"
                             @close="closeEdit('description')"
                         >
-                            <!-- @open="open"
-                            @close="close" -->
+                            <!-- @close="close" -->
                             <div v-if="item.description !== '' && item.description !== null">{{ item.description }}</div>
                             <div v-else class="text--disabled">Description</div>
                             <template v-slot:input>
@@ -48,21 +47,41 @@
                         </v-edit-dialog>
                     </template>
                     
+                    <template v-slot:item.account="{ item }">
+                        <v-edit-dialog
+                            large
+                            @save="saveEdit(item, 'account')"
+                            @open="openEdit(item.account, 'account')"
+                            @close="closeEdit('account')"
+                        >
+                            <!-- @close="close" -->
+                            <div v-if="item.account !== '' && item.account !== null">{{ item.account }}</div>
+                            <div v-else class="text--disabled">Account</div>
+                            <template v-slot:input>
+                                <v-text-field
+                                    v-model="formEntry.account"
+                                    label="Edit Account"
+                                    single-line
+                                ></v-text-field>
+                            </template>
+                        </v-edit-dialog>
+                    </template>
+                    
                     <template v-slot:item.amount="{ item }">
                         <v-edit-dialog
                             large
                             @save="saveEdit(item, 'amount')"
+                            @open="openEdit(item.amount, 'amount')"
                             @close="closeEdit('amount')"
                         >
-                            <!-- @open="open"
-                            @close="close" -->
+                            <!-- @close="close" -->
                             <div v-if="item.amount !== '' && item.amount !== null">{{ item.amount }}</div>
                             <div v-else class="text--disabled">Amount</div>
                             <template v-slot:input>
                                 <v-text-field
                                     v-model="formEntry.amount"
                                     label="Edit Amount"
-                                    :rules="[numberRule]"
+                                    type="number"
                                     single-line
                                 ></v-text-field>
                             </template>
@@ -122,7 +141,7 @@
                             <v-btn
                                 outlined
                                 :small="$vuetify.breakpoint.smAndDown"
-                                @click="addEntry('Widthraw')"
+                                @click="addEntry('Withdraw')"
                                 class="ml-md-1"
                             >
                                 Add Expense
@@ -251,9 +270,22 @@ export default {
                 { text: 'Actions', value: 'actions', sortable: false }
             ],
             addEntryModal: false,
+            account_types: [
+                { item: 'Inventory', value: 'Inventory' },
+                { item: 'Cash and Bank', value: 'Cash and Bank' },
+                { item: 'Credit Card', value: 'Credit Card' },
+            ],
+            category_types: {
+                Deposit: [
+                    { item: 'Income', value: 'Income Accounts' }
+                ],
+                Withdrawal: [
+                    { item: 'Operating Expense', value: 'Expense Accounts' }
+                ]
+            },
             formEntry: {
                 description: '',
-                amount: '0'
+                amount: 0
             },
             validate: false,
             submittingForm: false,
@@ -291,10 +323,10 @@ export default {
             this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
         },
         openEdit (value, key) {
-            this.formEntry[key] = key !== 'amount' ? value : parseFloat(value).toFixed(2).toString();
+            this.formEntry[key] = key !== 'amount' ? value : parseFloat(value).toFixed(2);
         },
         closeEdit (key) {
-            this.formEntry[key] = key !== 'amount' ? '' : '0';
+            this.formEntry[key] = key !== 'amount' ? '' : 0;
         },
         cancel () {
         }
@@ -302,7 +334,8 @@ export default {
     computed: {
         ...mapState({
             transactions: state => state.transactions.list,
-            loggeduser: state => state.auth.loggeduser
+            loggeduser: state => state.auth.loggeduser,
+            accounts: state => state.accounts.list
         }),
         tenant() {
             return this.loggeduser.tenantid.split('/')[1];
@@ -310,6 +343,7 @@ export default {
     },
     async created() {
         await this.$store.dispatch('transactions/get', { tenant: this.tenant });
+        await this.$store.dispatch('accounts/get', this.tenant);
     }
 }
 </script>
