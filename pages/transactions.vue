@@ -55,14 +55,16 @@
                             @close="closeEdit('account')"
                         >
                             <!-- @close="close" -->
-                            <div v-if="item.account !== '' && item.account !== null">{{ item.account }}</div>
+                            <div v-if="item.account !== '' && item.account !== null">{{ item.account.name }}</div>
                             <div v-else class="text--disabled">Account</div>
                             <template v-slot:input>
-                                <v-text-field
+                                <v-autocomplete
                                     v-model="formEntry.account"
+                                    :items="fillAccounts"
                                     label="Edit Account"
-                                    single-line
-                                ></v-text-field>
+                                    item-text="name"
+                                    return-object
+                                ></v-autocomplete>
                             </template>
                         </v-edit-dialog>
                     </template>
@@ -285,6 +287,7 @@ export default {
             },
             formEntry: {
                 description: '',
+                account: null,
                 amount: 0
             },
             validate: false,
@@ -329,6 +332,12 @@ export default {
             this.formEntry[key] = key !== 'amount' ? '' : 0;
         },
         cancel () {
+        },
+        groupKeys(list, key) {
+            return list.reduce(function(collection, elem) {
+                collection.includes(elem[key]) || collection.push(elem[key]);
+                return collection;
+            }, []);
         }
     },
     computed: {
@@ -339,6 +348,20 @@ export default {
         }),
         tenant() {
             return this.loggeduser.tenantid.split('/')[1];
+        },
+        fillAccounts() {
+            let _accounts = [];
+            this.account_types.forEach(group => {
+                let _temp = [];
+                Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
+                    _temp.push({ ...elem[1], id: elem[0] });
+                });
+                if (_temp.length > 0) {
+                    _accounts.push({ header: group.value });
+                    _accounts = _accounts.concat(_temp);
+                }
+            });
+            return _accounts;
         }
     },
     async created() {
