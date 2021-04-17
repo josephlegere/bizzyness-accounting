@@ -20,6 +20,9 @@
                     :items="transactions"
                     :search="search"
                     no-data-text="No Transactions Available"
+                    :item-class="itemRowStyle"
+                    :sort-by="['priority']"
+                    :group-desc="true"
                 >
                     <template v-slot:item.date="{ item }">
                         {{ item.date | moment("MMMM Do YYYY") }}
@@ -113,13 +116,22 @@
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                        <v-icon
-                            small
-                            class="mr-2"
-                            @click="editItem(item)"
-                        >
-                            mdi-pencil
-                        </v-icon>
+                        <span v-if="item.editing">
+                            <v-icon
+                                small
+                                class="mr-2"
+                                @click="editItem(item)"
+                            >
+                                mdi-check
+                            </v-icon>
+                            <v-icon
+                                small
+                                class="mr-2"
+                                @click="cancelAll(item)"
+                            >
+                                mdi-close
+                            </v-icon>
+                        </span>
                         <v-icon
                             small
                             @click="deleteItem(item)"
@@ -313,6 +325,7 @@ export default {
                 category: null,
                 amount: 0
             },
+            editItemDefaults: {},
             validate: false,
             submittingForm: false,
             editingTransaction: false,
@@ -347,6 +360,8 @@ export default {
         saveEdit (obj, key) {
             let _value = this.formEntry[key];
             if (key === 'amount') _value = parseFloat(_value).toFixed(2).toString();
+            if (!this.editItemDefaults.hasOwnProperty(obj.id)) this.editItemDefaults[obj.id] = {};
+            if (!this.editItemDefaults[obj.id].hasOwnProperty(key)) this.editItemDefaults[obj.id] = { ...this.editItemDefaults[obj.id], [key]: obj[key] };
             this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
         },
         openEdit (value, key) {
@@ -355,13 +370,30 @@ export default {
         closeEdit (key) {
             this.formEntry[key] = key !== 'amount' ? '' : 0;
         },
-        cancel () {
+        cancelAll (obj) {
+            let _reverts = { ...this.editItemDefaults[obj.id], editing: false };
+            this.$store.commit('transactions/update', { id: obj.id, updates: _reverts });
+            this.editItemDefaults = Object.keys(this.editItemDefaults).reduce((accumulator, key) => {
+                console.log(key);
+                console.log(obj.id);
+                if(key !== obj.id){
+                    accumulator[key] = this.editItemDefaults[key];
+                }
+                return accumulator
+            }, {});
+            console.log(this.editItemDefaults);
+        },
+        confirmAll () {
+
         },
         groupKeys(list, key) {
             return list.reduce(function(collection, elem) {
                 collection.includes(elem[key]) || collection.push(elem[key]);
                 return collection;
             }, []);
+        },
+        itemRowStyle: function (item) {
+            return item.editing ? 'row-editing' : '';
         }
     },
     computed: {
@@ -405,7 +437,7 @@ export default {
         }
     },
     async created() {
-        await this.$store.dispatch('transactions/get', { tenant: this.tenant });
+        await this.$store.dispatch('transactions/get', { tenant: this.loggeduser.tenantid });
         await this.$store.dispatch('accounts/get', this.tenant);
     }
 }

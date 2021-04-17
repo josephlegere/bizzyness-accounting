@@ -16,11 +16,11 @@ export const actions = {
                 .collection("transactions")
                 // .where("created_date", ">", new Date(dates[0]))
                 // .where("created_date", "<", new Date(dates[dates.length - 1]))
-                .where('tenant', '==', tenant)
+                .where('tenantid', '==', tenant)
                 .get();
             
             transactionSnap.forEach(doc => {
-                console.log(doc.id, "=>", doc.data());
+                // console.log(doc.id, "=>", doc.data());
                 let { date, description, account, category, amount, notes, type, created_by } = doc.data();
 
                 _transactions.push({
@@ -53,8 +53,8 @@ export const actions = {
         let _insert = { ...newTransaction, tenantid, created: this.$fireModule.firestore.FieldValue.serverTimestamp() };
         
         try {
-            let ref = await this.$fire.firestore.collection('transactions').add(_insert);
-            let _commit = { ...newTransaction, id: ref.id, priority: 1, datatype: 'record', editing: true };
+            // let ref = await this.$fire.firestore.collection('transactions').add(_insert);
+            let _commit = { ...newTransaction, id: Date.now(), priority: 1, datatype: 'record', editing: true };
             commit('insert', _commit);
         }
         catch (err) {
@@ -75,7 +75,12 @@ export const mutations = {
         let _index = state.list.findIndex((elem) => elem.id === id);
 		let _transactions = _.cloneDeep(state.list);
 
-		_transactions[_index][Object.keys(updates)[0]] = Object.values(updates)[0];
+        if (!_transactions[_index].editing) _transactions[_index].editing = true;
+        Object.entries(updates).forEach(elem => {
+            let _key = elem[0];
+            let _value = elem[1];
+            _transactions[_index][_key] = _value;
+        });
 
 		state.list = _transactions;
 	}

@@ -155,4 +155,8 @@ export default {
     .handle:active {
         cursor:                     grabbing;
     }
+
+	.row-editing {
+        background-color: 			rgba(255, 246, 237, 1);
+	}
 </style>
