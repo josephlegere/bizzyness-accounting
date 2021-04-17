@@ -34,7 +34,8 @@ export const actions = {
                     created_by,
                     id: doc.id,
                     priority: 2,
-                    datatype: 'record'
+                    datatype: 'record',
+                    editing: false
                 });
             });
 
@@ -45,6 +46,22 @@ export const actions = {
             throw err;
         }
     },
+    async add({ commit }, { newTransaction, tenantid }) {
+		console.log(newTransaction);
+		console.log(tenantid);
+		// commit("insert", newTransaction);
+        let _insert = { ...newTransaction, tenantid, created: this.$fireModule.firestore.FieldValue.serverTimestamp() };
+        
+        try {
+            let ref = await this.$fire.firestore.collection('transactions').add(_insert);
+            let _commit = { ...newTransaction, id: ref.id, priority: 1, datatype: 'record', editing: true };
+            commit('insert', _commit);
+        }
+        catch (err) {
+            console.error(err);
+            throw err;
+        }
+	}
 };
 
 export const mutations = {

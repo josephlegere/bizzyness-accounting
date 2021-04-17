@@ -326,21 +326,22 @@ export default {
     methods: {
         addEntry (type) {
             console.log('Add Entry');
-            this.$store.commit('transactions/insert', {
-                date: moment().toDate(),
-                description: '',
-                account: null,
-                category: null,
-                amount: '0',
-                notes: '',
-                type,
-                created_by: {
-                    id: this.loggeduser.tenantid,
-                    name: this.loggeduser.name
+            this.$store.dispatch('transactions/add', {
+                newTransaction: {
+                    date: moment().toDate(),
+                    description: '',
+                    account: null,
+                    category: null,
+                    amount: 0,
+                    notes: '',
+                    type,
+                    created_by: {
+                        id: this.loggeduser.id,
+                        name: this.loggeduser.name
+                    },
+                    // id: Date.now(), // temporary id
                 },
-                id: Date.now(), // temp id
-                priority: 1,
-                datatype: 'record'
+                tenantid: this.loggeduser.tenantid
             });
         },
         saveEdit (obj, key) {
