@@ -69,6 +69,28 @@
                         </v-edit-dialog>
                     </template>
                     
+                    <template v-slot:item.category="{ item }">
+                        <v-edit-dialog
+                            large
+                            @save="saveEdit(item, 'category')"
+                            @open="openEdit(item.category, 'category')"
+                            @close="closeEdit('category')"
+                        >
+                            <!-- @close="close" -->
+                            <div v-if="item.category !== '' && item.category !== null">{{ item.category.name }}</div>
+                            <div v-else class="text--disabled">Category</div>
+                            <template v-slot:input>
+                                <v-autocomplete
+                                    v-model="formEntry.category"
+                                    :items="fillCategories(item.type)"
+                                    label="Edit Category"
+                                    item-text="name"
+                                    return-object
+                                ></v-autocomplete>
+                            </template>
+                        </v-edit-dialog>
+                    </template>
+                    
                     <template v-slot:item.amount="{ item }">
                         <v-edit-dialog
                             large
@@ -281,13 +303,14 @@ export default {
                 Deposit: [
                     { item: 'Income', value: 'Income Accounts' }
                 ],
-                Withdrawal: [
+                Withdraw: [
                     { item: 'Operating Expense', value: 'Expense Accounts' }
                 ]
             },
             formEntry: {
                 description: '',
                 account: null,
+                category: null,
                 amount: 0
             },
             validate: false,
@@ -362,6 +385,22 @@ export default {
                 }
             });
             return _accounts;
+        },
+        fillCategories() {
+            return type => {
+                let _categories = [];
+                this.category_types[type].forEach(group => {
+                    let _temp = [];
+                    Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
+                        _temp.push({ ...elem[1], id: elem[0] });
+                    });
+                    if (_temp.length > 0) {
+                        _categories.push({ header: group.value });
+                        _categories = _categories.concat(_temp);
+                    }
+                });
+                return _categories;
+            }
         }
     },
     async created() {

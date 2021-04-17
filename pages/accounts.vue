@@ -262,7 +262,7 @@ export default {
                 if (!this.editingAccount) { //add an account
                     let { details, currency, name, description } = this.formEntry;
                     let { account_category, account_type } = details;
-                    let formEntry = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp() };
+                    let formEntry = { account_category, account_type, currency, name, set_date: this.$fireModule.firestore.FieldValue.serverTimestamp(), archive: false };
                     if (description) formEntry.description = description;
 
                     this.$store.dispatch('accounts/add', { newAccount: formEntry, tenant: this.tenant })
