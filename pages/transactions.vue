@@ -21,8 +21,12 @@
                     :search="search"
                     no-data-text="No Transactions Available"
                     :item-class="itemRowStyle"
-                    :sort-by="['priority']"
-                    :group-desc="true"
+                    :sort-by="['priority', 'date']"
+                    :sort-desc="[false, true]"
+                    multi-sort
+                    :expanded.sync="expanded"
+                    show-expand
+
                 >
                     <template v-slot:item.date="{ item }">
                         {{ item.date | moment("MMMM Do YYYY") }}
@@ -41,10 +45,10 @@
                             <template v-slot:input>
                                 <v-text-field
                                     v-model="formEntry.description"
-                                    :rules="[v => v.length <= 300 || 'Input too long!']"
+                                    :rules="[v => v.length <= 150 || 'Input too long!']"
                                     label="Edit Description"
                                     single-line
-                                    counter
+                                    counter="150"
                                 ></v-text-field>
                             </template>
                         </v-edit-dialog>
@@ -115,7 +119,7 @@
                         </v-edit-dialog>
                     </template>
 
-                    <template v-slot:item.actions="{ item }">
+                    <template v-slot:item.data-table-expand="{ item, expand, isExpanded }">
                         <span v-if="item.editing">
                             <v-icon
                                 small
@@ -133,11 +137,36 @@
                             </v-icon>
                         </span>
                         <v-icon
-                            small
-                            @click="deleteItem(item)"
+                            @click="(expand(!isExpanded))"
                         >
-                            mdi-delete
+                            {{isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                         </v-icon>
+                    </template>
+
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td :colspan="headers.length">
+                            <v-card class="mx-auto my-4" width="100%" flat>
+                                <v-textarea
+                                    v-model="formEntry.notes"
+                                    outlined
+                                    label="Notes"
+                                    :rules="[v => v.length <= 300 || 'Input too long!']"
+                                    counter="300"
+                                    autoGrow
+                                    dense
+                                    rows="3"
+                                ></v-textarea>
+                                <v-divider class="mx-auto"></v-divider>
+                                <v-card-actions class="d-flex flex-row-reverse">
+                                    <v-btn
+                                        outlined
+                                        text
+                                    >
+                                        Delete
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </td>
                     </template>
                 </v-data-table>
             </v-card>
@@ -303,7 +332,7 @@ export default {
                 { text: 'Account', value: 'account' },
                 { text: 'Category', value: 'category' },
                 { text: 'Amount', value: 'amount' },
-                { text: 'Actions', value: 'actions', sortable: false }
+                { text: '', value: 'data-table-expand', width: 'auto' }
             ],
             addEntryModal: false,
             account_types: [
@@ -319,11 +348,14 @@ export default {
                     { item: 'Operating Expense', value: 'Expense Accounts' }
                 ]
             },
+            selected: [],
+            expanded: [],
             formEntry: {
                 description: '',
                 account: null,
                 category: null,
-                amount: 0
+                amount: 0,
+                notes: ''
             },
             editItemDefaults: {},
             validate: false,
@@ -423,7 +455,8 @@ export default {
             this.account_types.forEach(group => {
                 let _temp = [];
                 Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
-                    _temp.push({ ...elem[1], id: elem[0] });
+                    let { name, currency } = elem[1];
+                    _temp.push({ name, currency, id: `tenant_accounts/${this.tenant}/accounts/${elem[0]}` });
                 });
                 if (_temp.length > 0) {
                     _accounts.push({ header: group.value });
@@ -438,7 +471,8 @@ export default {
                 this.category_types[type].forEach(group => {
                     let _temp = [];
                     Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
-                        _temp.push({ ...elem[1], id: elem[0] });
+                    let { name } = elem[1];
+                        _temp.push({ name, id: `tenant_accounts/${this.tenant}/accounts/${elem[0]}` });
                     });
                     if (_temp.length > 0) {
                         _categories.push({ header: group.value });

@@ -47,8 +47,6 @@ export const actions = {
         }
     },
     async add({ commit }, { newTransaction, tenantid }) {
-		console.log(newTransaction);
-		console.log(tenantid);
 		// commit("insert", newTransaction);
         let _insert = { ...newTransaction, tenantid, created: this.$fireModule.firestore.FieldValue.serverTimestamp() };
         
@@ -69,9 +67,6 @@ export const actions = {
             Object.keys(updates).forEach(key => {
                 _updates[key] = state.list[_index][key];
             });
-            console.log(state);
-            console.log(transaction);
-            console.log(_updates);
 		    await this.$fire.firestore.collection('transactions').doc(transaction).update(_updates);
             commit('update', { id: transaction, updates: { editing: false }});
         }
