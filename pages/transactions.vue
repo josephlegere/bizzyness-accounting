@@ -120,7 +120,7 @@
                             <v-icon
                                 small
                                 class="mr-2"
-                                @click="editItem(item)"
+                                @click="confirmAll(item)"
                             >
                                 mdi-check
                             </v-icon>
@@ -381,10 +381,23 @@ export default {
                 }
                 return accumulator
             }, {});
-            console.log(this.editItemDefaults);
         },
-        confirmAll () {
-
+        confirmAll (obj) {
+            this.$store.dispatch('transactions/edit', { transaction: obj.id, updates: this.editItemDefaults[obj.id] })
+                .then(() => {
+                    console.log('Update Successful!');
+                    this.editItemDefaults = Object.keys(this.editItemDefaults).reduce((accumulator, key) => {
+                        console.log(key);
+                        console.log(obj.id);
+                        if(key !== obj.id){
+                            accumulator[key] = this.editItemDefaults[key];
+                        }
+                        return accumulator
+                    }, {});
+                })
+                .catch(err => {
+                    console.log('Update Unsuccessful!');
+                });
         },
         groupKeys(list, key) {
             return list.reduce(function(collection, elem) {

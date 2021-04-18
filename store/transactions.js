@@ -53,9 +53,27 @@ export const actions = {
         let _insert = { ...newTransaction, tenantid, created: this.$fireModule.firestore.FieldValue.serverTimestamp() };
         
         try {
-            // let ref = await this.$fire.firestore.collection('transactions').add(_insert);
+            let ref = await this.$fire.firestore.collection('transactions').add(_insert);
             let _commit = { ...newTransaction, id: Date.now(), priority: 1, datatype: 'record', editing: true };
             commit('insert', _commit);
+        }
+        catch (err) {
+            console.error(err);
+            throw err;
+        }
+	},
+	async edit({ commit, state }, { transaction, updates }) {
+        try {
+            let _index = state.list.findIndex((elem) => elem.id === transaction);
+            let _updates = {};
+            Object.keys(updates).forEach(key => {
+                _updates[key] = state.list[_index][key];
+            });
+            console.log(state);
+            console.log(transaction);
+            console.log(_updates);
+		    await this.$fire.firestore.collection('transactions').doc(transaction).update(_updates);
+            commit('update', { id: transaction, updates: { editing: false }});
         }
         catch (err) {
             console.error(err);
