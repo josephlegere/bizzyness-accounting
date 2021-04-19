@@ -29,7 +29,39 @@
 
                 >
                     <template v-slot:item.date="{ item }">
-                        {{ item.date | moment("MMMM Do YYYY") }}
+                        <v-edit-dialog
+                            large
+                            @save="saveEdit(item, 'date')"
+                            @open="openEdit(item.date, 'date')"
+                            @close="closeEdit('date')"
+                        >
+                            {{ item.date | moment("MMMM Do YYYY") }}
+                            <template v-slot:input>
+                                <v-menu
+                                    ref="menu"
+                                    v-model="menu"
+                                    :close-on-content-click="false"
+                                    :nudge-right="40"
+                                    transition="scale-transition"
+                                    offset-y
+                                    min-width="auto"
+                                >
+                                    <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field
+                                        v-model="dateToDisplay"
+                                        label="Picker without buttons"
+                                        prepend-icon="mdi-calendar"
+                                        readonly
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="formEntry.date"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </template>
+                        </v-edit-dialog>
                     </template>
                     
                     <template v-slot:item.description="{ item }">
@@ -350,7 +382,9 @@ export default {
             },
             selected: [],
             expanded: [],
+            menu: false,
             formEntry: {
+                date: new Date().toISOString().substr(0, 10),
                 description: '',
                 account: null,
                 category: null,
@@ -397,10 +431,14 @@ export default {
             this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
         },
         openEdit (value, key) {
-            this.formEntry[key] = key !== 'amount' ? value : parseFloat(value).toFixed(2);
+            if (key === 'date') this.formEntry[key] = new Date(value).toISOString().substr(0, 10);
+            else if (key === 'amount') this.formEntry[key] = parseFloat(value).toFixed(2);
+            else this.formEntry[key] = value;
         },
         closeEdit (key) {
-            this.formEntry[key] = key !== 'amount' ? '' : 0;
+            if (key === 'date') this.formEntry[key] = new Date().toISOString().substr(0, 10);
+            else if (key === 'amount') this.formEntry[key] = 0;
+            else this.formEntry[key] = '';
         },
         cancelAll (obj) {
             let _reverts = { ...this.editItemDefaults[obj.id], editing: false };
@@ -481,6 +519,9 @@ export default {
                 });
                 return _categories;
             }
+        },
+        dateToDisplay() {
+            return moment(this.formEntry.date).format('MMMM Do YYYY');
         }
     },
     async created() {
