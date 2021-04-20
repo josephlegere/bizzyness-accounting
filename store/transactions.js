@@ -24,7 +24,7 @@ export const actions = {
                 let { date, description, account, category, amount, notes, type, created_by } = doc.data();
 
                 _transactions.push({
-                    date: moment.unix(date.seconds),
+                    date: date.toDate(),
                     description,
                     account,
                     category,
@@ -65,7 +65,13 @@ export const actions = {
             let _index = state.list.findIndex((elem) => elem.id === transaction);
             let _updates = {};
             Object.keys(updates).forEach(key => {
-                _updates[key] = state.list[_index][key];
+                let _value;
+
+                if (key === 'date') _value = moment(state.list[_index][key]).toDate();
+                else if (key === 'amount') _value = parseFloat(state.list[_index][key]);
+                else _value = state.list[_index][key];
+
+                _updates[key] = _value;
             });
 		    await this.$fire.firestore.collection('transactions').doc(transaction).update(_updates);
             commit('update', { id: transaction, updates: { editing: false }});

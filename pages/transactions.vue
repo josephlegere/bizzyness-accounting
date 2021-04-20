@@ -34,32 +34,16 @@
                             @save="saveEdit(item, 'date')"
                             @open="openEdit(item.date, 'date')"
                             @close="closeEdit('date')"
+                            persistent
                         >
                             {{ item.date | moment("MMMM Do YYYY") }}
                             <template v-slot:input>
-                                <v-menu
-                                    ref="menu"
-                                    v-model="menu"
-                                    :close-on-content-click="false"
-                                    :nudge-right="40"
-                                    transition="scale-transition"
-                                    offset-y
-                                    min-width="auto"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field
-                                        v-model="dateToDisplay"
-                                        label="Picker without buttons"
-                                        prepend-icon="mdi-calendar"
-                                        readonly
-                                        v-bind="attrs"
-                                        v-on="on"
-                                    ></v-text-field>
-                                    </template>
-                                    <v-date-picker
-                                        v-model="formEntry.date"
-                                    ></v-date-picker>
-                                </v-menu>
+                                <v-text-field
+                                    v-model="dateToDisplay"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    @click="showDatepicker"
+                                ></v-text-field>
                             </template>
                         </v-edit-dialog>
                     </template>
@@ -138,7 +122,7 @@
                             @close="closeEdit('amount')"
                         >
                             <!-- @close="close" -->
-                            <div v-if="item.amount !== '' && item.amount !== null">{{ item.amount }}</div>
+                            <div v-if="item.amount !== '' && item.amount !== null">{{ parseFloat(item.amount).toFixed(2) }}</div>
                             <div v-else class="text--disabled">Amount</div>
                             <template v-slot:input>
                                 <v-text-field
@@ -202,6 +186,20 @@
                     </template>
                 </v-data-table>
             </v-card>
+                    
+            <v-menu
+                v-model="datepicker"
+                :position-x="datepicker_X"
+                :position-y="datepicker_Y"
+                z-index="10"
+                absolute
+                transition="scale-transition"
+                offset-y
+            >
+                <v-date-picker
+                    v-model="formEntry.date"
+                ></v-date-picker>
+            </v-menu>
 
             <v-row
                 class="toolbar-container"
@@ -382,7 +380,9 @@ export default {
             },
             selected: [],
             expanded: [],
-            menu: false,
+            datepicker: false,
+            datepicker_X: 0,
+            datepicker_Y: 0,
             formEntry: {
                 date: new Date().toISOString().substr(0, 10),
                 description: '',
@@ -425,7 +425,8 @@ export default {
         },
         saveEdit (obj, key) {
             let _value = this.formEntry[key];
-            if (key === 'amount') _value = parseFloat(_value).toFixed(2).toString();
+            if (key === 'amount') _value = parseFloat(_value);
+            else if (key === 'date') _value = moment(_value).toDate();
             if (!this.editItemDefaults.hasOwnProperty(obj.id)) this.editItemDefaults[obj.id] = {};
             if (!this.editItemDefaults[obj.id].hasOwnProperty(key)) this.editItemDefaults[obj.id] = { ...this.editItemDefaults[obj.id], [key]: obj[key] };
             this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
@@ -468,6 +469,15 @@ export default {
                 .catch(err => {
                     console.log('Update Unsuccessful!');
                 });
+        },
+        showDatepicker(e) {
+            e.preventDefault();
+            this.datepicker = false;
+            this.datepicker_X = e.clientX;
+            this.datepicker_Y = e.clientY;
+            this.$nextTick(() => {
+                this.datepicker = true;
+            })
         },
         groupKeys(list, key) {
             return list.reduce(function(collection, elem) {
