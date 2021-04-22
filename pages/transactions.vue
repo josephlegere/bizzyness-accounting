@@ -384,7 +384,7 @@ export default {
             datepicker_X: 0,
             datepicker_Y: 0,
             formEntry: {
-                date: new Date().toISOString().substr(0, 10),
+                date: moment().format('YYYY-MM-DD'),
                 description: '',
                 account: null,
                 category: null,
@@ -407,7 +407,7 @@ export default {
             console.log('Add Entry');
             this.$store.dispatch('transactions/add', {
                 newTransaction: {
-                    date: moment().toDate(),
+                    date: moment(moment().format('YYYY-MM-DD')).toDate(),
                     description: '',
                     account: null,
                     category: null,
@@ -426,18 +426,17 @@ export default {
         saveEdit (obj, key) {
             let _value = this.formEntry[key];
             if (key === 'amount') _value = parseFloat(_value);
-            else if (key === 'date') _value = moment(_value).toDate();
             if (!this.editItemDefaults.hasOwnProperty(obj.id)) this.editItemDefaults[obj.id] = {};
             if (!this.editItemDefaults[obj.id].hasOwnProperty(key)) this.editItemDefaults[obj.id] = { ...this.editItemDefaults[obj.id], [key]: obj[key] };
             this.$store.commit('transactions/update', { id: obj.id, updates: { [key]: _value } });
         },
         openEdit (value, key) {
-            if (key === 'date') this.formEntry[key] = new Date(value).toISOString().substr(0, 10);
+            if (key === 'date') this.formEntry[key] = moment(value).format('YYYY-MM-DD');
             else if (key === 'amount') this.formEntry[key] = parseFloat(value).toFixed(2);
             else this.formEntry[key] = value;
         },
         closeEdit (key) {
-            if (key === 'date') this.formEntry[key] = new Date().toISOString().substr(0, 10);
+            if (key === 'date') this.formEntry[key] = moment().format('YYYY-MM-DD');
             else if (key === 'amount') this.formEntry[key] = 0;
             else this.formEntry[key] = '';
         },
@@ -445,8 +444,6 @@ export default {
             let _reverts = { ...this.editItemDefaults[obj.id], editing: false };
             this.$store.commit('transactions/update', { id: obj.id, updates: _reverts });
             this.editItemDefaults = Object.keys(this.editItemDefaults).reduce((accumulator, key) => {
-                console.log(key);
-                console.log(obj.id);
                 if(key !== obj.id){
                     accumulator[key] = this.editItemDefaults[key];
                 }

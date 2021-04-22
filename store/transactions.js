@@ -24,7 +24,7 @@ export const actions = {
                 let { date, description, account, category, amount, notes, type, created_by } = doc.data();
 
                 _transactions.push({
-                    date: date.toDate(),
+                    date: moment(date.toDate()).format('YYYY-MM-DD'),
                     description,
                     account,
                     category,
