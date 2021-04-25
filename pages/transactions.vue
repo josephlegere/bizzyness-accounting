@@ -26,7 +26,7 @@
                     multi-sort
                     :expanded.sync="expanded"
                     show-expand
-
+                    single-expand
                 >
                     <template v-slot:item.date="{ item }">
                         <v-edit-dialog
@@ -147,13 +147,13 @@
                             <v-icon
                                 small
                                 class="mr-2"
-                                @click="cancelAll(item)"
+                                @click="cancelAll(item, expand)"
                             >
                                 mdi-close
                             </v-icon>
                         </span>
                         <v-icon
-                            @click="(expand(!isExpanded))"
+                            @click="toggleExpanded(item, expand, isExpanded)"
                         >
                             {{isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                         </v-icon>
@@ -162,16 +162,23 @@
                     <template v-slot:expanded-item="{ headers, item }">
                         <td :colspan="headers.length">
                             <v-card class="mx-auto my-4" width="100%" flat>
-                                <v-textarea
-                                    v-model="formEntry.notes"
-                                    outlined
-                                    label="Notes"
-                                    :rules="[v => v.length <= 300 || 'Input too long!']"
-                                    counter="300"
-                                    autoGrow
-                                    dense
-                                    rows="3"
-                                ></v-textarea>
+                                <v-row no-gutters>
+                                    <v-combobox
+                                        v-model="formEntry.type"
+                                        :items="transaction_type"
+                                        :value="item.type"></v-combobox>
+                                    <v-spacer></v-spacer>
+                                    <v-textarea
+                                        v-model="formEntry.notes"
+                                        outlined
+                                        label="Notes"
+                                        :rules="[v => v.length <= 300 || 'Input too long!']"
+                                        counter="300"
+                                        autoGrow
+                                        dense
+                                        rows="3"
+                                    ></v-textarea>
+                                </v-row>
                                 <v-divider class="mx-auto"></v-divider>
                                 <v-card-actions class="d-flex flex-row-reverse">
                                     <v-btn
@@ -378,6 +385,7 @@ export default {
                     { item: 'Operating Expense', value: 'Expense Accounts' }
                 ]
             },
+            transaction_type: ['Deposit', 'Withdraw'],
             selected: [],
             expanded: [],
             datepicker: false,
@@ -389,6 +397,7 @@ export default {
                 account: null,
                 category: null,
                 amount: 0,
+                type: null,
                 notes: ''
             },
             editItemDefaults: {},
@@ -440,15 +449,19 @@ export default {
             else if (key === 'amount') this.formEntry[key] = 0;
             else this.formEntry[key] = '';
         },
-        cancelAll (obj) {
+        cancelAll (obj, expand) {
             let _reverts = { ...this.editItemDefaults[obj.id], editing: false };
             this.$store.commit('transactions/update', { id: obj.id, updates: _reverts });
+
+            // removes the object/transaction from the editItemDefaults
             this.editItemDefaults = Object.keys(this.editItemDefaults).reduce((accumulator, key) => {
                 if(key !== obj.id){
                     accumulator[key] = this.editItemDefaults[key];
                 }
                 return accumulator
             }, {});
+
+            expand(false);
         },
         confirmAll (obj) {
             this.$store.dispatch('transactions/edit', { transaction: obj.id, updates: this.editItemDefaults[obj.id] })
@@ -466,6 +479,11 @@ export default {
                 .catch(err => {
                     console.log('Update Unsuccessful!');
                 });
+        },
+        toggleExpanded (item, expand, isExpanded) {
+            this.formEntry.type = item.type;
+            this.formEntry.notes = item.notes;
+            expand(!isExpanded);
         },
         showDatepicker(e) {
             e.preventDefault();
@@ -529,6 +547,34 @@ export default {
         },
         dateToDisplay() {
             return moment(this.formEntry.date).format('MMMM Do YYYY');
+        },
+        entryType() {
+            return this.formEntry.type;
+        },
+        entryNotes() {
+            return this.formEntry.notes;
+        }
+    },
+    watch: {
+        entryType: function (newItem, item) {
+            if (this.expanded.length > 0) {
+                let { id, editing } = this.expanded[0];
+                let updates = { type: newItem };
+                if (!editing) updates.editing = true;
+                if (!this.editItemDefaults.hasOwnProperty(id)) this.editItemDefaults[id] = {};
+                if (!this.editItemDefaults[id].hasOwnProperty('type')) this.editItemDefaults[id] = { ...this.editItemDefaults[id], type: item };
+                this.$store.commit('transactions/update', { id, updates });
+            }
+        },
+        entryNotes: function (newItem, item) {
+            if (this.expanded.length > 0) {
+                let { id, editing } = this.expanded[0];
+                let updates = { notes: newItem };
+                if (!editing) updates.editing = true;
+                if (!this.editItemDefaults.hasOwnProperty(id)) this.editItemDefaults[id] = {};
+                if (!this.editItemDefaults[id].hasOwnProperty('notes')) this.editItemDefaults[id] = { ...this.editItemDefaults[id], notes: item };
+                this.$store.commit('transactions/update', { id, updates });
+            }
         }
     },
     async created() {
