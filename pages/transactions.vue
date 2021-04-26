@@ -402,6 +402,7 @@ export default {
             },
             editItemDefaults: {},
             validate: false,
+            editingMode: false,
             submittingForm: false,
             editingTransaction: false,
             numberRule: v  => {
@@ -481,9 +482,32 @@ export default {
                 });
         },
         toggleExpanded (item, expand, isExpanded) {
-            this.formEntry.type = item.type;
-            this.formEntry.notes = item.notes;
             expand(!isExpanded);
+
+            // turn off editing mode when the expanded is different from the current trigger of expand
+            if (this.expanded.length > 0 && this.expanded[0].id !== item.id) this.editingMode = false;
+
+            // Editing Mode is on by default when expanded var has data
+            // returns a promise after loading the transaction data to formEntry
+            // needs a promise, so turning on editingMode will be reflected in the next cycle
+            this.loadTransactionData(item)
+                .then(() => {
+                    this.editingMode = true;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        loadTransactionData (item) {
+            return new Promise((resolve, reject) => {
+                try {
+                    this.formEntry.type = item.type;
+                    this.formEntry.notes = item.notes;
+                    resolve('Success!');
+                } catch (err) {
+                    reject(err);
+                }
+            })
         },
         showDatepicker(e) {
             e.preventDefault();
@@ -557,7 +581,7 @@ export default {
     },
     watch: {
         entryType: function (newItem, item) {
-            if (this.expanded.length > 0) {
+            if (this.expanded.length > 0 && this.editingMode) {
                 let { id, editing } = this.expanded[0];
                 let updates = { type: newItem };
                 if (!editing) updates.editing = true;
@@ -567,7 +591,7 @@ export default {
             }
         },
         entryNotes: function (newItem, item) {
-            if (this.expanded.length > 0) {
+            if (this.expanded.length > 0 && this.editingMode) {
                 let { id, editing } = this.expanded[0];
                 let updates = { notes: newItem };
                 if (!editing) updates.editing = true;
