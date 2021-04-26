@@ -80,11 +80,22 @@ export const actions = {
             console.error(err);
             throw err;
         }
-	}
+	},
+    async delete({ commit }, { transaction }) {
+        try {
+            let { id } = transaction;
+            const res = await this.$fire.firestore.collection('transactions').doc(id).delete();
+            commit('stripList', transaction);
+        }
+        catch (err) {
+            throw err;
+        }
+    }
 };
 
 export const mutations = {
     setList: (state, transactions) => (state.list = transactions),
+    stripList: (state, transaction) => state.list = _.difference(state.list, [ transaction]),
     insert: (state, newTransaction) => {
         console.log(newTransaction);
         state.list.push(newTransaction);

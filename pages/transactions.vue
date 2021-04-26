@@ -184,6 +184,7 @@
                                     <v-btn
                                         outlined
                                         text
+                                        @click="deleteItem=item; deleteDialog=true"
                                     >
                                         Delete
                                     </v-btn>
@@ -207,6 +208,40 @@
                     v-model="formEntry.date"
                 ></v-date-picker>
             </v-menu>
+
+            <v-dialog
+                v-model="deleteDialog"
+                max-width="290"
+            >
+                <v-card>
+                    <v-card-title class="headline">
+                        Delete Transaction
+                    </v-card-title>
+
+                    <v-card-text>
+                        Do you want to DELETE the transaction {{ deleteItem !== null ? deleteItem.description : '' }} on {{ deleteItem !== null ? deleteItem.date : '' }}?
+                    </v-card-text>
+
+                    <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                        text
+                        @click="deleteItem = null; deleteDialog = false"
+                    >
+                        Cancel
+                    </v-btn>
+
+                    <v-btn
+                        color="red darken-1"
+                        text
+                        @click="deleteRecord"
+                    >
+                        DELETE
+                    </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
 
             <v-row
                 class="toolbar-container"
@@ -403,6 +438,8 @@ export default {
             editItemDefaults: {},
             validate: false,
             editingMode: false,
+            deleteDialog: false,
+            deleteItem: null,
             submittingForm: false,
             editingTransaction: false,
             numberRule: v  => {
@@ -479,6 +516,16 @@ export default {
                 })
                 .catch(err => {
                     console.log('Update Unsuccessful!');
+                });
+        },
+        deleteRecord () {
+            this.$store.dispatch('transactions/delete', { transaction: this.deleteItem })
+                .catch(err => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    this.deleteItem = null;
+                    this.deleteDialog = false;
                 });
         },
         toggleExpanded (item, expand, isExpanded) {
