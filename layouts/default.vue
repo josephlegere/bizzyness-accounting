@@ -156,7 +156,11 @@ export default {
         cursor:                     grabbing;
     }
 
+	/* For Trnasactions Page, when editing */
 	.row-editing {
+        background-color: 			rgba(255, 246, 237, 1);
+	}
+	.row-editing .v-data-table__mobile-row {
         background-color: 			rgba(255, 246, 237, 1);
 	}
 </style>
