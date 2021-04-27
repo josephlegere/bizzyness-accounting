@@ -52,7 +52,7 @@ export const actions = {
         
         try {
             let ref = await this.$fire.firestore.collection('transactions').add(_insert);
-            let _commit = { ...newTransaction, id: Date.now(), priority: 1, datatype: 'record', editing: true };
+            let _commit = { ...newTransaction, id: ref.id, priority: 1, datatype: 'record', editing: true };
             commit('insert', _commit);
         }
         catch (err) {
