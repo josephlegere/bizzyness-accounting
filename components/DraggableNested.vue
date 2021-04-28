@@ -30,6 +30,7 @@
                         ></v-select>
                     </v-col>
                     <v-col
+                        v-if="el.hasOwnProperty('rowtype') && focusRowTypes.includes(el.rowtype)"
                         v-for="(data, i) in headers"
                         :key="i"
                         cols="10"
@@ -48,6 +49,35 @@
                             rows="1"
                         ></v-textarea>
                     </v-col>
+
+                    <v-col 
+                        v-if="el.hasOwnProperty('rowtype') && el.rowtype === 'newline'"
+                        cols="10"
+                        md="8"
+                        offset="1"
+                        offset-md="0"
+                    >
+                        <v-textarea
+                            class="design-textarea"
+                            placeholder="New Line"
+                            v-model="el.description"
+                            readonly
+                            autoGrow
+                            dense
+                            hide-details
+                            rows="1"
+                        ></v-textarea>
+                    </v-col>
+
+                    <!-- This will be the v-else, including a v-else below a v-if inline with a v-for  -->
+                    <!-- will create a v-else for all the v-if inline with v-for  -->
+                    <v-col 
+                        v-if="!el.hasOwnProperty('rowtype') || el.rowtype === null"
+                        cols="10"
+                        md="8"
+                        offset="1"
+                        offset-md="0"
+                    ></v-col>
                     <v-col
                         cols="1"
                     >
@@ -85,19 +115,19 @@ export default {
     data: () => ({
         rowtypes: [
             {
-                text: 'MTR',
+                text: 'Materials',
                 value: 'materials'
             },
             {
-                text: 'JOB',
+                text: 'Job',
                 value: 'jobs'
             },
             {
-                text: '\\n',
-                value: 'new line'
+                text: 'New Line',
+                value: 'newline'
             }
         ],
-        definedRowTypes: [] //material and job will go here
+        focusRowTypes: ['materials', 'jobs'] //material and job will go here
     }),
     methods: {
         removeAt(i) {
