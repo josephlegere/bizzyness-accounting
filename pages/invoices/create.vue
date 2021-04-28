@@ -93,112 +93,121 @@
 
                 <br>
                 <br>
+                
+                <v-row
+                    class="toolbar-container"
+                    no-gutters
+                >
+                    <v-col
+                        md="5"
+                        class="ml-md-auto"
+                    >
+                        <v-sheet
+                            color="transparent"
+                            class="form-toolbar">
+                            <v-toolbar
+                                dark
+                                height="60">
 
-                <v-sheet
-                    dark
-                    class="form-toolbar">
-                    <v-toolbar
-                        color="secondary"
-                        flat
-                        height="60">
+                                <v-toolbar-title class="mr-4">Total:</v-toolbar-title>
 
-                        <v-toolbar-title class="mr-4">Total:</v-toolbar-title>
+                                <v-spacer></v-spacer>
 
-                        <v-spacer></v-spacer>
+                                <!-- Total: -->
+                                <v-text-field
+                                    v-model="accumulate"
+                                    :rules="[v => parseInt(v) > 0 || 'Total is required']"
+                                    label="Total"
+                                    readonly
+                                    solo
+                                    flat
+                                    dense
+                                    hide-details="auto"
+                                    background-color="rgba(255,255,255, 0)"
+                                    style="width:120px; margin: auto 0"
+                                ></v-text-field>
 
-                        <!-- Total: -->
-                        <v-text-field
-                            v-model="accumulate"
-                            :rules="[v => parseInt(v) > 0 || 'Total is required']"
-                            label="Total"
-                            readonly
-                            solo
-                            flat
-                            dense
-                            hide-details="auto"
-                            background-color="rgba(255,255,255, 0)"
-                            style="width:120px; margin: auto 0"
-                        ></v-text-field>
+                                <v-spacer></v-spacer>
+                                
+                                <v-btn
+                                    icon
+                                    @click="checkValidation(true, 'preview')"
+                                >
+                                    <v-icon>mdi-printer-search</v-icon>
+                                </v-btn>
+                                <v-btn
+                                    icon
+                                    @click="checkValidation(true, 'print')"
+                                >
+                                    <v-icon>mdi-send-circle-outline</v-icon>
+                                </v-btn>
 
-                        <v-spacer></v-spacer>
-                        
-                        <v-btn
-                            icon
-                            @click="checkValidation(true, 'preview')"
-                        >
-                            <v-icon>mdi-printer-search</v-icon>
-                        </v-btn>
-                        <v-btn
-                            icon
-                            @click="checkValidation(true, 'print')"
-                        >
-                            <v-icon>mdi-send-circle-outline</v-icon>
-                        </v-btn>
+                                <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Preview -->
+                                    <v-card dark>
+                                        <v-toolbar dark color="primary">
+                                            <v-btn icon dark @click="preview = false">
+                                                <v-icon>mdi-close</v-icon>
+                                            </v-btn>
+                                            <v-toolbar-title>Invoice</v-toolbar-title>
+                                        </v-toolbar>
+                                        <div v-if="preview">
+                                            <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=false />
+                                        </div>
 
-                        <v-dialog v-model="preview" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Preview -->
-                            <v-card dark>
-                                <v-toolbar dark color="primary">
-                                    <v-btn icon dark @click="preview = false">
-                                        <v-icon>mdi-close</v-icon>
-                                    </v-btn>
-                                    <v-toolbar-title>Invoice</v-toolbar-title>
-                                </v-toolbar>
-                                <div v-if="preview">
-                                    <InvoiceView :invoice="invoice" :key="viewerwKey" :toPrint=false />
-                                </div>
+                                    </v-card>
+                                </v-dialog>
+                                
+                                <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Print -->
+                                    <v-card dark>
+                                        <v-toolbar dark color="primary">
+                                            <v-btn icon dark @click="onSubmit">
+                                                <v-icon>mdi-close</v-icon>
+                                            </v-btn>
+                                            <v-toolbar-title>Invoice</v-toolbar-title>
+                                        </v-toolbar>
+                                        <div v-if="print">
+                                            <InvoiceView :invoice="invoice" :key="viewerwKey" />
+                                        </div>
+                                    </v-card>
+                                </v-dialog>
 
-                            </v-card>
-                        </v-dialog>
-                        
-                        <v-dialog v-model="print" fullscreen hide-overlay transition="dialog-bottom-transition"> <!-- Print -->
-                            <v-card dark>
-                                <v-toolbar dark color="primary">
-                                    <v-btn icon dark @click="onSubmit">
-                                        <v-icon>mdi-close</v-icon>
-                                    </v-btn>
-                                    <v-toolbar-title>Invoice</v-toolbar-title>
-                                </v-toolbar>
-                                <div v-if="print">
-                                    <InvoiceView :invoice="invoice" :key="viewerwKey" />
-                                </div>
-                            </v-card>
-                        </v-dialog>
+                                <v-dialog
+                                    v-model="confirmPrint"
+                                    max-width="290"
+                                >
+                                    <v-card>
+                                        <v-card-title class="headline">Confirm Submit</v-card-title>
 
-                        <v-dialog
-                            v-model="confirmPrint"
-                            max-width="290"
-                        >
-                            <v-card>
-                                <v-card-title class="headline">Confirm Submit</v-card-title>
+                                        <v-card-text>
+                                            Are you sure you want to submit? Check all the details of the invoice before submission.
+                                        </v-card-text>
 
-                                <v-card-text>
-                                    Are you sure you want to submit? Check all the details of the invoice before submission.
-                                </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
 
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
+                                            <v-btn
+                                                color="red darken-1"
+                                                text
+                                                @click="confirmPrint = false"
+                                            >
+                                                Cancel
+                                            </v-btn>
 
-                                    <v-btn
-                                        color="red darken-1"
-                                        text
-                                        @click="confirmPrint = false"
-                                    >
-                                        Cancel
-                                    </v-btn>
+                                            <v-btn
+                                                color="primary"
+                                                text
+                                                @click="confirmPrint = false; print = true"
+                                            >
+                                                Confirm
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
 
-                                    <v-btn
-                                        color="primary"
-                                        text
-                                        @click="confirmPrint = false; print = true"
-                                    >
-                                        Confirm
-                                    </v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-
-                    </v-toolbar>
-                </v-sheet>
+                            </v-toolbar>
+                        </v-sheet>
+                    </v-col>
+                </v-row>
             </v-form>
         </v-col>
     </v-row>
@@ -449,11 +458,22 @@ export default {
 </script>
 
 <style scoped>
-    .form-toolbar {
+    .toolbar-container {
+        width:                  100%;
         position:               fixed;
         z-index:                4;
         bottom:                 35px;
         right:                  0;
+    }
+    .toolbar-container .col {
+        width:                  100%;
+    }
+    .form-toolbar {
+        width:                  100%;
+    }
+    .form-toolbar .v-toolbar {
+        box-shadow:             0px -2px 4px -1px rgb(0 0 0 / 20%), 0px -2px 5px 0px rgb(0 0 0 / 14%);
+        border-radius:          15px 15px 0 0;
     }
     .drag-list {
         padding:                0 !important;
