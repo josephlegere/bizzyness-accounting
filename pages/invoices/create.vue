@@ -232,7 +232,7 @@ export default {
             ],
             // customers: [],
             isLoadingCustomers: false,
-            rowtypes: ['materials', 'jobs'],
+            rowtypes: ['entry'],
             headers: [
                 { value: 'key', text: 'Key' },
                 { value: 'description', text: 'Description', colsize: 2 },
@@ -259,39 +259,25 @@ export default {
     },
     methods: {
         add: function() {
-            let _temp = {};
+            /*let _temp = {};
             
             this.headers.forEach(elem => {
                 _temp[elem.value] = '';
             });
             _temp.items = [];
-            _temp.rowtype = '';
+            _temp.rowtype = '';*/
 
-            this.list.push(_temp);
+            this.list.push({ description: '', items: [] });
         },
         presets() {
-            let _items = [];
-
-            for (let i = 0; i < 4; i++) {
-                let _record = {};
-                this.headers.forEach(elem => {
-                    _record[elem.value] = '';
-                    if (elem.value === 'key') _record[elem.value] = i + 1;
-                });
-                _record.items = [];
-                _items.push(_record);
-            }
-
-            let _record = {};
-            this.headers.forEach(elem => { //add a child
-                _record[elem.value] = '';
-                if (elem.value === 'key') _record[elem.value] = _items.length + 1;
-            });
-            _record.items = [];
-            _record.rowtype = '';
-            _items[_items.length-1].items.push(_record);
-
-            this.list = _items;
+            this.list = [
+                { rowtype: 'entry', key: 1, description: 'Job Information Sample', quantity: '', price: '', amount: '', items: [] },
+                { rowtype: 'newline', description: '', items: [] },
+                { description: '', items: [] },
+                { rowtype: 'entry', key: 4, description: 'Material Item', quantity: 4, price: 5, amount: 20, items: [
+                    { rowtype: 'entry', key: 4.1, description: 'Object 1', quantity: 2, price: 3, amount: 6, items: [] }
+                ] }
+            ];
         },
         temp_customers() {
             this.customers = [
@@ -321,13 +307,14 @@ export default {
                 return acc + _total;
             }, 0);
         },
-        extractData(list, len = 0) {
+        extractData(list, len = 0) { // extracts data from the displayed data and turn to storable data
             let _items = {};
             let _layout = [];
 
             list.forEach((elem, key) => {
                 let _source = {};
                 let _children = [];
+                let _push = {};
 
                 if (elem.items.length > 0) {
                     let _child = this.extractData(elem.items, len+1);
@@ -339,7 +326,7 @@ export default {
                     if (!(_items.hasOwnProperty(elem.rowtype)))
                         _items[elem.rowtype] = {};
 
-                    _items.materials[`${key}${len}`] = {
+                    _items.entry[`${key}${len}`] = {
                         currency: this.currency,
                         name: elem.description,
                         price: elem.price,
@@ -350,11 +337,11 @@ export default {
                 else
                     _source.content = elem.description;
 
-                _layout.push({
-                    children: _children,
-                    key: elem.key,
-                    source: _source
-                });
+                if (elem.hasOwnProperty('key')) _push.key = elem.key;
+                _push.children = _children;
+                _push.source = _source;
+
+                _layout.push(_push);
             });
 
             return {

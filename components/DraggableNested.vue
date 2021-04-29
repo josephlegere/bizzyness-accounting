@@ -19,7 +19,7 @@
                         <v-select
                             :items="rowtypes"
                             v-model="el.rowtype"
-                            placeholder="Types"
+                            placeholder="type"
                             dense
                             hide-details
                             hide-selected
@@ -115,19 +115,15 @@ export default {
     data: () => ({
         rowtypes: [
             {
-                text: 'Materials',
-                value: 'materials'
-            },
-            {
-                text: 'Job',
-                value: 'jobs'
+                text: 'Material / Job',
+                value: 'entry'
             },
             {
                 text: 'New Line',
                 value: 'newline'
             }
         ],
-        focusRowTypes: ['materials', 'jobs'] //material and job will go here
+        focusRowTypes: ['entry'] //entry is material or job, all focus items will go here
     }),
     methods: {
         removeAt(i) {
