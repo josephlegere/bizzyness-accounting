@@ -13,26 +13,27 @@ export const actions = {
         
         await this.$fire.firestore
 			.collection("invoices")
-			.where("created_date", ">=", new Date(dates[0]))
-			.where("created_date", "<=", new Date(dates[dates.length - 1]))
+			.where("date", ">=", new Date(dates[0]))
+			.where("date", "<=", new Date(dates[dates.length - 1]))
 			.where('tenant', '==', tenant)
-			.orderBy("created_date")
+			.orderBy("date")
 			.orderBy("invoice_code")
 			.get()
 			.then(snapshot => {
 				snapshot.forEach(doc => {
 					console.log(doc.id, "=>", doc.data());
-					let _invoice = doc.data();
+					let { invoice_code, date, customer, total, agent, remarks, items, layout, payments } = doc.data();
 
 					_list.push({
-						invoice_code: _invoice.invoice_code,
-						date: moment.unix(_invoice.created_date.seconds),
-						customer: _invoice.customer,
-						total: _invoice.total,
-						author: _invoice.agent.name,
-						remarks: _invoice.remarks,
-						items: _invoice.items,
-						layout: _invoice.layout,
+						invoice_code,
+						date: moment.unix(date.seconds),
+						customer,
+						total,
+						author: agent.name,
+						remarks,
+						items,
+						layout,
+						payments,
 						id: doc.id
 					});
 				});

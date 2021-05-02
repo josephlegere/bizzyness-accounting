@@ -4,7 +4,23 @@
 
             <v-col cols="12" class="my-4">
                 <v-card>
+                    <v-btn outlined rounded small absolute style="top: 22px; right: 22px">Add Payment</v-btn>
                     <v-card-title>Payments</v-card-title>
+
+                    <v-card-text>
+                        <div class="mx-8 mb-2">
+                            <div class="mb-1">
+                                <strong>Amount Due:</strong> Php 9,499.00
+                            </div>
+
+                            <div>
+                                <strong>Status:</strong> Your invoice is partially paid
+                            </div>
+                        </div>
+                    </v-card-text>
+
+                    <v-divider class="mx-8"></v-divider>
+
                     <v-card-text>
                         <div class="font-weight-bold ml-8 mb-2">
                             Payments received:
@@ -61,6 +77,9 @@ export default {
         ...mapState({
             invoice: state => state.invoices.invoice
         })
+    },
+    async created() {
+        console.log(this.invoice);
     },
     components: {
         InvoiceView

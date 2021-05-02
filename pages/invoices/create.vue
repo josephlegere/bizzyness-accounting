@@ -357,14 +357,15 @@ export default {
                 active: true,
                 agent: { account, id, name },
                 customer: this.recipient.customer,
-                created_date: this.$fireModule.firestore.Timestamp.fromDate(new Date(date)),
+                date: this.$fireModule.firestore.Timestamp.fromDate(new Date(date)), //this format is set date from server side
                 invoice_code,
                 items,
                 layout,
                 remarks,
-                set_date: this.$fireModule.firestore.FieldValue.serverTimestamp(), //this format is set date from server side
+                created: this.$fireModule.firestore.FieldValue.serverTimestamp(),
                 tenant: tenantid,
-                total
+                total,
+                payments: []
             };
 
             // console.log(_invoice);
