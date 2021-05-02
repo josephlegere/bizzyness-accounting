@@ -44,6 +44,27 @@ export const actions = {
 
         commit("setList", _list);
     },
+	async details({ commit }, { code, tenant }) {
+		try {
+			let invoiceSnap = await this.$fire.firestore
+				.collection("invoices")
+				.where("invoice_code", "==", parseInt(code))
+				.where('tenant', '==', tenant)
+				.get();
+			
+			if (invoiceSnap.empty) throw 'Unauthorized access to this data!';
+
+			let invoice;
+			invoiceSnap.forEach(doc => {
+				invoice = doc.data();
+			});
+
+			commit('setInvoice', invoice);
+		}
+		catch (err) {
+			throw err;
+		}
+	},
     // async show({ commit }, id) {
     //     const response = await this.$axios.get(
     //         `${process.env.cmsURL}/posts/${id}`

@@ -56,7 +56,7 @@
                 </v-card>
             </v-col>
 
-            <v-col cols="12" class="my-4">
+            <v-col cols="12" class="my-4" v-if="Object.keys(this.invoice).length > 0">
                 <v-card dark>
                     <InvoiceView :invoice="invoice" />
                 </v-card>
@@ -75,10 +75,18 @@ export default {
     },
     computed: {
         ...mapState({
-            invoice: state => state.invoices.invoice
-        })
+            invoice: state => state.invoices.invoice,
+            loggeduser: state => state.auth.loggeduser
+        }),
+        tenant() {
+            return this.loggeduser.tenantid;
+        }
     },
     async created() {
+        if (!(Object.keys(this.invoice).length > 0)) {
+            this.$store.dispatch('invoices/details', { code: this.$route.params.id, tenant: this.tenant });
+        }
+        console.log(!(Object.keys(this.invoice).length > 0));
         console.log(this.invoice);
     },
     components: {
