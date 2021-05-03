@@ -155,7 +155,8 @@ export default {
                 doc.text(`Cash/Credit Invoice`, 85, 42);
                 doc.text(`No. ${this.invoice.invoice_code}`, 14, 52);
                 doc.text(`To: ${this.invoice.customer.account}`, 14, 58);
-                doc.text(`${moment(this.invoice.date).format("MMMM DD, YYYY")}`, 170, 52);
+                doc.text(`Date: ${moment(this.invoice.date).format("MMMM DD, YYYY")}`, 161, 52);
+                doc.text(`Due Date: ${moment(this.invoice.dateDue).format("MMMM DD, YYYY")}`, 153, 58);
 
                 doc.autoTable({
                     head: this.headers,

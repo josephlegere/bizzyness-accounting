@@ -12,7 +12,7 @@
                         </v-col>
                         <v-col cols="12" md="6" class="d-flex justify-md-end">
                             <div class="mr-4"><b>Amount Due:</b> {{amountdue}}</div>
-                            <div><b>Due On:</b> {{ invoice.date | moment("MMMM Do YYYY") }}</div>
+                            <div><b>Due On:</b> {{ invoice.dateDue | moment("MMMM Do YYYY") }}</div>
                         </v-col>
                     </v-row>
 

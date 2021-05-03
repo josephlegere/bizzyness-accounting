@@ -22,11 +22,12 @@ export const actions = {
 			.then(snapshot => {
 				snapshot.forEach(doc => {
 					console.log(doc.id, "=>", doc.data());
-					let { invoice_code, date, customer, total, agent, remarks, items, layout, payments } = doc.data();
+					let { invoice_code, date, dateDue, customer, total, agent, remarks, items, layout, payments } = doc.data();
 
 					_list.push({
 						invoice_code,
 						date: moment.unix(date.seconds),
+						dateDue: moment.unix(dateDue.seconds),
 						customer,
 						total,
 						author: agent.name,
@@ -56,10 +57,11 @@ export const actions = {
 
 			let invoice;
 			invoiceSnap.forEach(doc => {
-				let { invoice_code, date, customer, total, agent, remarks, items, layout, payments } = doc.data();
+				let { invoice_code, date, dateDue, customer, total, agent, remarks, items, layout, payments } = doc.data();
 				invoice = {
 					invoice_code,
 					date: moment.unix(date.seconds),
+					dateDue: moment.unix(dateDue.seconds),
 					customer,
 					total,
 					author: agent.name,
@@ -77,12 +79,6 @@ export const actions = {
 			throw err;
 		}
 	},
-    // async show({ commit }, id) {
-    //     const response = await this.$axios.get(
-    //         `${process.env.cmsURL}/posts/${id}`
-    //     );
-    //     commit("setPost", response.data);
-    // },
     async add({ commit }, invoice) {
         //const response = await axios.post('https://jsonplaceholder.typicode.com/todos', { title, completed: false });
         console.log(invoice);

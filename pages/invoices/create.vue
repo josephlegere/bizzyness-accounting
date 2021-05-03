@@ -46,28 +46,56 @@
                         </template>
                     </v-autocomplete>
 
-                    <v-dialog
-                        ref="dialog"
-                        v-model="datepicker"
-                        :return-value.sync="date"
-                        persistent
-                        width="290px"
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-text-field
-                                v-model="dateStringFormat"
-                                placeholder="Date"
-                                readonly
-                                dense
-                                v-on="on"
-                            ></v-text-field>
-                        </template>
-                        <v-date-picker v-model="date" scrollable>
-                            <v-spacer></v-spacer>
-                            <v-btn text color="primary" @click="datepicker = false">Cancel</v-btn>
-                            <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
-                        </v-date-picker>
-                    </v-dialog>
+                    <v-row no-gutters>
+                        <v-col cols="12" md="6" class="pr-md-2">
+                            <v-dialog
+                                ref="dialogDate"
+                                v-model="datepicker_date"
+                                :return-value.sync="date"
+                                persistent
+                                width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        v-model="invoiceDate_str"
+                                        label="Invoice Date"
+                                        readonly
+                                        dense
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="date" scrollable>
+                                    <v-spacer></v-spacer>
+                                    <v-btn text color="primary" @click="datepicker_date = false">Cancel</v-btn>
+                                    <v-btn text color="primary" @click="$refs.dialogDate.save(date)">OK</v-btn>
+                                </v-date-picker>
+                            </v-dialog>
+                        </v-col>
+                        <v-col cols="12" md="6" class="pl-md-2">
+                            <v-dialog
+                                ref="dialogDateDue"
+                                v-model="datepicker_dateDue"
+                                :return-value.sync="dateDue"
+                                persistent
+                                width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        v-model="invoiceDateDue_str"
+                                        label="Due Date"
+                                        readonly
+                                        dense
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="dateDue" scrollable>
+                                    <v-spacer></v-spacer>
+                                    <v-btn text color="primary" @click="datepicker_dateDue = false">Cancel</v-btn>
+                                    <v-btn text color="primary" @click="$refs.dialogDateDue.save(dateDue)">OK</v-btn>
+                                </v-date-picker>
+                            </v-dialog>
+                        </v-col>
+                    </v-row>
                 </v-container>
 
                 <v-container>
@@ -218,6 +246,7 @@ import DraggableNested from '~/components/DraggableNested';
 import InvoiceView from '~/components/InvoiceView';
 import _ from 'lodash';
 import { mapActions, mapState } from 'vuex';
+import moment from 'moment';
 
 export default {
     data () {
@@ -225,7 +254,9 @@ export default {
             validate: false,
             name: 'invoice-create',
             date: new Date().toISOString().substr(0, 10), //no need to specify time as date is user defined
-            datepicker: false,
+            dateDue: new Date().toISOString().substr(0, 10), //no need to specify time as date is user defined
+            datepicker_date: false,
+            datepicker_dateDue: false,
             recipient: null,
             recipientRules: [
                 v => !!v || 'Recipient is required'
@@ -350,7 +381,7 @@ export default {
             };
         },
         submitInvoice() {
-            let { date, invoice_code, items, layout, remarks, total } = this.invoice;
+            let { date, dateDue, invoice_code, items, layout, remarks, total } = this.invoice;
             let { account, id, name, tenantid } = this.loggeduser;
 
             let _invoice = { //invoice format for database
@@ -358,6 +389,7 @@ export default {
                 agent: { account, id, name },
                 customer: this.recipient.customer,
                 date: this.$fireModule.firestore.Timestamp.fromDate(new Date(date)), //this format is set date from server side
+                dateDue: this.$fireModule.firestore.Timestamp.fromDate(new Date(dateDue)), //this format is set date from server side
                 invoice_code,
                 items,
                 layout,
@@ -393,8 +425,11 @@ export default {
         }
     },
     computed: {
-        dateStringFormat () {
+        invoiceDate_str () {
             return new Date(this.date).toDateString().substr(3, 12);
+        },
+        invoiceDateDue_str () {
+            return new Date(this.dateDue).toDateString().substr(3, 12);
         },
         accumulate () {
             return this.accumulate_list(this.list, this.headers).toFixed(2);
@@ -406,6 +441,7 @@ export default {
                 author: 'Joseph Legere',
                 customer: this.recipient.customer,
                 date: this.date,
+                dateDue: this.dateDue,
                 invoice_code: this.invoice_number,
                 items: _records.items, //local
                 layout: _records.layout,
@@ -429,6 +465,13 @@ export default {
         }),
         tenant() {
             return this.loggeduser.tenantid.split('/')[1];
+        }
+    },
+    watch: {
+        date: function (newItem) {
+            if (moment(this.dateDue).isBefore(newItem)) {
+                this.dateDue = newItem;
+            }
         }
     },
     async created() {
