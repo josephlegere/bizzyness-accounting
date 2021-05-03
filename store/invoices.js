@@ -56,7 +56,19 @@ export const actions = {
 
 			let invoice;
 			invoiceSnap.forEach(doc => {
-				invoice = doc.data();
+				let { invoice_code, date, customer, total, agent, remarks, items, layout, payments } = doc.data();
+				invoice = {
+					invoice_code,
+					date: moment.unix(date.seconds),
+					customer,
+					total,
+					author: agent.name,
+					remarks,
+					items,
+					layout,
+					payments,
+					id: doc.id
+				};
 			});
 
 			commit('setInvoice', invoice);
