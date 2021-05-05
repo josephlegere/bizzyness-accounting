@@ -112,13 +112,26 @@
 
                         <v-spacer></v-spacer>
 
-                        <v-btn icon>
+                        <v-btn icon @click="tablemenu">
                             <v-icon>mdi-dots-vertical</v-icon>
                         </v-btn>
                     </v-toolbar>
 
                     <draggable-nested class="drag-list mt-md-3" :headers="headers" :items="list" />
                 </v-container>
+                <v-menu
+                    v-model="showTablemenu"
+                    :position-x="tablemenu_X"
+                    :position-y="tablemenu_Y"
+                    absolute
+                    offset-y
+                >
+                    <v-list>
+                        <v-list-item link>
+                            <v-list-item-title @click="addNewline">New Line</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
 
                 <br>
                 <br>
@@ -264,6 +277,9 @@ export default {
             ],
             // customers: [],
             isLoadingCustomers: false,
+            showTablemenu: false,
+            tablemenu_X: 0,
+            tablemenu_Y: 0,
             rowtypes: ['entry'],
             headers: [
                 { value: 'key', text: 'Key' },
@@ -300,6 +316,18 @@ export default {
             _temp.rowtype = '';*/
 
             this.list.push({ rowtype: 'entry', key: 0, description: '', quantity: 0, price: 0, amount: 0, items: [] });
+        },
+        addNewline: function() {
+            this.list.push({ rowtype: 'newline', size: 1, items: [] });
+        },
+        tablemenu: function (e) {
+            e.preventDefault()
+            this.showTablemenu = false;
+            this.tablemenu_X = e.clientX;
+            this.tablemenu_Y = e.clientY;
+            this.$nextTick(() => {
+                this.showTablemenu = true;
+            })
         },
         presets() {
             this.list = [

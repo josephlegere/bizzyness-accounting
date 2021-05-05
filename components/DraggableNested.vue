@@ -75,6 +75,7 @@
                             class="design-textarea"
                             placeholder="New Line"
                             readonly
+                            no-resize
                             dense
                             hide-details
                             :rows="el.size"
