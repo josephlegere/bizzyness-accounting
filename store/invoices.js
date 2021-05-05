@@ -76,6 +76,7 @@ export const actions = {
 			commit('setInvoice', invoice);
 		}
 		catch (err) {
+			console.log(err);
 			throw err;
 		}
 	},

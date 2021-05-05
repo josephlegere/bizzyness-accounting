@@ -21,6 +21,7 @@
                         item-text="name"
                         item-value="name"
                         return-object
+                        class="mb-4"
                     >
                         <template v-slot:selection="data">
                             <v-chip
@@ -34,7 +35,7 @@
                             </v-chip>
                         </template>
                         <template v-slot:item="data">
-                            <template v-if="typeof data.item !== 'object'">
+                            <template v-if="(typeof data.item !== 'object')">
                                 <v-list-item-content v-text="data.item"></v-list-item-content>
                             </template>
                             <template v-else>
@@ -298,13 +299,12 @@ export default {
             _temp.items = [];
             _temp.rowtype = '';*/
 
-            this.list.push({ description: '', items: [] });
+            this.list.push({ rowtype: 'entry', key: 0, description: '', quantity: 0, price: 0, amount: 0, items: [] });
         },
         presets() {
             this.list = [
                 { rowtype: 'entry', key: 1, description: 'Job Information Sample', quantity: '', price: '', amount: '', items: [] },
-                { rowtype: 'newline', description: '', items: [] },
-                { description: '', items: [] },
+                { rowtype: 'newline', size: 1, items: [] },
                 { rowtype: 'entry', key: 4, description: 'Material Item', quantity: 4, price: 5, amount: 20, items: [
                     { rowtype: 'entry', key: 4.1, description: 'Object 1', quantity: 2, price: 3, amount: 6, items: [] }
                 ] }
@@ -353,7 +353,8 @@ export default {
                     _items = _.merge(_items, _child.items);
                 }
 
-                if (this.rowtypes.includes(elem.rowtype)) {
+                // if (this.rowtypes.includes(elem.rowtype)) {
+                if (elem.rowtype === 'entry') {
                     if (!(_items.hasOwnProperty(elem.rowtype)))
                         _items[elem.rowtype] = {};
 
@@ -364,6 +365,9 @@ export default {
                         quantity: elem.quantity
                     }
                     _source.origin = `items/${elem.rowtype}/${key}${len}`;
+                }
+                else if (elem.rowtype === 'newline') {
+                    _source.size = elem.size;
                 }
                 else
                     _source.content = elem.description;

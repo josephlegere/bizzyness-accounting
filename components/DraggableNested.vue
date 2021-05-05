@@ -12,7 +12,7 @@
                     >
                         <v-icon class="handle align-self-center">mdi-drag-horizontal</v-icon>
                     </v-col>
-                    <v-col
+                    <!-- <v-col
                         cols="10"
                         md="2"
                     >
@@ -28,7 +28,7 @@
                             clearable
                             clear-icon="mdi-close-circle"
                         ></v-select>
-                    </v-col>
+                    </v-col> -->
                     <v-col
                         v-if="el.hasOwnProperty('rowtype') && focusRowTypes.includes(el.rowtype)"
                         v-for="(data, i) in headers"
@@ -52,20 +52,32 @@
 
                     <v-col 
                         v-if="el.hasOwnProperty('rowtype') && el.rowtype === 'newline'"
-                        cols="10"
-                        md="8"
+                        cols="1"
                         offset="1"
                         offset-md="0"
+                    >
+                        <v-text-field
+                            class="design-textarea"
+                            type="number"
+                            placeholder="Rows"
+                            v-model="el.size"
+                            dense
+                            rows="1"
+                            :rules="[v => !!v || 'Required', v => ( v && v >= 1 ) || '>= 1', v => ( v && v <= 10 ) || '<= 10']"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col 
+                        v-if="el.hasOwnProperty('rowtype') && el.rowtype === 'newline'"
+                        cols="8"
+                        md="7"
                     >
                         <v-textarea
                             class="design-textarea"
                             placeholder="New Line"
-                            v-model="el.description"
                             readonly
-                            autoGrow
                             dense
                             hide-details
-                            rows="1"
+                            :rows="el.size"
                         ></v-textarea>
                     </v-col>
 

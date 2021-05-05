@@ -62,6 +62,15 @@ export default {
                     _temp_object.amount = _item.price !== '' ? this.numberWithCommas(parseFloat(_item.price * _item.quantity).toFixed(2)) : ''; //total price
                     this.total += _item.price * _item.quantity;
                 }
+                else if (elem.source.hasOwnProperty('size')) {
+                    _temp_object.description = (() => {
+                        let newline = '';
+                        for ( let i = 1; i < elem.source.size; i++ ) {
+                            newline += '\n';
+                        }
+                        return newline;
+                    })();
+                }
 
                 //console.log(_temp_object)
                 _records.push(_temp_object);
