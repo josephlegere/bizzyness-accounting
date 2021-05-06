@@ -35,7 +35,8 @@
 
                 <v-col cols="12" class="my-4">
                     <v-card>
-                        <v-btn outlined rounded small absolute style="top: 22px; right: 22px">Add Payment</v-btn>
+                        <RecordPayment />
+
                         <v-card-title>Payments</v-card-title>
 
                         <v-card-text>
@@ -111,6 +112,7 @@
 
 <script>
 import InvoiceView from '~/components/InvoiceView';
+import RecordPayment from '~/components/RecordPayment';
 import { mapState } from 'vuex';
 
 export default {
@@ -159,7 +161,8 @@ export default {
         }
     },
     components: {
-        InvoiceView
+        InvoiceView,
+        RecordPayment
     }
 }
 </script>
