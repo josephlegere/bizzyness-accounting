@@ -28,7 +28,7 @@
     "vue-moment": "^4.1.0",
     "vue-pdf": "^4.2.0",
     "vuedraggable": "^2.23.2",
+    "vuelidate": "^0.7.6",
     "vuex-persistedstate": "^3.0.1"
-  },
-  "devDependencies": {}
+  }
 }

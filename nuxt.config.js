@@ -33,6 +33,7 @@ export default {
   plugins: [
     "~/plugins/vue-moment.js",
     '~/plugins/localStorage.js',
+    '~/plugins/Vuelidate',
     { src: '~/plugins/vue-pdf.js', ssr: false }
   ],
   /**
