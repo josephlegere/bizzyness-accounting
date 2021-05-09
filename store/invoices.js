@@ -101,7 +101,19 @@ export const actions = {
 			});
 
         commit("setNext", invoice_code);
-    }
+	},
+	async payment({ commit }, { invoice, payment }) {
+		try {
+			let invoiceRef = this.$fire.firestore.collection('invoices').doc(invoice);
+			const res = await invoiceRef.update({
+				payments: this.$fireModule.firestore.FieldValue.arrayUnion(payment)
+			});
+			commit('newPayment', payment);
+;		}
+		catch (err) {
+			throw err;
+		}
+	}
 };
 
 export const mutations = {
@@ -111,5 +123,8 @@ export const mutations = {
     },
     setNext(state, invoice) {
         state.current = invoice;
-    }
+    },
+	newPayment: (state, payment) => {
+		state.invoice.payments.push(payment);
+	}
 };

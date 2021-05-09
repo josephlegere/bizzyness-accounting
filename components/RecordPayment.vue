@@ -108,10 +108,16 @@
                                 md="8"
                                 offset-md="2"
                             >
-                                <v-text-field
-                                    label="Account *"
+                                <v-combobox
                                     v-model="account"
-                                ></v-text-field>
+                                    :items="fillAccounts"
+                                    label="Account *"
+                                    item-text="name"
+                                    return-object
+                                    :error-messages="accountErrors"
+                                    @change="$v.account.$touch()"
+                                    @blur="$v.account.$touch()"
+                                ></v-combobox>
                             </v-col>
                             <v-col
                                 cols="12"
@@ -153,7 +159,7 @@
                 <v-btn
                     color="#663b0e"
                     dark
-                    @click="addPaymentDialog = false"
+                    @click="submitPayment"
                 >
                     Add Payment
                 </v-btn>
@@ -163,8 +169,9 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import moment from 'moment';
-import { required, numeric } from 'vuelidate/lib/validators';
+import { required, minValue, numeric } from 'vuelidate/lib/validators';
 
 export default {
     data () {
@@ -176,6 +183,10 @@ export default {
             method: null,
             payment_methods: ['Bank Payment', 'Cash', 'Cheque', 'Credit Card', 'Other'],
             account: null,
+            payment_accounts: [
+                { item: 'Cash and Bank', value: 'Cash and Bank' },
+                { item: 'Credit Card', value: 'Credit Card' },
+            ],
             notes: '',
             validate: false
         }
@@ -186,6 +197,7 @@ export default {
         },
         amount: {
             required,
+            minValue: (value) => value > 0,
             numeric
         },
         method: {
@@ -195,9 +207,49 @@ export default {
             required
         }
     },
+    methods: {
+        submitPayment() {
+            this.$v.$touch();
+            if (!this.$v.$invalid) {
+                let _payment = {
+                    date: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.date)),
+                    amount: this.amount,
+                    method: this.method,
+                    account: this.account
+                };
+
+                if (this.notes !== '' && this.notes !== null && this.notes !== this.notes.replace(/\s/g, '')) _payment.notes = this.notes;
+
+                this.$emit('clicked', _payment);
+                this.addPaymentDialog = false;
+            }
+        }
+    },
     computed: {
+        ...mapState({
+            accounts: state => state.accounts.list,
+            loggeduser: state => state.auth.loggeduser
+        }),
+        tenant() {
+            return this.loggeduser.tenantid.split('/')[1];
+        },
         dateToDisplay() {
             return moment(this.date).format('MMMM Do, YYYY');
+        },
+        fillAccounts() {
+            let _accounts = [];
+            this.payment_accounts.forEach(group => {
+                let _temp = [];
+                Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
+                    let { name, currency } = elem[1];
+                    _temp.push({ name, currency, id: `tenant_accounts/${this.tenant}/accounts/${elem[0]}` });
+                });
+                if (_temp.length > 0) {
+                    _accounts.push({ header: group.value });
+                    _accounts = _accounts.concat(_temp);
+                }
+            });
+            return _accounts;
         },
         dateErrors() {
             const errors = []
@@ -210,6 +262,7 @@ export default {
             const errors = [];
             if (!this.$v.amount.$dirty) return errors;
             !this.$v.amount.required && errors.push('Amount is required');
+            !this.$v.amount.minValue && errors.push('Amount should be numeric and greater than 0');
             return errors;
         },
         methodErrors() {
@@ -234,6 +287,12 @@ export default {
                 this.method = null;
                 this.account = null;
             }
+        }
+    },
+    created() {
+        if (!(Object.values(this.accounts).length > 0)) {
+            // this.loading = true;
+            this.$store.dispatch('accounts/get', this.tenant);
         }
     }
 }

@@ -25,7 +25,7 @@
                             </v-col>
                             <v-col cols="12" md="6" class="d-flex justify-md-end">
                                 <div class="mr-4"><b>Amount Due:</b> {{amountdue}}</div>
-                                <div><b>Due On:</b> {{ invoice.dateDue | moment("MMMM Do YYYY") }}</div>
+                                <div><b>Due On:</b> {{ invoice.dateDue | moment("MMMM Do, YYYY") }}</div>
                             </v-col>
                         </v-row>
 
@@ -35,56 +35,50 @@
 
                 <v-col cols="12" class="my-4">
                     <v-card>
-                        <RecordPayment />
+                        <RecordPayment @clicked="addPayment" />
 
                         <v-card-title>Payments</v-card-title>
 
                         <v-card-text>
                             <div class="mx-8 mb-2">
                                 <div class="mb-1">
-                                    <strong>Amount Due:</strong> Php 9,499.00
+                                    <strong>Amount Due:</strong> {{amountdue}}
                                 </div>
 
                                 <div>
-                                    <strong>Status:</strong> Your invoice is partially paid
+                                    <strong>Status:</strong> {{ status_detailed }}
                                 </div>
                             </div>
                         </v-card-text>
 
-                        <v-divider class="mx-8"></v-divider>
+                        <div v-if="invoice.payments.length > 0">
+                            <v-divider class="mx-8"></v-divider>
 
-                        <v-card-text>
-                            <div class="font-weight-bold ml-8 mb-2">
-                                Payments received:
-                            </div>
+                            <v-card-text>
+                                <div class="font-weight-bold ml-8 mb-2">
+                                    Payments received:
+                                </div>
 
-                            <v-timeline
-                                align-top
-                                dense
-                            >
-                                <v-timeline-item
-                                    small
-                                    color="grey"
+                                <v-timeline
+                                    align-top
+                                    dense
                                 >
-                                    <div>
-                                        <div class="font-weight-normal">
-                                            <strong>January 1, 2021 - A payment for Php6,000.00 ‎was made using cash.</strong>
+                                    <v-timeline-item
+                                        small
+                                        color="grey"
+                                        v-for="(payment, i) in invoice.payments"
+                                        :key="i"
+                                    >
+                                        <div>
+                                            <div class="font-weight-normal">
+                                                <strong>{{ payment.date.toDate() | moment("MMMM Do, YYYY") }} - A payment for {{ payment.amount }} ‎was made using {{ payment.method }}.</strong>
+                                            </div>
+                                            <div v-if="i===0">Down Payment</div>
                                         </div>
-                                        <div>Down Payment</div>
-                                    </div>
-                                </v-timeline-item>
-                                <v-timeline-item
-                                    small
-                                    color="grey"
-                                >
-                                    <div>
-                                        <div class="font-weight-normal">
-                                            <strong>February 1, 2021 - A payment for Php4,750.00 ‎was made using cash.</strong>
-                                        </div>
-                                    </div>
-                                </v-timeline-item>
-                            </v-timeline>
-                        </v-card-text>
+                                    </v-timeline-item>
+                                </v-timeline>
+                            </v-card-text>
+                        </div>
                     </v-card>
                 </v-col>
 
@@ -119,12 +113,20 @@ export default {
     data () {
         return {
             loading: false,
-            errors: ''
+            errors: '',
+            newPayment: null
         }
     },
     methods: {
         goToInvoices () {
             this.$router.push({ path: `/invoices` });
+        },
+        addPayment (payment) {
+            console.log(payment);
+            this.$store.dispatch('invoices/payment', { invoice: this.invoice.id, payment })
+                .catch(err => {
+                    this.errors = err;
+                });
         }
     },
     computed: {
@@ -143,9 +145,14 @@ export default {
             return (parseFloat(this.invoice.total) - parseFloat(total_paid)).toFixed(2);
         },
         status() {
-            if (parseFloat(this.amountdue) == parseFloat(this.invoice.total)) return 'Unpaid';
+            if (parseFloat(this.amountdue) == parseFloat(this.invoice.total)) return 'Pending';
             if (parseFloat(this.invoice.total) > parseFloat(this.amountdue) && parseFloat(this.amountdue) > 0) return 'Partial';
             return 'Paid';
+        },
+        status_detailed() {
+            if (parseFloat(this.amountdue) == parseFloat(this.invoice.total)) return 'Payment for your invoice is pending.';
+            if (parseFloat(this.invoice.total) > parseFloat(this.amountdue) && parseFloat(this.amountdue) > 0) return 'Your invoice is partially paid.';
+            return 'Your invoice is fully paid';
         }
     },
     created() {

@@ -650,7 +650,8 @@ export default {
     },
     async created() {
         await this.$store.dispatch('transactions/get', { tenant: this.loggeduser.tenantid });
-        await this.$store.dispatch('accounts/get', this.tenant);
+        if (!(Object.values(this.accounts).length > 0))
+            await this.$store.dispatch('accounts/get', this.tenant);
     }
 }
 </script>
