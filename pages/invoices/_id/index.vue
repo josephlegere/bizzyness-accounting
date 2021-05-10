@@ -123,7 +123,7 @@ export default {
         },
         addPayment (payment) {
             console.log(payment);
-            this.$store.dispatch('invoices/payment', { invoice: this.invoice.id, payment })
+            this.$store.dispatch('invoices/payment_add', { invoice: this.invoice.id, payment })
                 .catch(err => {
                     this.errors = err;
                 });
@@ -156,9 +156,19 @@ export default {
         }
     },
     created() {
-        if (!(Object.keys(this.invoice).length > 0)) {
+        if (this.invoice === null) {
             this.loading = true;
             this.$store.dispatch('invoices/details', { code: this.$route.params.id, tenant: this.tenant })
+                .catch(err => {
+                    this.errors = err;
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        }
+        else {
+            this.loading = true;
+            this.$store.dispatch('invoices/payments', this.invoice.id)
                 .catch(err => {
                     this.errors = err;
                 })

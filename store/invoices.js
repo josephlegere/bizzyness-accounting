@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export const state = () => ({
 	list: [],
-	invoice: {},
+	invoice: null,
 	current: null
 });
 
@@ -56,8 +56,9 @@ export const actions = {
 			if (invoiceSnap.empty) throw 'Unauthorized access to this data!';
 
 			let invoice;
+			let payments = [];
 			invoiceSnap.forEach(doc => {
-				let { invoice_code, date, dateDue, customer, total, agent, remarks, items, layout, payments } = doc.data();
+				let { invoice_code, date, dateDue, customer, total, agent, remarks, items, layout } = doc.data();
 				invoice = {
 					invoice_code,
 					date: moment.unix(date.seconds),
@@ -68,10 +69,14 @@ export const actions = {
 					remarks,
 					items,
 					layout,
-					payments,
 					id: doc.id
 				};
 			});
+			
+			let paymentsSnap = await this.$fire.firestore.collection('invoices').doc(invoice.id).collection('payments').get(); paymentsSnap.forEach(doc => {
+				payments.push(doc.data());
+			});
+			invoice.payments = payments;
 
 			commit('setInvoice', invoice);
 		}
@@ -102,12 +107,23 @@ export const actions = {
 
         commit("setNext", invoice_code);
 	},
-	async payment({ commit }, { invoice, payment }) {
+	async payments({ commit }, id) {
 		try {
-			let invoiceRef = this.$fire.firestore.collection('invoices').doc(invoice);
-			const res = await invoiceRef.update({
-				payments: this.$fireModule.firestore.FieldValue.arrayUnion(payment)
+			let payments = [];
+			let paymentsSnap = await this.$fire.firestore.collection('invoices').doc(id).collection('payments').get();
+			paymentsSnap.forEach(doc => {
+				payments.push(doc.data());
 			});
+			commit('setPayments', payments);
+		}
+		catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
+	async payment_add({ commit }, { invoice, payment }) {
+		try {
+			await this.$fire.firestore.collection('invoices').doc(invoice).collection('payments').add(payment);
 			commit('newPayment', payment);
 ;		}
 		catch (err) {
@@ -118,13 +134,10 @@ export const actions = {
 
 export const mutations = {
     setList: (state, invoices) => (state.list = invoices),
-    setInvoice(state, invoice) {
-        state.invoice = invoice;
-    },
+    setInvoice: (state, invoice) => (state.invoice = invoice),
     setNext(state, invoice) {
         state.current = invoice;
     },
-	newPayment: (state, payment) => {
-		state.invoice.payments.push(payment);
-	}
+	setPayments: (state, payments) => (state.invoice.payments = payments),
+	newPayment: (state, payment) => (state.invoice.payments.push(payment))
 };
