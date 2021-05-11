@@ -122,8 +122,7 @@ export default {
             this.$router.push({ path: `/invoices` });
         },
         addPayment (payment) {
-            console.log(payment);
-            this.$store.dispatch('invoices/payment_add', { invoice: this.invoice.id, payment })
+            this.$store.dispatch('invoices/payment_add', { invoice: this.invoice, payment, user: this.loggeduser })
                 .catch(err => {
                     this.errors = err;
                 });

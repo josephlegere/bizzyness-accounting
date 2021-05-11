@@ -121,9 +121,40 @@ export const actions = {
 			throw err;
 		}
 	},
-	async payment_add({ commit }, { invoice, payment }) {
+	async payment_add({ commit }, { invoice, payment, user }) {
 		try {
-			await this.$fire.firestore.collection('invoices').doc(invoice).collection('payments').add(payment);
+			let { id: invoiceid, invoice_code, customer } = invoice;
+			let { account, amount, date, method } = payment;
+			let { id: userid, name, tenantid } = user;
+			payment.created = this.$fireModule.firestore.FieldValue.serverTimestamp();
+
+			let batch = this.$fire.firestore.batch();
+
+			let paymentRef = this.$fire.firestore.collection('invoices').doc(invoiceid).collection('payments').doc();
+			batch.set(paymentRef, payment);
+
+			let transactionRef = this.$fire.firestore.collection('transactions').doc(paymentRef.id);
+			batch.set(transactionRef, {
+				account,
+				amount,
+				category: {
+					id: `invoices/${invoiceid}/payments/${paymentRef.id}`,
+					name: `Invoice #${invoice_code} from ${customer.account}`,
+				},
+				created: this.$fireModule.firestore.FieldValue.serverTimestamp(),
+				created_by: {
+					userid,
+					name
+				},
+				date,
+				description: `Invoice Payment - ${method}`,
+				notes: '',
+				tenantid,
+				type: 'Deposit'
+			});
+			
+			await batch.commit();
+			
 			commit('newPayment', payment);
 ;		}
 		catch (err) {
