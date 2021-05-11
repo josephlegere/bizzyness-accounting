@@ -35,7 +35,7 @@
 
                 <v-col cols="12" class="my-4">
                     <v-card>
-                        <RecordPayment @clicked="addPayment" />
+                        <PaymentAdd @clicked="addPayment" />
 
                         <v-card-title>Payments</v-card-title>
 
@@ -63,19 +63,11 @@
                                     align-top
                                     dense
                                 >
-                                    <v-timeline-item
-                                        small
-                                        color="grey"
+                                    <PaymentItem
                                         v-for="(payment, i) in invoice.payments"
                                         :key="i"
-                                    >
-                                        <div>
-                                            <div class="font-weight-normal">
-                                                <strong>{{ payment.date.toDate() | moment("MMMM Do, YYYY") }} - A payment for {{ payment.amount }} ‎was made using {{ payment.method }}.</strong>
-                                            </div>
-                                            <div v-if="i===0">Down Payment</div>
-                                        </div>
-                                    </v-timeline-item>
+                                        :payment="payment"
+                                        :key_item="i" />
                                 </v-timeline>
                             </v-card-text>
                         </div>
@@ -106,7 +98,8 @@
 
 <script>
 import InvoiceView from '~/components/InvoiceView';
-import RecordPayment from '~/components/RecordPayment';
+import PaymentAdd from '~/components/PaymentAdd';
+import PaymentItem from '~/components/PaymentItem';
 import { mapState } from 'vuex';
 
 export default {
@@ -178,7 +171,8 @@ export default {
     },
     components: {
         InvoiceView,
-        RecordPayment
+        PaymentAdd,
+        PaymentItem
     }
 }
 </script>

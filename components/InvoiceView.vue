@@ -39,7 +39,8 @@ export default {
         fillFooter() {
             let _footer = [];
             _footer[0] = [
-                { content: `${this.toWords.convert(this.total)} Qatar Riyals Only`, colSpan: 4, styles: { halign: 'left' } },
+                //  Qatar Riyals
+                { content: `${this.toWords.convert(this.total)} Only`, colSpan: 4, styles: { halign: 'left' } },
                 { content: this.numberWithCommas(this.total.toFixed(2)), styles: { halign: 'right' }}
             ];
             this.footer = _footer;

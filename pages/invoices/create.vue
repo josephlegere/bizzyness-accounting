@@ -428,8 +428,7 @@ export default {
                 remarks,
                 created: this.$fireModule.firestore.FieldValue.serverTimestamp(),
                 tenant: tenantid,
-                total,
-                payments: []
+                total
             };
 
             // console.log(_invoice);

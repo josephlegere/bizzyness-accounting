@@ -149,7 +149,7 @@
                 <v-spacer></v-spacer>
 
                 <v-btn
-                    color="red darken-4"
+                    color="#303030"
                     text
                     @click="addPaymentDialog = false"
                 >
