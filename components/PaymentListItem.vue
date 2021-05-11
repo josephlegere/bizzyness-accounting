@@ -9,7 +9,12 @@
             </div>
             <div v-if="key_item===0">Down Payment</div>
             <div>
-                <v-btn text small color="#663b0e">Edit</v-btn>
+                <PaymentRecord
+                    editing
+                    text
+                    small
+                    color="#663b0e"
+                    buttonText="Edit" />
                 <v-btn text small color="#663b0e" @click="confirmDelete = true">Delete</v-btn>
             </div>
         </div>
@@ -49,6 +54,8 @@
 </template>
 
 <script>
+import PaymentRecord from '~/components/PaymentRecord';
+
 export default {
     props: {
         payment: {
@@ -70,6 +77,9 @@ export default {
             this.$emit('delete', this.payment.id);
             this.confirmDelete = false;
         }
+    },
+    components: {
+        PaymentRecord
     }
 }
 </script>

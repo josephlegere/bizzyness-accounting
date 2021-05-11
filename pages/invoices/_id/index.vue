@@ -35,7 +35,14 @@
 
                 <v-col cols="12" class="my-4">
                     <v-card>
-                        <PaymentAdd @clicked="addPayment" />
+                        <PaymentRecord
+                            @clicked="addPayment"
+                            absolute
+                            outlined
+                            rounded
+                            small
+                            buttonText="Add Payment"
+                            buttonStyle="top: 22px; right: 22px" />
 
                         <v-card-title>Payments</v-card-title>
 
@@ -63,7 +70,7 @@
                                     align-top
                                     dense
                                 >
-                                    <PaymentItem
+                                    <PaymentListItem
                                         v-for="(payment, i) in invoice.payments"
                                         :key="i"
                                         :payment="payment"
@@ -99,8 +106,8 @@
 
 <script>
 import InvoiceView from '~/components/InvoiceView';
-import PaymentAdd from '~/components/PaymentAdd';
-import PaymentItem from '~/components/PaymentItem';
+import PaymentRecord from '~/components/PaymentRecord';
+import PaymentListItem from '~/components/PaymentListItem';
 import { mapState } from 'vuex';
 
 export default {
@@ -178,8 +185,8 @@ export default {
     },
     components: {
         InvoiceView,
-        PaymentAdd,
-        PaymentItem
+        PaymentRecord,
+        PaymentListItem
     }
 }
 </script>

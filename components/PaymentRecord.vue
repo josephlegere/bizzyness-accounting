@@ -5,16 +5,18 @@
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
-                outlined
-                rounded
-                small
-                absolute
+                :text="text"
+                :outlined="outlined"
+                :rounded="rounded"
+                :small="small"
+                :absolute="absolute"
+                :color="color"
+                :style="buttonStyle"
                 @click.stop="addPaymentDialog = true"
-                style="top: 22px; right: 22px"
                 v-bind="attrs"
                 v-on="on"
             >
-                Add Payment
+                {{ buttonText }}
             </v-btn>
         </template>
         <v-card rounded="xl" class="pa-2">
@@ -174,6 +176,35 @@ import moment from 'moment';
 import { required, minValue, numeric } from 'vuelidate/lib/validators';
 
 export default {
+    props: {
+        absolute: {
+            type: Boolean
+        },
+        editing: {
+            type: Boolean
+        },
+        outlined: {
+            type: Boolean
+        },
+        rounded: {
+            type: Boolean
+        },
+        small: {
+            type: Boolean
+        },
+        text: {
+            type: Boolean
+        },
+        color: {
+            type: String
+        },
+        buttonText: {
+            type: String
+        },
+        buttonStyle: {
+            type: String
+        },
+    },
     data () {
         return {
             addPaymentDialog: false,
