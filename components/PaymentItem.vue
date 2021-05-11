@@ -38,7 +38,7 @@
                     <v-btn
                         color="#663b0e"
                         dark
-                        @click="confirmDelete = false;"
+                        @click="deletePayment"
                     >
                         Delete
                     </v-btn>
@@ -63,6 +63,12 @@ export default {
     data() {
         return {
             confirmDelete: false
+        }
+    },
+    methods: {
+        deletePayment() {
+            this.$emit('delete', this.payment.id);
+            this.confirmDelete = false;
         }
     }
 }

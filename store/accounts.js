@@ -65,11 +65,7 @@ export const mutations = {
 
 		state.list[key] = _account;
 	},
-	archive: (state, account) => {
-		let { key } = account;
-
-		state.list = Object.filter(state.list, _key => _key !== key); ;
-	}
+	archive: (state, account) => (state.list = Object.filter(state.list, _key => _key !== account.key))
 };
 
 Object.filter = (obj, predicate) => 

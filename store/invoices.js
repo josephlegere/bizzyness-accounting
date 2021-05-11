@@ -74,7 +74,7 @@ export const actions = {
 			});
 			
 			let paymentsSnap = await this.$fire.firestore.collection('invoices').doc(invoice.id).collection('payments').get(); paymentsSnap.forEach(doc => {
-				payments.push(doc.data());
+				payments.push({ ...doc.data(), id: doc.id });
 			});
 			invoice.payments = payments;
 
@@ -112,7 +112,7 @@ export const actions = {
 			let payments = [];
 			let paymentsSnap = await this.$fire.firestore.collection('invoices').doc(id).collection('payments').get();
 			paymentsSnap.forEach(doc => {
-				payments.push(doc.data());
+				payments.push({ ...doc.data(), id: doc.id });
 			});
 			commit('setPayments', payments);
 		}
@@ -154,9 +154,28 @@ export const actions = {
 			});
 			
 			await batch.commit();
+			payment.id = paymentRef.id;
 			
 			commit('newPayment', payment);
 ;		}
+		catch (err) {
+			throw err;
+		}
+	},
+	async payment_delete({ commit }, { invoice, payment }) {
+		try {
+			let batch = this.$fire.firestore.batch();
+
+			let paymentRef = this.$fire.firestore.collection('invoices').doc(invoice).collection('payments').doc(payment);
+			batch.delete(paymentRef);
+
+			let transactionRef = this.$fire.firestore.collection('transactions').doc(paymentRef.id);
+			batch.delete(transactionRef);
+
+			await batch.commit();
+
+			commit('deletePayment', payment);
+		}
 		catch (err) {
 			throw err;
 		}
@@ -170,5 +189,6 @@ export const mutations = {
         state.current = invoice;
     },
 	setPayments: (state, payments) => (state.invoice.payments = payments),
-	newPayment: (state, payment) => (state.invoice.payments.push(payment))
+	newPayment: (state, payment) => (state.invoice.payments.push(payment)),
+	deletePayment: (state, payment) => (state.invoice.payments = state.invoice.payments.filter(elem => elem.id !== payment))
 };

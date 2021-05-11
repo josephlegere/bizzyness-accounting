@@ -67,7 +67,8 @@
                                         v-for="(payment, i) in invoice.payments"
                                         :key="i"
                                         :payment="payment"
-                                        :key_item="i" />
+                                        :key_item="i"
+                                        @delete="deletePayment" />
                                 </v-timeline>
                             </v-card-text>
                         </div>
@@ -116,6 +117,12 @@ export default {
         },
         addPayment (payment) {
             this.$store.dispatch('invoices/payment_add', { invoice: this.invoice, payment, user: this.loggeduser })
+                .catch(err => {
+                    this.errors = err;
+                });
+        },
+        deletePayment (payment) {
+            this.$store.dispatch('invoices/payment_delete', { invoice: this.invoice.id, payment })
                 .catch(err => {
                     this.errors = err;
                 });
