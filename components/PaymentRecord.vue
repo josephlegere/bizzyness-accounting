@@ -12,7 +12,7 @@
                 :absolute="absolute"
                 :color="color"
                 :style="buttonStyle"
-                @click.stop="addPaymentDialog = true"
+                @click.stop="openDialog"
                 v-bind="attrs"
                 v-on="on"
             >
@@ -163,7 +163,7 @@
                     dark
                     @click="submitPayment"
                 >
-                    Add Payment
+                    {{ editing ? 'Edit Payment' : 'Add Payment' }}
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -182,6 +182,9 @@ export default {
         },
         editing: {
             type: Boolean
+        },
+        editData: {
+            type: Object
         },
         outlined: {
             type: Boolean
@@ -239,19 +242,47 @@ export default {
         }
     },
     methods: {
+        openDialog() {
+            if (this.editing) {
+                let { date, amount, method, account, notes } = this.editData;
+                this.date = moment(date.toDate()).format('YYYY-MM-DD');
+                this.amount = amount;
+                this.method = method;
+                this.account = account;
+                if (notes) this.notes = notes;
+            }
+            this.addPaymentDialog = true;
+        },
         submitPayment() {
             this.$v.$touch();
             if (!this.$v.$invalid) {
-                let _payment = {
-                    date: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.date)),
-                    amount: this.amount,
-                    method: this.method,
-                    account: this.account
-                };
 
-                if (this.notes !== '' && this.notes !== null && this.notes !== this.notes.replace(/\s/g, '')) _payment.notes = this.notes;
+                if (!this.editing) {
+                    let _payment = {
+                        date: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.date)),
+                        amount: this.amount,
+                        method: this.method,
+                        account: this.account
+                    };
 
-                this.$emit('clicked', _payment);
+                    if (this.notes !== '' && this.notes !== null && this.notes !== this.notes.replace(/\s/g, '')) _payment.notes = this.notes;
+
+                    this.$emit('payment', _payment);
+                }
+                else {
+                    let { date, amount, method, account, notes } = this.editData;
+                    let _payment = {};
+                    if (this.date !== moment(date.toDate()).format('YYYY-MM-DD')) _payment.date = this.$fireModule.firestore.Timestamp.fromDate(new Date(this.date));
+                    if (this.amount !== amount) _payment.amount = this.amount;
+                    if (this.method !== method) _payment.method = this.method;
+                    if (this.account.name !== account.name) _payment.account = this.account;
+                    if (!notes) notes = '';
+                    if (this.notes !== notes) _payment.notes = this.notes;
+
+                    if (Object.values(_payment).length > 0) {
+                        this.$emit('payment', _payment);
+                    }
+                }
                 this.addPaymentDialog = false;
             }
         }

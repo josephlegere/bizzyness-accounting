@@ -36,7 +36,7 @@
                 <v-col cols="12" class="my-4">
                     <v-card>
                         <PaymentRecord
-                            @clicked="addPayment"
+                            @payment="addPayment"
                             absolute
                             outlined
                             rounded
@@ -75,7 +75,8 @@
                                         :key="i"
                                         :payment="payment"
                                         :key_item="i"
-                                        @delete="deletePayment" />
+                                        @delete="deletePayment"
+                                        @update="editPayment" />
                                 </v-timeline>
                             </v-card-text>
                         </div>
@@ -124,6 +125,14 @@ export default {
         },
         addPayment (payment) {
             this.$store.dispatch('invoices/payment_add', { invoice: this.invoice, payment, user: this.loggeduser })
+                .catch(err => {
+                    this.errors = err;
+                });
+        },
+        editPayment ({ payment, updates }) {
+            console.log(payment);
+            console.log(updates);
+            this.$store.dispatch('invoices/payment_edit', { invoice: this.invoice.id, payment, updates })
                 .catch(err => {
                     this.errors = err;
                 });

@@ -169,12 +169,29 @@ export const actions = {
 			let paymentRef = this.$fire.firestore.collection('invoices').doc(invoice).collection('payments').doc(payment);
 			batch.delete(paymentRef);
 
-			let transactionRef = this.$fire.firestore.collection('transactions').doc(paymentRef.id);
+			let transactionRef = this.$fire.firestore.collection('transactions').doc(payment);
 			batch.delete(transactionRef);
 
 			await batch.commit();
 
 			commit('deletePayment', payment);
+		}
+		catch (err) {
+			throw err;
+		}
+	},
+	async payment_edit({ commit }, { invoice, payment, updates }) {
+		try {
+			let batch = this.$fire.firestore.batch();
+
+			let paymentRef = this.$fire.firestore.collection('invoices').doc(invoice).collection('payments').doc(payment);
+			batch.update(paymentRef, updates);
+
+			let transactionRef = this.$fire.firestore.collection('transactions').doc(payment);
+			batch.update(transactionRef, updates);
+			
+			await batch.commit();
+			commit('updatePayment', { payment, updates });
 		}
 		catch (err) {
 			throw err;
@@ -190,5 +207,9 @@ export const mutations = {
     },
 	setPayments: (state, payments) => (state.invoice.payments = payments),
 	newPayment: (state, payment) => (state.invoice.payments.push(payment)),
-	deletePayment: (state, payment) => (state.invoice.payments = state.invoice.payments.filter(elem => elem.id !== payment))
+	deletePayment: (state, payment) => (state.invoice.payments = state.invoice.payments.filter(elem => elem.id !== payment)),
+	updatePayment(state, { payment, updates }) {
+		let _index = state.invoice.payments.findIndex((elem) => elem.id === payment);
+		state.invoice.payments[_index] = Object.assign(state.invoice.payments[_index], updates);
+	}
 };

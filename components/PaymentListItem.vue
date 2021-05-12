@@ -11,10 +11,12 @@
             <div>
                 <PaymentRecord
                     editing
+                    :editData="payment"
                     text
                     small
                     color="#663b0e"
-                    buttonText="Edit" />
+                    buttonText="Edit"
+                    @payment="editPayment" />
                 <v-btn text small color="#663b0e" @click="confirmDelete = true">Delete</v-btn>
             </div>
         </div>
@@ -76,6 +78,9 @@ export default {
         deletePayment() {
             this.$emit('delete', this.payment.id);
             this.confirmDelete = false;
+        },
+        editPayment(updates) {
+            this.$emit('update', { payment: this.payment.id, updates });
         }
     },
     components: {
