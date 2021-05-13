@@ -70,6 +70,9 @@ export default {
     props: {
         suggests: {
             type: Array
+        },
+        setDates: {
+            type: Array
         }
     },
     methods: {
@@ -106,7 +109,12 @@ export default {
         }
     },
     created() {
-        this.setDefault();
+        if (this.setDates.length > 0) {
+            this.dates = this.setDates;
+            this.$emit('update-range', this.dates);
+        }
+        else
+            this.setDefault();
     }
 }
 </script>

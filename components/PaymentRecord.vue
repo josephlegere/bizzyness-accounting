@@ -173,7 +173,7 @@
 <script>
 import { mapState } from 'vuex';
 import moment from 'moment';
-import { required, minValue, numeric } from 'vuelidate/lib/validators';
+import { required, minValue, decimal } from 'vuelidate/lib/validators';
 
 export default {
     props: {
@@ -232,7 +232,7 @@ export default {
         amount: {
             required,
             minValue: (value) => value > 0,
-            numeric
+            decimal
         },
         method: {
             required
@@ -256,7 +256,6 @@ export default {
         submitPayment() {
             this.$v.$touch();
             if (!this.$v.$invalid) {
-
                 if (!this.editing) {
                     let _payment = {
                         date: this.$fireModule.firestore.Timestamp.fromDate(new Date(this.date)),
@@ -323,8 +322,10 @@ export default {
         amountErrors() {
             const errors = [];
             if (!this.$v.amount.$dirty) return errors;
+            console.log(errors);
             !this.$v.amount.required && errors.push('Amount is required');
-            !this.$v.amount.minValue && errors.push('Amount should be numeric and greater than 0');
+            !this.$v.amount.minValue && errors.push('Amount should be greater than 0');
+            !this.$v.amount.decimal && errors.push('Amount should be decimal');
             return errors;
         },
         methodErrors() {

@@ -14,7 +14,7 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" md="6" class="pa-2">
-                            <date-range :suggests="suggests" @update-range="updateDateFilter" />
+                            <date-range :suggests="suggests" :setDates="datefilter" @update-range="updateDateFilter" />
                         </v-col>
                     </v-row>
                 </v-card-title>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+    import moment from 'moment';
     import DateRange from '~/components/DateRange';
     import { mapState } from 'vuex';
 
@@ -72,10 +73,10 @@
         methods: {
             updateDateFilter(range) {
                 this.datefilter = range;
+                this.$router.push({path: this.$route.path, query: { start: range[0], end: range[1] }});
                 this.filterData();
             },
             open(invoice) {
-                //console.log(invoice)
                 this.$store.commit('invoices/setInvoice', invoice);
                 this.$router.push({ path: `/invoices/${invoice.invoice_code}` });
             },
@@ -96,7 +97,17 @@
             })
         },
         async created() {
-            
+            if (this.$route.query.hasOwnProperty('start') && this.$route.query.hasOwnProperty('end')) {
+                let { start, end } = this.$route.query;
+                this.datefilter = [moment(start).format('YYYY-MM-DD'), moment(end).format('YYYY-MM-DD')];
+            }
+            else {
+                let start = moment().startOf('week').format('YYYY-MM-DD');
+                let end = moment().endOf('week').format('YYYY-MM-DD');
+
+                this.$router.push({path: this.$route.path, query: { start, end }});
+                this.datefilter = [start, end]
+            }
         },
         // async mounted() {
             //await this.$store.dispatch('invoices/get', this.datefilter);
