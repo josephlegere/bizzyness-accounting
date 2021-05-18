@@ -4,7 +4,7 @@
             <v-card>
                 <v-card-title>
                     <v-row no-gutters>
-                        <v-col cols="12"  md="6" class="pa-2">
+                        <!-- <v-col cols="12"  md="6" class="pa-2">
                             <v-text-field
                                 v-model="search"
                                 append-icon="mdi-magnify"
@@ -12,7 +12,7 @@
                                 single-line
                                 hide-details
                             ></v-text-field>
-                        </v-col>
+                        </v-col> -->
                         <v-col cols="12" md="6" class="pa-2">
                             <date-range :suggests="suggests" :setDates="datefilter" @update-range="updateDateFilter" />
                         </v-col>

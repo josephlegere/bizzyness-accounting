@@ -257,12 +257,12 @@
                         <v-toolbar
                             dark
                             height="60">
-                            <v-btn
+                            <!-- <v-btn
                                 outlined
                                 :small="$vuetify.breakpoint.smAndDown"
                             >
                                 <v-icon :small="$vuetify.breakpoint.smAndDown">mdi-magnify</v-icon>
-                            </v-btn>
+                            </v-btn> -->
 
                             <v-spacer></v-spacer>
 

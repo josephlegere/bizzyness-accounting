@@ -1,17 +1,13 @@
 <template>
 	<v-row
-		class="flex-column"
 		justify="center"
 		align="center"
 	>
 		<v-col
-			xs12
-			sm8
-			md6
-			class="mb-4"
+			class="mt-12"
 		>
 			<div class="text-center">
-				<logo />
+				<div class="text-h3" v-text="'Welcome To Accounting'"></div>
 			</div>
 		</v-col>
 

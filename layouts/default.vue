@@ -122,10 +122,15 @@ export default {
 					title: 'Chart of Accounts',
 					to: '/accounts'
 				},
+				// {
+				// 	icon: 'mdi-chart-bar',
+				// 	title: 'Reports',
+				// 	to: '/accounts'
+				// },
 				{
-					icon: 'mdi-chart-bar',
-					title: 'Reports',
-					to: '/accounts'
+					icon: 'mdi-account-group',
+					title: 'Customers',
+					to: '/customers'
 				}
 			],
 			miniVariant: false,
