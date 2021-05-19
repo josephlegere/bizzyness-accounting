@@ -113,6 +113,11 @@ export default {
 					to: '/invoices/create'
 				},
 				{
+					icon: 'mdi-account-group',
+					title: 'Customers',
+					to: '/customers'
+				},
+				{
 					icon: 'mdi-bank-transfer',
 					title: 'Transactions',
 					to: '/transactions'
@@ -126,12 +131,7 @@ export default {
 				// 	icon: 'mdi-chart-bar',
 				// 	title: 'Reports',
 				// 	to: '/accounts'
-				// },
-				{
-					icon: 'mdi-account-group',
-					title: 'Customers',
-					to: '/customers'
-				}
+				// }
 			],
 			miniVariant: false,
 			right: true,

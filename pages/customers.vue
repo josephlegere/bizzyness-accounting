@@ -165,7 +165,7 @@ export default {
             this.$refs.form.validate();
 
             if (this.validate) {
-                console.log(this.formEntry);
+                // console.log(this.formEntry);
 
                 this.$store.dispatch('customers/add', { tenant: this.tenant, customer: this.formEntry })
                 .then(res => {
@@ -180,8 +180,15 @@ export default {
                 });
             }
         },
-        deleteItem(item) {
-            console.log(item);
+        deleteItem(customer) {
+            this.$store.dispatch('customers/delete', { tenant: this.tenant, customer })
+                .catch(err => {
+                    this.errors = err;
+                })
+                .finally(() => {
+                    // this.deleteItem = null;
+                    // this.deleteDialog = false;
+                });
         }
     },
     computed: {
