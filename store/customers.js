@@ -37,9 +37,38 @@ export const actions = {
             });
 
         commit("setList", _list);
+    },
+    async add({ commit }, { tenant, customer}) {
+        try {
+            let { name, group } = customer;
+            let customer_details = {};
+            console.log(customer);
+            let customerRef = await this.$fire.firestore.collection('tenant_customers').doc(tenant).collection('customers').add({
+                account: name,
+                account_type: 'non-tenant',
+                created: this.$fireModule.firestore.FieldValue.serverTimestamp(),
+                group
+            });
+
+            commit('insert', {
+                name,
+                group,
+                customer: {
+                    account: name,
+                    id: `customers/${customerRef.id}`,
+                    account_type: 'non-tenant'
+                },
+                id: customerRef.id
+            });
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
     }
 };
 
 export const mutations = {
-    setList: (state, customers) => (state.list = customers)
+    setList: (state, customers) => (state.list = customers),
+    insert: (state, customer) => (state.list.push(customer))
 };

@@ -22,9 +22,9 @@
                             </v-row>
                         </th>
                     </template>
-                    <template v-slot:item.customer="{ item }">
+                    <!-- <template v-slot:item.customer="{ item }">
                         {{ item.customer.account_type }}
-                    </template>
+                    </template> -->
                     <template v-slot:item.action="{ item }">
                         <!-- <v-icon
                             small
@@ -43,55 +43,97 @@
                 </v-data-table>
             </v-card>
 
-
-
-                <v-row
-                    class="toolbar-container"
-                    no-gutters
+            <v-row
+                class="toolbar-container"
+                no-gutters
+            >
+                <v-col
+                    md="3"
+                    class="ml-md-auto"
                 >
-                    <v-col
-                        md="3"
-                        class="ml-md-auto"
-                    >
-                        <v-sheet
-                            color="transparent"
-                            class="form-toolbar">
-                            <v-toolbar
-                                dark
-                                height="60"
-                                class="d-flex justify-center">
+                    <v-sheet
+                        color="transparent"
+                        class="form-toolbar">
+                        <v-toolbar
+                            dark
+                            height="60"
+                            class="d-flex justify-center">
 
-                                <v-btn
-                                    outlined
-                                    @click="addCustomerModal = !addCustomerModal"
-                                >
-                                    Add Customer
-                                </v-btn>
-                                
-                                <v-bottom-sheet v-model="addCustomerModal" scrollable transition="dialog-bottom-transition">
-                                    <v-card class="rounded-t-xl">
-                                        <v-toolbar dark dense class="rounded-t-xl">
-                                            <v-btn icon dark @click="addCustomerModal = !addCustomerModal">
-                                                <v-icon>mdi-close</v-icon>
-                                            </v-btn>
-                                            <v-toolbar-title>Add Customer</v-toolbar-title>
-                                        </v-toolbar>
+                            <v-btn
+                                outlined
+                                @click="addCustomerModal = !addCustomerModal"
+                            >
+                                Add Customer
+                            </v-btn>
+                            
+                            <v-bottom-sheet v-model="addCustomerModal" scrollable transition="dialog-bottom-transition">
+                                <v-card class="rounded-t-xl">
+                                    <v-toolbar dark dense class="rounded-t-xl">
+                                        <v-btn icon dark @click="addCustomerModal = !addCustomerModal">
+                                            <v-icon>mdi-close</v-icon>
+                                        </v-btn>
+                                        <v-toolbar-title>Add Customer</v-toolbar-title>
+                                    </v-toolbar>
 
-                                        <v-card-text class="my-md-16">
-                                            <v-container>
-                                                <v-form ref="form" v-model="validate">
-                                                    <v-row>
-                                                    </v-row>
-                                                </v-form>
-                                            </v-container>
-                                        </v-card-text>
-                                    </v-card>
-                                </v-bottom-sheet>
+                                    <v-card-text class="my-md-16">
+                                        <v-container>
+                                            <v-form ref="form" v-model="validate">
+                                                <v-row>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-text-field
+                                                            v-model="formEntry.group"
+                                                            label="Company Name (Group) *"
+                                                            :rules="[v => !!v || 'Company Group is required']"
+                                                        ></v-text-field>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <v-text-field
+                                                            v-model="formEntry.name"
+                                                            label="Customer / Branch Name *"
+                                                            :rules="[v => !!v || 'Customer Name is required']"
+                                                        ></v-text-field>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                        class="d-flex flex-row-reverse"
+                                                    >
+                                                        <span class="button-overlay-color ml-2">
+                                                            <v-btn
+                                                                dark
+                                                                @click="submitCustomer"
+                                                                :loading="submittingForm"
+                                                                :disabled="submittingForm"
+                                                            >Submit</v-btn>
+                                                        </span>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="6"
+                                                        offset-md="3"
+                                                    >
+                                                        <small>* indicates required field</small>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-form>
+                                        </v-container>
+                                    </v-card-text>
+                                </v-card>
+                            </v-bottom-sheet>
 
-                            </v-toolbar>
-                        </v-sheet>
-                    </v-col>
-                </v-row>
+                        </v-toolbar>
+                    </v-sheet>
+                </v-col>
+            </v-row>
         </v-col>
     </v-row>
 </template>
@@ -104,15 +146,40 @@ export default {
     data () {
         return {
             headers: [
-                { text: 'Customer', value: 'name' },
-                { text: 'Profile', value: 'customer' },
+                { text: 'Customer', value: 'name', align: 'center' },
+                // { text: 'Profile', value: 'customer' },
                 { text: '', value: 'action' }
             ],
             addCustomerModal: false,
-            validate: false
+            validate: false,
+            formEntry: {
+                name: null,
+                group: null
+            },
+            submittingForm: false,
+            errors: ''
         }
     },
     methods: {
+        submitCustomer() {
+            this.$refs.form.validate();
+
+            if (this.validate) {
+                console.log(this.formEntry);
+
+                this.$store.dispatch('customers/add', { tenant: this.tenant, customer: this.formEntry })
+                .then(res => {
+                    this.addCustomerModal = false;
+                })
+                .catch(err => {
+                    this.errors = err;
+                })
+                .finally(() => {
+                    this.validate = false;
+                    this.submittingForm = false;
+                });
+            }
+        },
         deleteItem(item) {
             console.log(item);
         }
@@ -124,6 +191,11 @@ export default {
         }),
         tenant() {
             return this.loggeduser.tenantid.split('/')[1];
+        }
+    },
+    watch: {
+        addCustomerModal (val) { // For resetting Add Account Form
+            !val && this.$refs.form.reset()
         }
     },
     async created() {
