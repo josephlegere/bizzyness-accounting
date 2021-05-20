@@ -26,19 +26,7 @@
                         {{ item.customer.account_type }}
                     </template> -->
                     <template v-slot:item.action="{ item }">
-                        <!-- <v-icon
-                            small
-                            class="mr-2"
-                            @click="deleteItem(item)"
-                        >
-                            mdi-pencil-outline
-                        </v-icon> -->
-                        <v-icon
-                            small
-                            @click="deleteItem(item)"
-                        >
-                            mdi-close
-                        </v-icon>
+                        <TableRowAction :itemData="item" deleteButton @delete="deleteCustomer" />
                     </template>
                 </v-data-table>
             </v-card>
@@ -141,6 +129,7 @@
 <script>
 import moment from 'moment';
 import { mapState } from 'vuex';
+import TableRowAction from '~/components/TableRowAction';
 
 export default {
     data () {
@@ -180,7 +169,8 @@ export default {
                 });
             }
         },
-        deleteItem(customer) {
+        deleteCustomer(customer) {
+            console.log(customer);
             this.$store.dispatch('customers/delete', { tenant: this.tenant, customer })
                 .catch(err => {
                     this.errors = err;
@@ -207,6 +197,9 @@ export default {
     },
     async created() {
         await this.$store.dispatch('customers/get', this.tenant);
+    },
+    components: {
+        TableRowAction
     }
 }
 </script>
