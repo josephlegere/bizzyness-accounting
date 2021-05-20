@@ -13,7 +13,7 @@
             ></v-skeleton-loader>
         </div>
         <div v-else>
-            <v-row no-gutters="" v-if="Object.keys(this.invoice).length > 0">
+            <v-row no-gutters="" v-if="invoice !== null">
 
                 <v-col class="pt-2">
                     <v-card flat>
