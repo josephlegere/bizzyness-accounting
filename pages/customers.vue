@@ -131,6 +131,36 @@
                             </v-sheet>
                         </v-col>
                     </v-row>
+
+                    <v-alert
+                        v-model="alertSuccess"
+                        border="bottom"
+                        elevation="2"
+                        close-text="Close Alert"
+                        color="rgba(102, 59, 14, 0.95)"
+                        dark
+                        dismissible
+                        transition="scroll-y-transition"
+                        class="mt-2 alert-box"
+                        type="success"
+                    >
+                        {{ prompts }}
+                    </v-alert>
+
+                    <v-alert
+                        v-model="alertError"
+                        border="bottom"
+                        elevation="2"
+                        close-text="Close Alert"
+                        color="rgba(102, 59, 14, 0.95)"
+                        dark
+                        dismissible
+                        transition="scroll-y-transition"
+                        class="mt-2 alert-box"
+                        type="error"
+                    >
+                        {{ prompts }}
+                    </v-alert>
                 </v-col>
             </v-row>
         </div>
@@ -158,7 +188,9 @@ export default {
                 group: null
             },
             submittingForm: false,
-            errors: ''
+            alertSuccess: false,
+            alertError: false,
+            prompts: 'Prompt!'
         }
     },
     methods: {
@@ -171,9 +203,18 @@ export default {
                 this.$store.dispatch('customers/add', { tenant: this.tenant, customer: this.formEntry })
                 .then(res => {
                     this.addCustomerModal = false;
+                    this.prompts = 'Successfully Added a Customer!'
+                    this.alertSuccess = true;
+                    setTimeout(() => {
+                        this.alertSuccess = false;
+                    }, 5000);
                 })
                 .catch(err => {
-                    this.errors = err;
+                    this.prompts = err;
+                    this.alertError = true;
+                    setTimeout(() => {
+                        this.alertError = false;
+                    }, 10000);
                 })
                 .finally(() => {
                     this.validate = false;
@@ -184,8 +225,19 @@ export default {
         deleteCustomer(customer) {
             console.log(customer);
             this.$store.dispatch('customers/delete', { tenant: this.tenant, customer })
+                .then(res => {
+                    this.prompts = 'You have Deleted a Customer!'
+                    this.alertSuccess = true;
+                    setTimeout(() => {
+                        this.alertSuccess = false;
+                    }, 5000);
+                })
                 .catch(err => {
-                    this.errors = err;
+                    this.prompts = err;
+                    this.alertError = true;
+                    setTimeout(() => {
+                        this.alertError = false;
+                    }, 10000);
                 })
                 .finally(() => {
                     // this.deleteItem = null;
@@ -237,5 +289,11 @@ export default {
         /* v-sheet need to contain the toolbar in order for the border radius to take effect */
         box-shadow:             0px -2px 4px -1px rgb(0 0 0 / 20%), 0px -2px 5px 0px rgb(0 0 0 / 14%);
         border-radius:          15px 15px 0 0;
+    }
+    .alert-box {
+        position:               fixed;
+        top:                    0;
+        z-index:                5;
+        width:                  100%;
     }
 </style>
