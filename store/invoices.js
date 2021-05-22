@@ -90,6 +90,30 @@ export const actions = {
         console.log(invoice);
         return await this.$fire.firestore.collection('invoices').add(invoice);
     },
+	async delete({ commit }, { invoice }) {
+		try {
+			let { id, payments } = invoice;
+			let batch = this.$fire.firestore.batch();
+
+			payments.forEach(pay => {
+				let transactionRef = this.$fire.firestore.collection('transactions').doc(pay.id);
+				batch.delete(transactionRef);
+				let paymentRef = this.$fire.firestore.collection('invoices').doc(id).collection('payments').doc(pay.id);
+				batch.delete(paymentRef);
+			});
+
+			let invoiceRef = this.$fire.firestore.collection('invoices').doc(id);
+			batch.delete(invoiceRef);
+
+			await batch.commit();
+
+			commit('stripList', invoice);
+		}
+		catch (err) {
+			console.log(err);
+			throw err;
+		}
+	},
 	async next({ commit }, tenant) {
         let invoice_code = 0;
 
@@ -178,6 +202,7 @@ export const actions = {
 			commit('deletePayment', payment);
 		}
 		catch (err) {
+			console.log(err);
 			throw err;
 		}
 	},
@@ -202,7 +227,8 @@ export const actions = {
 
 export const mutations = {
     setList: (state, invoices) => (state.list = invoices),
-    setInvoice: (state, invoice) => (state.invoice = invoice),
+	setInvoice: (state, invoice) => (state.invoice = invoice),
+	stripList: (state, invoice) => (state.invoice = null),
     setNext(state, invoice) {
         state.current = invoice;
     },

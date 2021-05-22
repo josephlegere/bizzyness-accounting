@@ -17,7 +17,14 @@
 
                 <v-col class="pt-2">
                     <v-card flat>
-                        <div class="text-h4" v-text="`Invoice #${invoice.invoice_code}`"></div>
+                        <v-row no-gutters>
+                            <v-col cols="6">
+                                <div class="text-h4" v-text="`Invoice #${invoice.invoice_code}`"></div>
+                            </v-col>
+                            <v-col cols="6" class="d-flex flex-row-reverse">
+                                <v-btn rounded outlined small @click="deleteInvoice">Delete</v-btn>
+                            </v-col>
+                        </v-row>
                         <v-row no-gutters>
                             <v-col cols="12" md="6" class="d-flex flex-row">
                                 <div class="mr-4"><b>Status:</b> {{status}}</div>
@@ -122,6 +129,15 @@ export default {
     methods: {
         goToInvoices () {
             this.$router.push({ path: `/invoices` });
+        },
+        deleteInvoice () {
+            this.$store.dispatch('invoices/delete', { invoice: this.invoice })
+                .then(elem => {
+                    this.$router.push({ path: `/invoices` });
+                })
+                .catch(err => {
+                    this.errors = err;
+                });
         },
         addPayment (payment) {
             this.$store.dispatch('invoices/payment_add', { invoice: this.invoice, payment, user: this.loggeduser })
