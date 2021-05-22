@@ -83,8 +83,13 @@ export const actions = {
 	},
     async delete({ commit }, { transaction }) {
         try {
-            let { id } = transaction;
-            const res = await this.$fire.firestore.collection('transactions').doc(id).delete();
+            let { id, category } = transaction;
+            const transactionRes = await this.$fire.firestore.collection('transactions').doc(id).delete();
+
+            if (category !== null && category.hasOwnProperty('account_type') && category.account_type === 'Invoice Payment') {
+                const paymentRes = await this.$fire.firestore.doc(category.id).delete();
+            }
+
             commit('stripList', transaction);
         }
         catch (err) {

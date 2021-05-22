@@ -605,8 +605,8 @@ export default {
                 this.category_types[type].forEach(group => {
                     let _temp = [];
                     Object.entries(this.accounts).filter(elem => elem[1].account_type === group.item).forEach(elem => {
-                    let { name } = elem[1];
-                        _temp.push({ name, id: `tenant_accounts/${this.tenant}/accounts/${elem[0]}` });
+                    let { name, account_type } = elem[1];
+                        _temp.push({ name, account_type, id: `tenant_accounts/${this.tenant}/accounts/${elem[0]}` });
                     });
                     if (_temp.length > 0) {
                         _categories.push({ header: group.value });

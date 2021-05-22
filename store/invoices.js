@@ -139,6 +139,7 @@ export const actions = {
 				amount,
 				category: {
 					id: `invoices/${invoiceid}/payments/${paymentRef.id}`,
+					account_type: 'Invoice Payment',
 					name: `Invoice #${invoice_code} from ${customer.account}`,
 				},
 				created: this.$fireModule.firestore.FieldValue.serverTimestamp(),
