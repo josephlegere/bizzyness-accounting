@@ -22,7 +22,7 @@
                                 <div class="text-h4" v-text="`Invoice #${invoice.invoice_code}`"></div>
                             </v-col>
                             <v-col cols="6" class="d-flex flex-row-reverse">
-                                <v-btn rounded outlined small @click="deleteInvoice">Delete</v-btn>
+                                <v-btn rounded outlined small @click="confirmDelete = true">Delete</v-btn>
                             </v-col>
                         </v-row>
                         <v-row no-gutters>
@@ -95,6 +95,39 @@
                         <InvoiceView :invoice="invoice" />
                     </v-card>
                 </v-col>
+
+                <v-dialog
+                    v-model="confirmDelete"
+                    max-width="290"
+                >
+                    <v-card rounded="xl">
+                        <v-card-title class="headline">Delete Invoice</v-card-title>
+
+                        <v-card-text>
+                            Are you sure you want to delete this Invoice?
+                        </v-card-text>
+
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+
+                            <v-btn
+                                color="#303030"
+                                text
+                                @click="confirmDelete = false"
+                            >
+                                Cancel
+                            </v-btn>
+
+                            <v-btn
+                                color="#663b0e"
+                                dark
+                                @click="deleteInvoice"
+                            >
+                                Delete
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             </v-row>
             <v-row no-gutters v-else>
                 <v-col>
@@ -123,6 +156,7 @@ export default {
         return {
             loading: false,
             errors: '',
+            confirmDelete: false,
             newPayment: null
         }
     },
