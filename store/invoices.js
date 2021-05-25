@@ -229,9 +229,7 @@ export const mutations = {
     setList: (state, invoices) => (state.list = invoices),
 	setInvoice: (state, invoice) => (state.invoice = invoice),
 	stripList: (state, invoice) => (state.invoice = null),
-    setNext(state, invoice) {
-        state.current = invoice;
-    },
+    setNext: (state, invoice) => (state.current = invoice),
 	setPayments: (state, payments) => (state.invoice.payments = payments),
 	newPayment: (state, payment) => (state.invoice.payments.push(payment)),
 	deletePayment: (state, payment) => (state.invoice.payments = state.invoice.payments.filter(elem => elem.id !== payment)),

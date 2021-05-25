@@ -127,11 +127,11 @@ export default {
 					title: 'Chart of Accounts',
 					to: '/accounts'
 				},
-				// {
-				// 	icon: 'mdi-chart-bar',
-				// 	title: 'Reports',
-				// 	to: '/accounts'
-				// }
+				{
+					icon: 'mdi-chart-bar',
+					title: 'Reports',
+					to: '/reports'
+				}
 			],
 			miniVariant: false,
 			right: true,
