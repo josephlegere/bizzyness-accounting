@@ -7,20 +7,51 @@
 			app
 		>
 			<v-list>
-				<v-list-item
+				<div
 					v-for="(item, i) in items"
 					:key="i"
-					:to="item.to"
-					router
-					exact
 				>
-					<v-list-item-action>
-						<v-icon>{{ item.icon }}</v-icon>
-					</v-list-item-action>
-					<v-list-item-content>
-						<v-list-item-title v-text="item.title" />
-					</v-list-item-content>
-				</v-list-item>
+					<v-list-item
+						v-if="!item.sublinks"
+						:to="item.to"
+						router
+						exact
+					>
+						<!-- <v-list-item-action>
+							<v-icon>{{ item.icon }}</v-icon>
+						</v-list-item-action> -->
+						<v-list-item-content>
+							<v-list-item-title v-text="item.title" />
+						</v-list-item-content>
+					</v-list-item>
+					<v-expansion-panels
+						accordion
+						flat
+						v-else
+					>
+    					<v-expansion-panel>
+							<v-expansion-panel-header style="min-height: 48px;">
+								<!-- <v-icon>{{ item.icon }}</v-icon> -->
+								{{ item.title }}
+							</v-expansion-panel-header>
+							<v-expansion-panel-content class="expandable-nav">
+								<v-list class="pa-0">
+									<v-list-item
+										v-for="(sublink, j) in item.sublinks"
+										:key="j"
+										:to="sublink.to"
+										router
+										exact
+									>
+										<v-list-item-content>
+											<v-list-item-title v-text="sublink.title" />
+										</v-list-item-content>
+									</v-list-item>
+								</v-list>
+							</v-expansion-panel-content>
+    					</v-expansion-panel>
+					</v-expansion-panels>
+				</div>
 			</v-list>
 			<div>
 				<v-btn
@@ -65,9 +96,9 @@
 			<v-list>
 				<v-list-item @click.native="right = !right">
 					<v-list-item-action>
-					<v-icon light>
-						mdi-repeat
-					</v-icon>
+						<v-icon light>
+							mdi-repeat
+						</v-icon>
 					</v-list-item-action>
 					<v-list-item-title>Switch drawer (click me)</v-list-item-title>
 				</v-list-item>
@@ -104,13 +135,19 @@ export default {
 				},
 				{
 					icon: 'mdi-form-select',
-					title: 'Invoices',
-					to: '/invoices'
-				},
-				{
-					icon: 'mdi-text-box-plus-outline',
-					title: 'Create Invoice',
-					to: '/invoices/create'
+					title: 'Sales',
+					sublinks: [
+						{
+							icon: 'mdi-form-select',
+							title: 'Invoices',
+							to: '/invoices'
+						},
+						{
+							icon: 'mdi-text-box-plus-outline',
+							title: 'Create Invoice',
+							to: '/invoices/create'
+						}
+					]
 				},
 				{
 					icon: 'mdi-account-group',
@@ -154,6 +191,10 @@ export default {
 </script>
 
 <style>
+	.expandable-nav .v-expansion-panel-content__wrap {
+		padding:					0px;
+	}
+
     .handle {
         cursor:                     grab;
     }
