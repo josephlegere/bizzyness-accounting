@@ -11,6 +11,15 @@
                         <v-list-item-group>
                             <v-list-item>
                                 <v-list-item-content>
+                                    <v-list-item-title v-text="'Profit & Loss (Income Statement)'"></v-list-item-title>
+                                    <v-list-item-subtitle v-text="'This is a summary of your revenue and expenses, which is used to calculate your profit.'"></v-list-item-subtitle>
+                                </v-list-item-content>
+                                <v-list-item-icon>
+                                    <v-icon v-text="'mdi-chevron-right'"></v-icon>
+                                </v-list-item-icon>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-list-item-content>
                                     <v-list-item-title v-text="'Balance Sheet'"></v-list-item-title>
                                     <v-list-item-subtitle v-text="'To calculate the profit made by the company, a summary of revenue and expenditures must be provided.'"></v-list-item-subtitle>
                                 </v-list-item-content>
