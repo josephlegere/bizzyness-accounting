@@ -407,7 +407,7 @@ export default {
         if (process.server) {
             rawCurrency = JSON.parse(require('fs').readFileSync('./static/data/currency.json', 'utf8'))
         } else {
-            rawCurrency = await $axios.get('/data/currency.json').then(res => res.data)
+            rawCurrency = await $axios.get(`${process.env.BASE_URL}/data/currency.json`).then(res => res.data)
         }
         return { rawCurrency };
     }
